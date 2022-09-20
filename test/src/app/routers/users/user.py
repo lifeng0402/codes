@@ -9,4 +9,4 @@
 from fastapi import APIRouter
 
 
-router = APIRouter(prefix = "/auth")
+router = APIRouter(prefix = "/users")

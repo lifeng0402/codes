@@ -7,3 +7,4 @@ pymysql
 redis
 pydantic
 cryptography
+alembic
