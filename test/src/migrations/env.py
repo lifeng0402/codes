@@ -9,7 +9,7 @@ import sys, os
 curPath = os.path.abspath(os.path.dirname(__file__))
 rootPath = os.path.split(curPath)[0]
 sys.path.append(os.path.split(rootPath)[0])
-from src.app.models import BASE
+from src.app.models.users_model import BASE
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

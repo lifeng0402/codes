@@ -11,23 +11,27 @@ from src.app.models import *
 __all__ = ["Users", "Items"]
 
 
-class Users(BASE):
+class Users(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String(50), unique=True, index=True)
-    password = Column(String(50))
+    password = Column(String(50), index=True)
     is_active = Column(Boolean, default=True)
+    created_time = Column(TIMESTAMP, nullable=False, default=datetime.now())
+    updated_time = Column(TIMESTAMP, nullable=False, default=datetime.now())
 
-    items = relationship("Item", back_populates="owner")
+    items = relationship("Items", back_populates="users")
 
 
-class Items(BASE):
+class Items(Base):
     __tablename__ = "items"
 
     id = Column(Integer, primary_key=True, index=True)
-    title = Column(String(50), index=True)
-    description = Column(String(200), index=True)
+    mail = Column(String(50), index=True)
+    brief_introduction = Column(String(200), index=True)
+    created_time = Column(TIMESTAMP, nullable=False, default=datetime.now())
+    updated_time = Column(TIMESTAMP, nullable=False, default=datetime.now())
     owner_id = Column(Integer, ForeignKey("users.id"))
 
-    owner = relationship("User", back_populates="items")
+    users = relationship("Users", back_populates="items")

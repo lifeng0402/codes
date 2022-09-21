@@ -13,6 +13,15 @@ from pydantic import BaseModel
 class UserBase(BaseModel):
     username: str
 
+    def __repr__(self):
+        return self.username
+
 
 class UserPwd(UserBase):
     password: str
+
+    def __repr__(self):
+        return self.username, self.password
+
+    class Config:
+        orm_mode = True

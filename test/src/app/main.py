@@ -8,24 +8,16 @@
 
 import uvicorn
 from fastapi import FastAPI
-from src.app.models import BASE
-from src.app.public.databases import CONNECTDB
-from src.app.public.databases import DATABASES
+# from src.app.models import BASE
+from src.app.routers.users import user
+# from src.app.public.databases import DATABASES
 
 # 绑定连接，使用表元数据和引擎
-BASE.metadata.create_all(bind=DATABASES.ENGINE)
+# BASE.metadata.create_all(bind=DATABASES.ENGINE)
 
 app = FastAPI()
 
-
-def get_db():
-    """
-    初始化持久对象，并yield返回
-    无论失败与否最后都会调用关闭
-    :return:
-    """
-    with CONNECTDB(var=DATABASES.SESSIONLOCAL) as db:
-        yield db
+app.include_router(router=user.router, tags=["用户模块"])
 
 
 @app.get("/")
