@@ -9,7 +9,7 @@ import sys, os
 curPath = os.path.abspath(os.path.dirname(__file__))
 rootPath = os.path.split(curPath)[0]
 sys.path.append(os.path.split(rootPath)[0])
-from src.app.models.users_model import BASE
+from src.app.models.users_model import Base
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -25,7 +25,7 @@ if config.config_file_name is not None:
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 # target_metadata = None
-target_metadata = BASE.metadata
+target_metadata = Base.metadata
 
 
 # other values from the config, defined by the needs of env.py,
