@@ -16,7 +16,7 @@ __all__ = ["TestResponse"]
 class TestResponse:
 
     @classmethod
-    def encode_json(cls, data: Any):
+    def _encode_json(cls, data: Any):
         """
         接收的数据处理成json返回
         :param data:
@@ -27,24 +27,29 @@ class TestResponse:
         )
 
     @classmethod
-    def successful(cls, code: int = 1, msg: str = "操作成功", data: Any = None):
+    def successful(cls, status: int = 1, msg: str = "操作成功", data: Any = None, response: Any = None):
         """
         接口请求成功的返回方法
-        :param code:
+        :param status:
         :param msg:
         :param data:
-        :param token:
+        :param response:
         :return:
         """
-        return cls.encode_json(dict(code=code, msg=msg, data=data))
+        if response:
+            return cls._encode_json(dict(response))
+        return cls._encode_json(dict(code=status, msg=msg, data=data))
 
     @classmethod
-    def defeated(cls, *, code: int = 0, msg: str = "操作失败", data: Any = None):
+    def defeated(cls, *, status: int = 0, msg: str = "操作失败", data: Any = None, response: Any = None):
         """
         接口请求失败的返回方法
-        :param code:
+        :param status:
         :param msg:
         :param data:
+        :param response:
         :return:
         """
-        return dict(code=code, msg=str(msg), data=data)
+        if response:
+            return cls._encode_json(dict(response))
+        return dict(code=status, msg=str(msg), data=data)

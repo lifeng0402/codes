@@ -7,7 +7,7 @@
 """
 
 import redis
-from src.app import settings as st
+from src.app import setting as st
 
 __all__ = ["redispy"]
 

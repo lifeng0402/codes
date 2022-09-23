@@ -6,12 +6,15 @@
 # @File    : access_token.py
 # @Software: PyCharm
 
-from typing import Optional
+from jose import jwt
+from jose import JWTError
 from fastapi import Header
-from jose import JWTError, jwt
+from typing import Optional
 from src.app.config import ReadConfig
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
+from src.app.public.redispy import redispy
+from jose.exceptions import ExpiredSignatureError
 
 __all__ = ["AccessToken"]
 
@@ -47,17 +50,19 @@ class AccessToken:
             #   解析token值
             payload = jwt.decode(token, key=cls._KEY, algorithms=cls._ALGORITHM)
             username: str = payload["username"]
+            exception_info = Exception(" 凭证错误或失效啦...... ")
             #   判断用户是不是空值
             if username is None:
-                raise Exception(" 凭证错误或已失效啦...... ")
+                raise exception_info
             #  redis读取token值
             redis_token = redispy.get_value(username, is_data=True)
             #   如不满足条件则抛出错误
             if not username and not redis_token and redis_token != token:
-                raise Exception("凭证错误或已失效啦...... ")
-            return
-        except JWTError:
-            raise Exception("用户未登录或者登陆 token 已经失效！")
+                raise exception_info
+        except ExpiredSignatureError:
+            raise Exception(" 登录凭证失效，请重新登录 ！")
+        except Exception or JWTError:
+            raise Exception("登录状态校验失败, 请重新登录 ！")
 
     @classmethod
     def encryption_password(cls, *, pwd: str):

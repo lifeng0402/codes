@@ -4,7 +4,7 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo 'Asia/Shangh
 
 WORKDIR /code
 
-COPY ./requirements.txt /code/requirements.txt
+COPY ../requirements.txt /code/requirements.txt
 
 RUN  python -m pip install --upgrade pip && pip install --no-cache-dir --upgrade -r /code/requirements.txt -i https://pypi.douban.com/simple/
 

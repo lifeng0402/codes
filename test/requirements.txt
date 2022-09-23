@@ -9,3 +9,4 @@ pydantic
 cryptography
 alembic
 flet
+httpx[cli]

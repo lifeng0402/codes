@@ -8,7 +8,7 @@
 
 from typing import Union
 from pydantic import BaseModel
-from pydantic import validator, validators
+from pydantic import validator
 
 
 class UserBase(BaseModel):
