@@ -7,7 +7,6 @@
 # @Software: PyCharm
 
 from sqlalchemy import select, and_
-from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from src.app.models import users_model
 from src.app.public.logger import do_logger

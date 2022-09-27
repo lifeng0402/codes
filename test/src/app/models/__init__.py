@@ -8,7 +8,6 @@
 
 from datetime import datetime
 from sqlalchemy.orm import relationship
-from src.app.public.databases import Base
+from src.app.public.databases import Engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, TIMESTAMP
-
+from sqlalchemy import Table, Boolean, Column, ForeignKey, Integer, String, TIMESTAMP

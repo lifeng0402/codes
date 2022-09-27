@@ -16,16 +16,26 @@ router = APIRouter(
 )
 
 
+@router.post("/save")
+async def request_data_save():
+    pass
+
+
 @router.post("/request")
 async def request_http(data: HttpBody):
+    """
+    请求HTTP协议接口
+    :param data:
+    :return:
+    """
     try:
-        response = HttpRequest(
+        response = HttpRequest().request(
             method=data.method,
             url=data.url,
-            body_type=data.body_type,
+            body=data.body,
             headers=data.headers,
-            body=data.body
-        ).request.json()
+            body_type=data.body_type
+        )
         return TestResponse.successful(response=response)
     except Exception as e:
-        return TestResponse.defeated(msg=str(e.args[0]), data={})
+        return TestResponse.defeated(msg=str(e.args[0]))

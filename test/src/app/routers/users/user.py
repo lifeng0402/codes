@@ -37,9 +37,9 @@ async def register_user(user: UserPwd, db: Session = Depends(session_local)):
         databases_users = DatabasesUsers(db=db)
         data = databases_users.register_users(user=user)
         if status.HTTP_200_OK and data:
-            return TestResponse.successful(code=status.HTTP_200_OK, msg="注册成功，请登录 ！", data=data)
+            return TestResponse.successful(msg="注册成功，请登录 ！", data=data)
     except Exception as e:
-        return TestResponse.defeated(code=status.HTTP_400_BAD_REQUEST, msg=str(e.args[0]), data={})
+        return TestResponse.defeated(msg=str(e.args[0]), data={})
 
 
 @router.post("/login")
@@ -54,15 +54,14 @@ async def login_user(user: UserPwd, background_tasks: BackgroundTasks, db: Sessi
     try:
         databases_users = DatabasesUsers(db=db)
         if databases_users.login_users(user=user):
-            token, expire = AccessToken.generate_access_token(data={"username": user.username},)
+            token, expire = AccessToken.generate_access_token(data={"username": user.username}, )
 
         # 后台运行写入token到redis数据库
         background_tasks.add_task(redispy.set_value, user.username, token, is_data=True)
 
         return TestResponse.successful(
-            data=dict(username=user.username, expire=expire, token=token),
-            code=status.HTTP_201_CREATED,
-            msg="登录成功 ！"
+            msg="登录成功 ！",
+            data=dict(username=user.username, expire=expire, token=token)
         )
     except Exception as e:
-        return TestResponse.defeated(code=status.HTTP_401_UNAUTHORIZED, msg=str(e.args[0]), data={})
+        return TestResponse.defeated(msg=str(e.args[0]), data={})

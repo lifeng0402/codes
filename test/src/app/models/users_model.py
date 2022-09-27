@@ -8,6 +8,9 @@
 
 from src.app.models import *
 
+# 定义一个ORM模型基类
+Base = declarative_base(Engine)
+
 __all__ = ["Users", "Items"]
 
 
