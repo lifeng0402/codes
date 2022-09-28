@@ -22,4 +22,3 @@ class BodyType(IntEnum):
     form_urlencoded = 3
     binary = 4
     graphQL = 5
-

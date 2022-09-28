@@ -8,9 +8,8 @@
 
 from fastapi import Depends
 from fastapi import APIRouter
-from src.app.dependencies.access_token import AccessToken
 from src.app.handler.fatcory import TestResponse
-from fastapi import status
+from src.app.dependencies.access_token import AccessToken
 
 router = APIRouter(
     dependencies=[Depends(AccessToken.verify_token)]
@@ -20,6 +19,6 @@ router = APIRouter(
 @router.get("/")
 async def index():
     try:
-        return TestResponse.successful(code=status.HTTP_200_OK, msg="欢迎来到首页...", data={})
+        return TestResponse.successful(msg="欢迎来到 1024 测试平台 ...", data={})
     except Exception as e:
         return TestResponse.defeated(msg=str(e.args[0]), data={})

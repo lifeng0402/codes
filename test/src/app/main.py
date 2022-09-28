@@ -25,3 +25,4 @@ app.include_router(router=request.router, tags=["首页模块"])
 
 if __name__ == '__main__':
     uvicorn.run(app="src.app.main:app", port=8086, host="0.0.0.0", debug=True)
+

@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @Time    : 2022/9/23 17:27
+# @Time    : 2022/9/28 15:52
 # @Author  : debugfeng
 # @Site    : 
-# @File    : http_schemas.py
+# @File    : cases_schemas.py
 # @Software: PyCharm
 
 from pydantic import validator
@@ -11,11 +11,11 @@ from typing import Union, Optional
 from pydantic import BaseModel, HttpUrl
 from src.app.handler.enum_fatcory import BodyType
 
-__all__ = ["HttpBody"]
+__all__ = ["CaseDatas"]
 
 
-class HttpBody(BaseModel):
-    title: str
+class CaseDatas(BaseModel):
+    name: str
     method: str
     url: HttpUrl
     headers: dict

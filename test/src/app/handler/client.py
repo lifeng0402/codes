@@ -10,6 +10,7 @@ import os.path
 
 import httpx
 import typing
+from httpx import Response
 from functools import wraps
 from json import JSONDecodeError
 from src.app.public.logger import do_logger
@@ -39,11 +40,11 @@ class HttpRequest:
         self.verify = False
 
     @staticmethod
-    def log_request(request):
+    def _log_request(request):
         do_logger.info(f"Request event hook: [ {request.method} : {request.url} ] - Waiting for response")
 
     @staticmethod
-    def log_response(response):
+    def _log_response(response):
         request = response.request
         do_logger.info(f"Response event hook: [ {request.method} : {request.url} ] - Status [ {response.status_code} ]")
 
@@ -56,7 +57,7 @@ class HttpRequest:
             return results
 
     @classmethod
-    def default_headers(cls, *, body_type: BodyType, **kwargs: typing.Any):
+    def _default_headers(cls, *, body_type: BodyType, **kwargs: typing.Any):
         if not hasattr(kwargs, "headers"):
             # 把获取的数据转成字典
             headers = dict(kwargs.get("headers"))
@@ -72,6 +73,8 @@ class HttpRequest:
                         headers.update({"Content-Type": "multipart/form-data"})
                     case BodyType.binary:
                         headers.update({"Content-Type": "binary"})
+                    case BodyType.graphQL:
+                        headers.update({"Content-Type": "binary"})
                     case _:
                         pass
                 return headers
@@ -79,7 +82,7 @@ class HttpRequest:
                 raise Exception("headers必须要存在")
 
     @classmethod
-    def default_files(cls, **kwargs: typing.Any):
+    def _default_files(cls, **kwargs: typing.Any):
         # 判断files字段是否存在
         if not hasattr(kwargs, "files"):
             files = kwargs.get("files")
@@ -94,7 +97,12 @@ class HttpRequest:
                 pass
 
     @classmethod
-    def default_body(cls, **kwargs: typing.Any):
+    def _default_body(cls, **kwargs: typing.Any):
+        """
+        处理body传参
+        :param kwargs:
+        :return:
+        """
         if not hasattr(kwargs, "body"):
             body = kwargs.get("body")
             if body:
@@ -106,30 +114,55 @@ class HttpRequest:
             else:
                 pass
 
-    def request(self, *, method: str, url: str, body_type: BodyType, **kwargs: typing.Any):
-
-        # 判断url开头是不是http、https开头
-        if not url.startswith(("http://", "https://")):
-            raise Exception("请输入正确的url, 记得带上http或https")
-
-        headers = self.default_headers(body_type=body_type, **kwargs)
-        body, files = self.default_body(**kwargs), self.default_files(**kwargs)
-
-        # 根据传参类型判断，然后执行请求接口操作
-        match body_type:
-            case BodyType.json:
-                return self._send_request_safe(method=method, url=url, json=body, headers=headers)
-            case BodyType.form_urlencoded:
-                return self._send_request_safe(method=method, url=url, data=body, headers=headers)
-            case (BodyType.binary, BodyType.form_data.value):
-                if not files:
-                    return self._send_request_safe(method=method, url=url, data=body, headers=headers)
-                else:
-                    return self._send_request_safe(method=method, url=url, data=body, files=files, headers=headers)
-            case _:
+    @classmethod
+    def _default_params(cls, **kwargs: typing.Any):
+        """
+        处理
+        :param kwargs:
+        :return:
+        """
+        if not hasattr(kwargs, "params"):
+            params = kwargs.get("params")
+            if params:
+                return params
+            else:
                 pass
 
-        return self._send_request_safe(method=method, url=url, **kwargs)
+    def request(self, *, method: str, url: str, body_type: BodyType, **kwargs: typing.Any):
+
+        try:
+            # 判断url开头是不是http、https开头
+            if not url.startswith(("http://", "https://")):
+                raise Exception("请输入正确的url, 记得带上http或https")
+
+            body, params = self._default_body(**kwargs), self._default_params(**kwargs)
+            headers, files = self._default_headers(body_type=body_type, **kwargs), self._default_files(**kwargs)
+
+            # 根据传参类型判断，然后执行请求接口操作
+            match body_type:
+                case BodyType.json:
+                    return self._send_request_safe(method=method, url=url, json=body, params=params, headers=headers)
+                case BodyType.form_urlencoded:
+                    return self._send_request_safe(method=method, url=url, data=body, params=params, headers=headers)
+                case (BodyType.binary, BodyType.form_data.value):
+                    if not files:
+                        return self._send_request_safe(
+                            method=method, url=url, data=body, params=params, headers=headers
+                        )
+                    else:
+                        return self._send_request_safe(
+                            method=method, url=url, data=body, params=params, files=files, headers=headers
+                        )
+                case BodyType.graphQL:
+                    pass
+                case _:
+                    return self._send_request_safe(method=method, url=url, **kwargs)
+
+            return self._send_request_safe(method=method, url=url, **kwargs)
+
+        except Exception as ex:
+            do_logger.error(ex)
+            raise ex
 
     @d_response
     def _send_request_safe(self, *, method: str, url: str, **kwargs: typing.Any):
@@ -149,7 +182,9 @@ class HttpRequest:
         except (RequestError, InvalidURL) as ex:
             do_logger.error(f"请检查URL是否正确：{ex}")
             raise ex
-        except (HTTPStatusError, Exception) as ex:
+        except HTTPStatusError as ex:
+            raise ex
+        except Exception as ex:
             do_logger.error(f"异常错误：{ex}")
             raise ex
 

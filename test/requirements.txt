@@ -10,3 +10,4 @@ cryptography
 alembic
 flet
 httpx[cli]
+jsonpath

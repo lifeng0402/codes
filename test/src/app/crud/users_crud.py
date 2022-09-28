@@ -6,11 +6,12 @@
 # @File    : users_crud.py
 # @Software: PyCharm
 
-from sqlalchemy import select, and_
 from sqlalchemy.orm import Session
+from sqlalchemy import select, and_
 from src.app.models import users_model
 from src.app.public.logger import do_logger
 from src.app.schemas.users import user_schemas
+from src.app.public.databases import database_commit
 from src.app.dependencies.access_token import AccessToken
 
 
@@ -42,13 +43,14 @@ class DatabasesUsers:
             # 对密码进行加密处理
             hashed_password = AccessToken.encryption_password(pwd=user.password)
             db_users = self._users(username=user.username, password=hashed_password, mobile=user.mobile)
-            # 添加用户数据
-            self._session.add(db_users)
-            # 提交用户数据
-            self._session.commit()
-            # # 刷新用户数据
-            self._session.refresh(db_users)
-            return db_users
+            # 提交数据成功后并执行刷新
+            database_commit(_session=self._session, _datas=db_users)
+            # 查询数据并返回
+            return self._session.execute(
+                select(
+                    self._users.username, self._users.mobile, self._users.is_active
+                ).where(and_(self._users.username == user.username, self._users.mobile == user.mobile))
+            ).first()
         except Exception as e:
             do_logger.error(f"用户注册失败: {str(e)}")
             raise Exception("注册失败 ！")
