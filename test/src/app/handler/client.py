@@ -5,46 +5,47 @@
 # @Site    : 
 # @File    : client.py
 # @Software: PyCharm
+
+import ast
 import json
 import os.path
-
 import httpx
 import typing
 from httpx import Response
 from functools import wraps
 from json import JSONDecodeError
 from src.app.public.logger import do_logger
-from src.app.handler.enum_fatcory import BodyType
+from src.app.enumeration.request_enum import BodyType
 from httpx import HTTPStatusError, RequestError, InvalidURL
 
 __all__ = ["HttpRequest"]
 
 
-def d_response(func):
-    @wraps(func)
-    def response_wraps(*args, **kwargs):
-        results = func(*args, **kwargs)
-        try:
-            return results.json()
-        except JSONDecodeError:
-            return results.text.encode("utf-8")
-        except Exception as ex:
-            do_logger.error(f"非json和text类型返回值: {ex}")
-            raise ex
-
-    return response_wraps
+# def _response(func):
+#     @wraps(func)
+#     def response_wraps(*args, **kwargs):
+#         results = func(*args, **kwargs)
+#         try:
+#             return results.json()
+#         except JSONDecodeError:
+#             return results.text.encode("utf-8")
+#         except Exception as ex:
+#             do_logger.error(f"非json和text类型返回值: {ex}")
+#             raise ex
+#
+#     return response_wraps
 
 
 class HttpRequest:
     def __init__(self):
         self.verify = False
 
-    @staticmethod
-    def _log_request(request):
+    @classmethod
+    def _log_request(cls, request):
         do_logger.info(f"Request event hook: [ {request.method} : {request.url} ] - Waiting for response")
 
-    @staticmethod
-    def _log_response(response):
+    @classmethod
+    def _log_response(cls, response):
         request = response.request
         do_logger.info(f"Response event hook: [ {request.method} : {request.url} ] - Status [ {response.status_code} ]")
 
@@ -110,7 +111,7 @@ class HttpRequest:
                     # 判断数据类型是不是字典，不是就转下，是就是直接返回
                     return kwargs.get("body") if isinstance(body, dict) else json.loads(body)
                 except JSONDecodeError:
-                    raise
+                    raise Exception("非json数据无法解析")
             else:
                 pass
 
@@ -123,48 +124,67 @@ class HttpRequest:
         """
         if not hasattr(kwargs, "params"):
             params = kwargs.get("params")
-            if params:
-                return params
-            else:
-                pass
+            return params if params else None
 
     def request(self, *, method: str, url: str, body_type: BodyType, **kwargs: typing.Any):
 
-        try:
-            # 判断url开头是不是http、https开头
-            if not url.startswith(("http://", "https://")):
-                raise Exception("请输入正确的url, 记得带上http或https")
+        # 判断url开头是不是http、https开头
+        if not url.startswith(("http://", "https://")):
+            raise Exception("请输入正确的url, 记得带上http或https")
 
-            body, params = self._default_body(**kwargs), self._default_params(**kwargs)
-            headers, files = self._default_headers(body_type=body_type, **kwargs), self._default_files(**kwargs)
+        body, params = self._default_body(**kwargs), self._default_params(**kwargs)
+        headers, files = self._default_headers(body_type=body_type, **kwargs), self._default_files(**kwargs)
 
-            # 根据传参类型判断，然后执行请求接口操作
-            match body_type:
-                case BodyType.json:
-                    return self._send_request_safe(method=method, url=url, json=body, params=params, headers=headers)
-                case BodyType.form_urlencoded:
-                    return self._send_request_safe(method=method, url=url, data=body, params=params, headers=headers)
-                case (BodyType.binary, BodyType.form_data.value):
-                    if not files:
-                        return self._send_request_safe(
-                            method=method, url=url, data=body, params=params, headers=headers
-                        )
-                    else:
-                        return self._send_request_safe(
+        # 根据传参类型判断，然后执行请求接口操作
+        match body_type:
+            case BodyType.json:
+                return self._response(
+                    self._send_request_safe(method=method, url=url, json=body, params=params, headers=headers)
+                )
+            case BodyType.form_urlencoded:
+                return self._response(
+                    self._send_request_safe(method=method, url=url, data=body, params=params, headers=headers)
+                )
+            case (BodyType.binary, BodyType.form_data.value):
+                if not files:
+                    return self._response(
+                        self._send_request_safe(method=method, url=url, data=body, params=params, headers=headers)
+                    )
+                else:
+                    return self._response(
+                        self._send_request_safe(
                             method=method, url=url, data=body, params=params, files=files, headers=headers
-                        )
-                case BodyType.graphQL:
-                    pass
-                case _:
-                    return self._send_request_safe(method=method, url=url, **kwargs)
+                        ))
+            case BodyType.graphQL:
+                pass
+            case _:
+                return self._response(self._send_request_safe(method=method, url=url, **kwargs))
 
-            return self._send_request_safe(method=method, url=url, **kwargs)
-
-        except Exception as ex:
-            do_logger.error(ex)
+    @classmethod
+    def _response(cls, response: Response):
+        """
+        处理返回值
+        :param response:
+        :return:
+        """
+        try:
+            response.raise_for_status()
+        except (RequestError, Exception) as ex:
             raise ex
+        else:
+            do_logger.info(
+                f"""
+                ----------------------------------------------------------------------
+                请求方式：{response.request.method}
+                请求 URL：{response.request.url}
+                请求Header：{response.request.headers.multi_items()}
+                请求参数：{ast.literal_eval(response.request.content.decode("utf-8"))}
+                请求结果：{ast.literal_eval(response.content.decode("utf-8"))}
+                ----------------------------------------------------------------------
+                """
+            )
+            return response
 
-    @d_response
     def _send_request_safe(self, *, method: str, url: str, **kwargs: typing.Any):
 
         # 转化成大写
@@ -175,7 +195,7 @@ class HttpRequest:
         try:
             # 调用httpx库用于请求接口
             with httpx.Client(
-                    event_hooks={'requests': [HttpRequest.log_request], 'response': [HttpRequest.log_response]}
+                    event_hooks={'requests': [self._log_request], 'response': [self._log_response]}
             ) as client:
                 client.verify = self.verify
                 return client.send(client.build_request(methods, url, **kwargs))

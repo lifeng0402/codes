@@ -6,41 +6,66 @@
 # @File    : extract_value.py
 # @Software: PyCharm
 
+import re
 import json
 import typing
 from jsonpath import jsonpath
 
+__all__ = ["ExtractValue"]
+
 
 class ExtractValue:
-    pass
 
     @classmethod
-    def extract(cls, response: typing.Any, expr):
-        if isinstance(response, dict):
-            response = json.loads(json.dumps(response))
-            return response
-            # return jsonpath(response, expr=f"$.{expr}")
+    def json_extract(cls, response: typing.Any, expr: jsonpath):
+        """
+        json数据提取参数
+        :param response:
+        :param expr:
+        :return:
+        """
+        try:
+            if isinstance(response, dict):
+                pass
+            if isinstance(response, str):
+                # 转成json字符串后再转成字典
+                response = json.loads(json.dumps(response))
+        except Exception as ex:
+            raise Exception(f"错误信息：{ex}")
+        else:
+            results = jsonpath(response, expr=f"$.{expr}")
+            return results if results else Exception("未提取到指定值，请检查 ！")
+
+    @classmethod
+    def regular_extract(cls, response: typing.Any, expr: str):
+        """
+        正则表达式提取参数
+        :param response:
+        :param expr:
+        :return:
+        """
+        try:
+            response = json.dumps(response)
+        except json.JSONDecodeError as ex:
+            raise Exception(f" json 数据解析失败：{ex}")
+        else:
+            results = re.search(pattern=expr, string=response)
+            return re.findall(pattern=expr, string=response) if results else Exception("未提取到指定值，请检查 ！")
 
 
 if __name__ == '__main__':
     datas = {
-    "code": 1,
-    "msg": "接口请求数据添加成功 ！",
-    "data": {
-        "method": "post",
-        "headers": {"Content-Type": "application/json; charset=UTF-8"},
-        "title": "登录接口4444",
-        "params": "None",
-        "cookies": "None",
-        "created_time": "2022-09-28 14:30:09",
-        "url": "https://api-lms3.9first.com/user/auth",
-        "id": 6,
-        "body_type": 1,
-        "body": {'user_name': 'account01', 'password': 'account01', 'scenario': 'web', 'day': 1},
-        "is_active": "true",
-        "updated_time": "2022-09-28 14:30:09"
+        "status": 1,
+        "data": {
+            "status": 1,
+            "id": 897777,
+            "token": "93afdf6c5b9214be269d1c37174be552",
+            "user_type": 2,
+            "company_id": 6923
+        },
+        "errMsg": "",
+        "errCode": 0
     }
-}
-    # print(ExtractValue.extract(datas, expr="data.headers.Content-Type"))
-    print(json.dumps(datas, indent=2))
+    # print(ExtractValue.extract(datas, expr="data.status"))
+    print(jsonpath(datas, "$.data.token"))
     # print(json.loads(json.dumps(datas, indent=4)))

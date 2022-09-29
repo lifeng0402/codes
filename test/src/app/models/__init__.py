@@ -10,4 +10,4 @@ from datetime import datetime
 from sqlalchemy.orm import relationship
 from src.app.public.databases import Engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Table, Boolean, Column, ForeignKey, Integer, String, TIMESTAMP, INT
+from sqlalchemy import Table, Boolean, Column, ForeignKey, Integer, String, TIMESTAMP, INT, TEXT

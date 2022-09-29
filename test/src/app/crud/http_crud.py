@@ -6,13 +6,12 @@
 # @File    : http_crud.py
 # @Software: PyCharm
 
-import json
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from src.app.models import datas_model
 from src.app.public.logger import do_logger
 from src.app.schemas.http import http_schemas
-from src.app.handler.enum_fatcory import BodyType
+from src.app.enumeration.request_enum import BodyType
 from src.app.public.databases import database_commit
 
 
@@ -42,7 +41,7 @@ class DatabasesHttp:
             case _:
                 return body_type.none.value
 
-    def request_save_http(self, *, data: http_schemas.HttpBody):
+    def request_save_http(self, *, data: http_schemas.HttpBodySave):
         """
         接口请求数据，新增到Datas表中
         :param data:
@@ -58,13 +57,12 @@ class DatabasesHttp:
 
             body_type = self._body_type_value_mode(body_type=data.body_type)
             db_datas = self._datas(
-                title=data.title, method=data.method, url=data.url, headers=data.headers,
-                body_type=body_type, body=data.body, params=data.params, cookies=data.cookies
-            ).to_dict()
-            # 提交数据成功后并执行刷新
-            database_commit(_session=self._session, _datas=db_datas)
-            # 查询数据并返回
-            return self._session.execute(select(self._datas).where(self._datas.title == data.title)).first()
+                title=data.title, method=data.method, url=data.url, headers=str(data.headers),
+                body_type=body_type, body=str(data.body), params=str(data.params),
+                cookies=str(data.cookies), actual=str(data.actual), expect=str(data.expect)
+            )
+            # 提交数据成功后执行刷新, 并返回数据
+            return database_commit(_session=self._session, _datas=db_datas)
         except Exception as ex:
             do_logger.error(f"数据添加失败: {str(ex)}")
             raise ex

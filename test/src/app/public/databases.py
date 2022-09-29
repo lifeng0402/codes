@@ -5,6 +5,7 @@
 # @Site    : 
 # @File    : databases.py
 # @Software: PyCharm
+import json
 import typing
 
 from src.app import setting as st
@@ -38,9 +39,16 @@ def session_local():
 
 
 def database_commit(*, _session: typing.Any, _datas: typing.Any):
+    """
+    提交指定数据
+    :param _session:
+    :param _datas:
+    :return:
+    """
     # 添加用户数据
     _session.add(_datas)
     # 提交用户数据
     _session.commit()
     # # 刷新用户数据
     _session.refresh(_datas)
+    return _datas

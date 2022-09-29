@@ -14,7 +14,7 @@ from src.app.handler.client import HttpRequest
 from src.app.crud.http_crud import DatabasesHttp
 from src.app.handler.fatcory import TestResponse
 from src.app.public.databases import session_local
-from src.app.schemas.http.http_schemas import HttpBody
+from src.app.schemas.http.http_schemas import HttpBody, HttpBodySave
 from src.app.dependencies.access_token import AccessToken
 
 router = APIRouter(
@@ -24,7 +24,7 @@ router = APIRouter(
 
 
 @router.post("/save")
-async def request_data_save(datas: HttpBody, db: Session = Depends(session_local)):
+async def request_data_save(datas: HttpBodySave, db: Session = Depends(session_local)):
     """
     存储请求参数接口
     :param datas:

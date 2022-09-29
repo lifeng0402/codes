@@ -9,13 +9,12 @@
 from pydantic import validator
 from typing import Union, Optional
 from pydantic import BaseModel, HttpUrl
-from src.app.handler.enum_fatcory import BodyType
+from src.app.enumeration.request_enum import BodyType
 
-__all__ = ["HttpBody"]
+__all__ = ["HttpBody", "HttpBodySave"]
 
 
 class HttpBody(BaseModel):
-    title: str
     method: str
     url: HttpUrl
     headers: dict
@@ -25,7 +24,20 @@ class HttpBody(BaseModel):
     cookies: Optional[Union[str, dict]] = None
 
     @classmethod
-    @validator('method', 'url', "headers")
+    @validator("method", "url", "headers")
+    def name_not_empty(cls, v):
+        if isinstance(v, str) and len(v.strip()) == 0:
+            raise ValueError(f"{v} 不能为空")
+        return v
+
+
+class HttpBodySave(HttpBody):
+    title: str
+    actual: Optional[Union[str, dict]] = None
+    expect: Optional[Union[str, dict]] = None
+
+    @classmethod
+    @validator("title", "method", "url", "headers")
     def name_not_empty(cls, v):
         if isinstance(v, str) and len(v.strip()) == 0:
             raise ValueError(f"{v} 不能为空")

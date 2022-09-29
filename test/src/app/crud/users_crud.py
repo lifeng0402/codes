@@ -43,14 +43,8 @@ class DatabasesUsers:
             # 对密码进行加密处理
             hashed_password = AccessToken.encryption_password(pwd=user.password)
             db_users = self._users(username=user.username, password=hashed_password, mobile=user.mobile)
-            # 提交数据成功后并执行刷新
-            database_commit(_session=self._session, _datas=db_users)
-            # 查询数据并返回
-            return self._session.execute(
-                select(
-                    self._users.username, self._users.mobile, self._users.is_active
-                ).where(and_(self._users.username == user.username, self._users.mobile == user.mobile))
-            ).first()
+            # 提交数据成功后执行刷新，并返回数据
+            return database_commit(_session=self._session, _datas=db_users)
         except Exception as e:
             do_logger.error(f"用户注册失败: {str(e)}")
             raise Exception("注册失败 ！")
