@@ -12,7 +12,7 @@ from src.app.docs import tags_metadata
 from src.app.routers.users import user
 from src.app.routers.home import index
 from src.app.routers.repuests import request
-from src.app.routers.project import case_management
+from src.app.routers.project import case_test
 
 app = FastAPI(
     title="Test测试平台接口文档",

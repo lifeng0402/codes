@@ -24,8 +24,9 @@ if config.config_file_name is not None:
 # target_metadata = None
 from src.app.models.users_model import Base as user_base
 from src.app.models.datas_model import Base as data_base
+from src.app.models.case_model import Base as case_base
 
-target_metadata = [user_base.metadata, data_base.metadata]
+target_metadata = [user_base.metadata, data_base.metadata, case_base.metadata]
 
 
 # other values from the config, defined by the needs of env.py,

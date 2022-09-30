@@ -5,7 +5,6 @@
 # @Site    : 
 # @File    : datas_model.py
 # @Software: PyCharm
-import json
 
 from src.app.models import *
 
@@ -29,12 +28,7 @@ class Datas(Base):
     cookies = Column(TEXT, comment="cookies")
     actual = Column(TEXT, comment="断言使用-接口的实际结果")
     expect = Column(TEXT, comment="断言使用-接口的预期结果")
+    comparison = Column(TEXT, comment="断言比较符号")
     is_active = Column(Boolean, default=True, comment="是否被删除")
     created_time = Column(TIMESTAMP, nullable=False, default=datetime.now(), comment="创建时间")
     updated_time = Column(TIMESTAMP, nullable=False, default=datetime.now(), comment="更新时间")
-
-    def to_json(self):
-        dict = self.__dict__
-        if "_sa_instance_state" in dict:
-            del dict["_sa_instance_state"]
-        return dict

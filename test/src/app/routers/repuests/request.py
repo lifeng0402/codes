@@ -23,22 +23,6 @@ router = APIRouter(
 )
 
 
-@router.post("/save")
-async def request_data_save(datas: HttpBodySave, db: Session = Depends(session_local)):
-    """
-    存储请求参数接口
-    :param datas:
-    :param db:
-    :return:
-    """
-    try:
-        databases_datas = DatabasesHttp(db=db)
-        data = databases_datas.request_save_http(data=datas)
-        return TestResponse.successful(msg="请求数据添加成功 ！", data=data)
-    except Exception as ex:
-        return TestResponse.defeated(msg=str(ex.args[0]))
-
-
 @router.post("/request")
 async def request_http(data: HttpBody):
     """
