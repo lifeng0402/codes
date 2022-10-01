@@ -20,10 +20,8 @@ router = APIRouter(
 async def request_http(data: HttpBody):
     try:
         response = HttpRequest(
-            method=data.method,
-            url=data.url,
-            body_type=data.body_type,
-            headers=data.headers,
+            method=data.method, url=data.url,
+            body_type=data.body_type, headers=data.headers,
             body=data.body
         ).request.json()
         return TestResponse.successful(response=response)
