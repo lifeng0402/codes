@@ -25,6 +25,7 @@ class Cases(Base):
     expect = Column(TEXT, comment="断言-预期结果")
     comparison = Column(TEXT, comment="断言符号")
     is_success = Column(Boolean, comment="是否执行成功")
+    is_fail = Column(Boolean, comment="是否执行失败")
     is_error = Column(Boolean, comment="是否错误")
     exception = Column(TEXT, comment="报错异常捕获")
     is_active = Column(Boolean, default=False, comment="是否被删除")

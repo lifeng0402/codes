@@ -12,49 +12,106 @@ import threading
 import typing
 from pydantic import HttpUrl
 from fastapi import status
+from sqlalchemy.orm import Session
 from src.app.constructor import affirm
+from src.app.crud.cases_crud import DatabasesCases
+from src.app.crud.report_crud import DatabasesReport
 from src.app.handler.client import HttpRequest
 from src.app.enumeration.request_enum import BodyType
 
 
 class ExecuteRun:
-    def __init__(self):
+    def __init__(self, *, db: Session):
         self._http = HttpRequest()
-        self._actual = None
-        self._expect = None
-        self._comparison = None
+        self._case = DatabasesCases(db=db)
+        self._report = DatabasesReport(db=db)
 
-    def _request_(self, method: str, url: HttpUrl, headers: dict, body_type: BodyType, **kwargs):
+    @staticmethod
+    def _read_request(*, key: str, _list: list):
+        """
+        获取列表中数据
+        :param key:
+        :param datas_list:
+        :return:
+        """
+        return tuple(i[key] for i in _list)[0]
 
-        results = self._http.request(method=method, url=url, headers=headers, body_type=body_type, **kwargs)
+    @staticmethod
+    def _handle_report(*, key: str, results: typing.Any):
+        """
 
-        if results.is_success:
-            match body_type:
-                case (BodyType.json):
-                    response = results.json()
-                    affirm.self_main(comparison=self._comparison, expect=self._expect, actual=response)
-                    return response
-                case (BodyType.binary, BodyType.form_data.value, BodyType.form_urlencoded):
-                    response = results.text
-                    return response
-                case BodyType.binary:
-                    pass
-                case _:
-                    response = results.text
-                    return response
-        if results.is_error or results.is_client_error or results.is_server_error:
-            return results.content.decode("utf-8")
+        :param key:
+        :param results:
+        :return:
+        """
+        return len(tuple(su[key] for su in results if su is not None))
 
+    def _handel_datas(self, datas: typing.Dict):
 
-def execute(self, *, response: typing.Any):
-    for items in response:
-        case_id, title, datas = items["id"], items["name"], items["datas"]
-        self._actual, self._expect, self._comparison = items["actual"], items["expect"], items["expect"]
-        is_success, is_error, exception = items["is_success"], items["is_error"], items["exception"]
+        if isinstance(datas, dict):
+            pass
+        if isinstance(datas, str):
+            datas = json.loads(datas)
 
-        self._request_()
+        data, request_data = datas, datas.get("datas")
 
-        for item in datas:
-            t = threading.Thread(target=self._request_, kwargs=item)
-            t.start()
-            print(t)
+        case_id = data.get("id")
+        case_name = data.get("name")
+        expect = data.get("expect")
+        comparison = data.get("comparison")
+
+        if not request_data:
+            raise Exception("datas为空...")
+
+        method = ExecuteRun._read_request(key="method", _list=request_data)
+        url = ExecuteRun._read_request(key="url", _list=request_data)
+        headers = ExecuteRun._read_request(key="headers", _list=request_data)
+        body = ExecuteRun._read_request(key="body", _list=request_data)
+        params = ExecuteRun._read_request(key="params", _list=request_data)
+        cookies = ExecuteRun._read_request(key="cookies", _list=request_data)
+        body_type = ExecuteRun._read_request(key="body_type", _list=request_data)
+
+        response = self._http.request(
+            method=method, url=url, headers=headers, body_type=body_type, body=body, params=params, cookies=cookies
+        )
+
+        try:
+            # 如果是json就返回json格式，否则返回文本格式
+            results = response.json() if body == BodyType.json else response.text.encode("utf-8")
+            results_info = {"case_id": case_id, "actual": results}
+            results_info["is_success"] = 1 if response.is_success else results_info["is_success"] = 2
+            return results_info
+
+        except Exception as ex:
+            return ex
+
+    def execute_cases(self, *, datas: typing.List):
+        """
+        执行测试用例
+        :param datas:
+        :return:
+        """
+
+        try:
+
+            datas = self._case.select_case_request(case_id=datas)
+
+            for case in datas:
+                self._handel_datas(datas=case)
+
+            total = len(datas)
+            results = self._case.select_cases_get(case_id=datas)
+
+            success = ExecuteRun._handle_report(key="is_success", results=results)
+            error = ExecuteRun._handle_report(key="is_error", results=results)
+            fail = ExecuteRun._handle_report(key="is_fail", results=results)
+            percent = (success / (total - error)) * 100
+
+            report_info = {
+                "cases_id": list(datas), "total": total, "success": success, "error": error,
+                "fail": fail, "percent": percent
+            }
+            self._report.insert_reports_info(report_datas=json.dumps(report_info))
+            return report_info
+        except Exception as ex:
+            raise ex

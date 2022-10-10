@@ -38,7 +38,7 @@ class TestResponse:
         """
         if response:
             return cls._encode_json(dict(response))
-        return cls._encode_json(dict(code=status, msg=msg, data=data))
+        return cls._encode_json(dict(code=status, msg=msg, data={} if data is None else data))
 
     @classmethod
     def defeated(cls, *, status: int = 0, msg: str = "操作失败", data: Any = None, response: Any = None):
@@ -52,4 +52,4 @@ class TestResponse:
         """
         if response:
             return cls._encode_json(dict(response))
-        return dict(code=status, msg=str(msg), data=data)
+        return dict(code=status, msg=str(msg), data={} if data is None else data)

@@ -23,7 +23,7 @@ app = FastAPI(
 app.include_router(router=user.router, tags=["用户模块"])
 app.include_router(router=index.router, tags=["首页模块"])
 app.include_router(router=request.router, tags=["请求模块"])
-app.include_router(router=case_management.router, tags=["用例模块"])
+app.include_router(router=case_test.router, tags=["用例模块"])
 
 if __name__ == '__main__':
     uvicorn.run(app="src.app.main:app", port=8086, host="0.0.0.0", debug=True)
