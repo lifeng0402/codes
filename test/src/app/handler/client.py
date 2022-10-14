@@ -22,6 +22,7 @@ from httpx import HTTPStatusError, RequestError, InvalidURL
 
 __all__ = ["HttpRequest"]
 
+
 # def _response(func):
 #     @wraps(func)
 #     def response_wraps(*args, **kwargs):
@@ -35,6 +36,7 @@ __all__ = ["HttpRequest"]
 #             raise ex
 #
 #     return response_wraps
+
 
 
 _loop = asyncio.get_event_loop()
