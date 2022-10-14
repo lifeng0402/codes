@@ -46,7 +46,7 @@ class ExecuteRun:
         """
         return len(tuple(su[key] for su in results if su is not None))
 
-    def _handel_datas(self, datas: typing.Dict):
+    def _handel_datas(self, datas: typing.Any):
 
         if isinstance(datas, dict):
             pass
@@ -77,10 +77,11 @@ class ExecuteRun:
 
         try:
             # 如果是json就返回json格式，否则返回文本格式
-            results = response.json() if body == BodyType.json else response.text.encode("utf-8")
-            results_info = {"case_id": case_id, "actual": results}
-            results_info["is_success"] = 1 if response.is_success else results_info["is_success"] = 2
-            return results_info
+            results = response.json() if body_type == BodyType.json else response.text.encode("utf-8")
+            return results
+            # results_info = {"case_id": case_id, "actual": results}
+            # results_info["is_success"] = 1 if response.is_success else results_info["is_success"] = 2
+            # return results_info
 
         except Exception as ex:
             return ex
@@ -95,23 +96,25 @@ class ExecuteRun:
         try:
 
             datas = self._case.select_case_request(case_id=datas)
+            print(datas, 33333)
 
             for case in datas:
-                self._handel_datas(datas=case)
+                print(self._handel_datas(datas=case))
 
-            total = len(datas)
-            results = self._case.select_cases_get(case_id=datas)
+            # total = len(datas)
+            # results = self._case.select_cases_get(case_id=datas)
+            # print(results)
 
-            success = ExecuteRun._handle_report(key="is_success", results=results)
-            error = ExecuteRun._handle_report(key="is_error", results=results)
-            fail = ExecuteRun._handle_report(key="is_fail", results=results)
-            percent = (success / (total - error)) * 100
-
-            report_info = {
-                "cases_id": list(datas), "total": total, "success": success, "error": error,
-                "fail": fail, "percent": percent
-            }
-            self._report.insert_reports_info(report_datas=json.dumps(report_info))
-            return report_info
+            # success = ExecuteRun._handle_report(key="is_success", results=results)
+            # error = ExecuteRun._handle_report(key="is_error", results=results)
+            # fail = ExecuteRun._handle_report(key="is_fail", results=results)
+            # percent = (success / (total - error)) * 100
+            #
+            # report_info = {
+            #     "cases_id": list(datas), "total": total, "success": success, "error": error,
+            #     "fail": fail, "percent": percent
+            # }
+            # self._report.insert_reports_info(report_datas=json.dumps(report_info))
+            # return report_info
         except Exception as ex:
             raise ex

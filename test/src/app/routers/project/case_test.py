@@ -102,4 +102,4 @@ async def case_execute(case: cases_schemas.CaseDatas, db: Session = Depends(sess
         # data = databases_datas.select_case_request(case_id=case.case_id)
         return TestResponse.successful(msg="查询数据成功", data=results)
     except Exception as ex:
-        TestResponse.defeated(msg=str(ex.args[0]))
+        TestResponse.defeated(msg=str(ex))

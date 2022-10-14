@@ -11,6 +11,8 @@ import json
 import os.path
 import httpx
 import typing
+import asyncio
+import nest_asyncio
 from httpx import Response
 from functools import wraps
 from json import JSONDecodeError
@@ -19,7 +21,6 @@ from src.app.enumeration.request_enum import BodyType
 from httpx import HTTPStatusError, RequestError, InvalidURL
 
 __all__ = ["HttpRequest"]
-
 
 # def _response(func):
 #     @wraps(func)
@@ -36,18 +37,12 @@ __all__ = ["HttpRequest"]
 #     return response_wraps
 
 
+_loop = asyncio.get_event_loop()
+
+
 class HttpRequest:
     def __init__(self):
         self.verify = False
-
-    @classmethod
-    def _log_request(cls, request):
-        do_logger.info(f"Request event hook: [ {request.method} : {request.url} ] - Waiting for response")
-
-    @classmethod
-    def _log_response(cls, response):
-        request = response.request
-        do_logger.info(f"Response event hook: [ {request.method} : {request.url} ] - Status [ {response.status_code} ]")
 
     @classmethod
     def _handel_default_value(cls, *, params, **kwargs: typing.Any):
@@ -126,40 +121,6 @@ class HttpRequest:
             params = kwargs.get("params")
             return params if params else None
 
-    def request(self, *, method: str, url: str, body_type: BodyType, **kwargs: typing.Any):
-
-        # 判断url开头是不是http、https开头
-        if not url.startswith(("http://", "https://")):
-            raise Exception("请输入正确的url, 记得带上http或https")
-
-        body, params = self._default_body(**kwargs), self._default_params(**kwargs)
-        headers, files = self._default_headers(body_type=body_type, **kwargs), self._default_files(**kwargs)
-
-        # 根据传参类型判断，然后执行请求接口操作
-        match body_type:
-            case BodyType.json:
-                return self._response(
-                    self._send_request_safe(method=method, url=url, json=body, params=params, headers=headers)
-                )
-            case BodyType.form_urlencoded:
-                return self._response(
-                    self._send_request_safe(method=method, url=url, data=body, params=params, headers=headers)
-                )
-            case (BodyType.binary, BodyType.form_data.value):
-                if not files:
-                    return self._response(
-                        self._send_request_safe(method=method, url=url, data=body, params=params, headers=headers)
-                    )
-                else:
-                    return self._response(
-                        self._send_request_safe(
-                            method=method, url=url, data=body, params=params, files=files, headers=headers
-                        ))
-            case BodyType.graphQL:
-                pass
-            case _:
-                return self._response(self._send_request_safe(method=method, url=url, **kwargs))
-
     @classmethod
     def _response(cls, response: Response):
         """
@@ -185,7 +146,54 @@ class HttpRequest:
             )
             return response
 
-    def _send_request_safe(self, *, method: str, url: str, **kwargs: typing.Any):
+    def request(self, *, method: str, url: str, body_type: BodyType, **kwargs: typing.Any):
+        # 解决asyncio不允许它的事件循环被嵌套。允许嵌套使用asyncio.run和loop.run_until_complete。
+        nest_asyncio.apply()
+
+        # 判断url开头是不是http、https开头
+        if not url.startswith(("http://", "https://")):
+            raise Exception("请输入正确的url, 记得带上http或https")
+
+        body, params = self._default_body(**kwargs), self._default_params(**kwargs)
+        headers, files = self._default_headers(body_type=body_type, **kwargs), self._default_files(**kwargs)
+
+        # 根据传参类型判断，然后执行请求接口操作
+        match body_type:
+            case BodyType.json:
+                response = _loop.run_until_complete(
+                    self._send_request_safe(method=method, url=url, json=body, params=params, headers=headers)
+                )
+                return self._response(response=response)
+
+            case (BodyType.binary, BodyType.form_data.value, BodyType.form_urlencoded):
+                if not files:
+                    response = _loop.run_until_complete(
+                        self._send_request_safe(method=method, url=url, data=body, params=params, headers=headers)
+                    )
+                    return self._response(response=response)
+                else:
+                    response = _loop.run_until_complete(
+                        self._send_request_safe(
+                            method=method, url=url, data=body, params=params, files=files, headers=headers
+                        )
+                    )
+                    return self._response(response=response)
+            case BodyType.graphQL:
+                pass
+            case _:
+                response = _loop.run_until_complete(
+                    self._send_request_safe(method=method, url=url, **kwargs)
+                )
+                return self._response(response=response)
+
+    async def _send_request_safe(self, *, method: str, url: str, **kwargs: typing.Any):
+
+        def _log_request(request):
+            do_logger.info(f"Request: [ {request.method} : {request.url} ] ")
+
+        def _log_response(response):
+            request = response.request
+            do_logger.info(f"Response: [ {request.method} : {request.url} ] - Status [ {response.status_code} ]")
 
         # 转化成大写
         methods = method.upper()
@@ -194,11 +202,10 @@ class HttpRequest:
 
         try:
             # 调用httpx库用于请求接口
-            with httpx.Client(
-                    event_hooks={'requests': [self._log_request], 'response': [self._log_response]}
-            ) as client:
+            event_hooks = {'requests': [_log_request], 'response': [_log_response]}
+            async with httpx.AsyncClient(event_hooks=event_hooks) as client:
                 client.verify = self.verify
-                return client.send(client.build_request(methods, url, **kwargs))
+                return await client.send(client.build_request(methods, url, **kwargs))
         except (RequestError, InvalidURL) as ex:
             do_logger.error(f"请检查URL是否正确：{ex}")
             raise ex
