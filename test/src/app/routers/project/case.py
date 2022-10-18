@@ -3,7 +3,7 @@
 # @Time    : 2022/9/28 15:50
 # @Author  : debugfeng
 # @Site    : 
-# @File    : case_test.py
+# @File    : case.py
 # @Software: PyCharm
 
 
@@ -14,7 +14,7 @@ from src.app.handler.fatcory import TestResponse
 from src.app.public.databases import session_local
 from src.app.schemas.project import cases_schemas
 from src.app.crud import cases_crud
-from src.app.constructor.execute_run import ExecuteRun
+from src.app.constructor.execute import ExecuteRun
 from src.app.dependencies.access_token import AccessToken
 
 router = APIRouter(
@@ -90,7 +90,7 @@ async def case_update(case: cases_schemas.CaseDatas, db: Session = Depends(sessi
 @router.post("/execute")
 async def case_execute(case: cases_schemas.CaseDatas, db: Session = Depends(session_local)):
     """
-    批量执行用例接口
+    执行用例接口
     :param case:
     :param db:
     :return:

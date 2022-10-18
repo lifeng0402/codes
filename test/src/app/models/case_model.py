@@ -31,3 +31,12 @@ class Cases(Base):
     is_active = Column(Boolean, default=False, comment="是否被删除")
     created_time = Column(TIMESTAMP, nullable=False, default=datetime.now())
     updated_time = Column(TIMESTAMP, nullable=False, default=datetime.now())
+
+    @staticmethod
+    def is_json(*, results: typing.Any):
+        data_list = []
+        for data in results:
+            results = dict(zip(data.keys(), data))
+            results["datas"] = json.loads(results["datas"])
+            data_list.append(results)
+        return data_list

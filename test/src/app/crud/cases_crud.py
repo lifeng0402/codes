@@ -45,15 +45,6 @@ class DatabasesCases:
             case _:
                 return body_type.none.value
 
-    @classmethod
-    def _is_json(cls, *, results: typing.Any):
-        data_list = []
-        for data in results:
-            results = dict(zip(data.keys(), data))
-            results["datas"] = json.loads(results["datas"])
-            data_list.append(results)
-        return data_list
-
     def cases_add(self, *, case: cases_schemas.CaseAdd):
         """
         添加用例，新增到cases表中
@@ -84,7 +75,7 @@ class DatabasesCases:
                 select([self._cases.id, self._cases.name, self._cases.datas, self._cases.expect])
             ).fetchall()
 
-            return self._is_json(results=results_info)
+            return self._cases.is_json(results=results_info)
 
         except Exception as ex:
             do_logger.error(f"用例数据添加失败: {str(ex)}")
@@ -133,7 +124,7 @@ class DatabasesCases:
                 ).where(self._cases.id == case.case_id)
             )
 
-            return self._is_json(results=results_info)
+            return self._cases.is_json(results=results_info)
 
         except Exception as ex:
             do_logger.error(f"用例数据更新失败: {str(ex)}")
@@ -157,7 +148,7 @@ class DatabasesCases:
                 ).where(self._cases.is_active == 0).offset(skip).limit(limit)
             ).all()
 
-            return self._is_json(results=db_datas)
+            return self._cases.is_json(results=db_datas)
 
         except Exception as ex:
             do_logger.error(f"列表数据为空: {ex}")
@@ -228,7 +219,7 @@ class DatabasesCases:
         ).all()
         # datas = results.scalars().first()
         do_logger.info(results)
-        return self._is_json(results=results)
+        return self._cases.is_json(results=results)
 
     def select_case_request(self, *, case_id):
         """
@@ -243,12 +234,12 @@ class DatabasesCases:
                         self._cases.id, self._cases.name, self._cases.datas,
                         self._cases.expect, self._cases.comparison
                     ]
-                ).where(self._cases.id.in_(case_id), self._cases.is_active == 0)
+                ).where(self._cases.id == case_id, self._cases.is_active == 0)
             ).all()
             # do_logger.info(results)
             if results is None:
                 raise
-            return self._is_json(results=results)
+            return self._cases.is_json(results=results)
         except Exception as ex:
             do_logger.error(ex)
             raise ex
