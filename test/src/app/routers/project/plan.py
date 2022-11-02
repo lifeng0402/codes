@@ -33,7 +33,23 @@ async def plan_create(plan: plan_schemas.PlanAdd, db: Session = Depends(session_
     try:
         databases_datas = plan_crud.DatabasesPlan(db=db)
         data = databases_datas.plan_add(plan=plan)
-        return TestResponse.successful(msg="测试计划添加成功 ！", data=data)
+        return TestResponse.successful(msg="添加成功 ！", data=data)
+    except Exception as ex:
+        return TestResponse.defeated(msg=str(ex.args[0]))
+
+
+@router.put("/update")
+async def plan_update(plan: plan_schemas.PlanUpdate, db: Session = Depends(session_local)):
+    """
+    修改测试计划
+    :param plan:
+    :param db:
+    :return:
+    """
+    try:
+        databases_datas = plan_crud.DatabasesPlan(db=db)
+        data = databases_datas.plan_update(plan=plan)
+        return TestResponse.successful(msg="修改成功 ！", data=data)
     except Exception as ex:
         return TestResponse.defeated(msg=str(ex.args[0]))
 
@@ -50,6 +66,37 @@ async def plan_list(skip: int = 0, limit: int = 10, db: Session = Depends(sessio
     try:
         databases_datas = plan_crud.DatabasesPlan(db=db)
         data = databases_datas.plan_list(skip=skip, limit=limit)
-        return TestResponse.successful(msg="数据查询成功 ！", data=data)
+        return TestResponse.successful(msg="查询成功 ！", data=data)
+    except Exception as ex:
+        return TestResponse.defeated(msg=str(ex.args[0]))
+
+
+@router.delete("/delete/{plan_id}")
+async def plan_delete(plan_id: int, db: Session = Depends(session_local)):
+    """
+    删除测试计划
+    :param plan_id:
+    :param db:
+    :return:
+    """
+    try:
+        databases_datas = plan_crud.DatabasesPlan(db=db)
+        data = databases_datas.plan_delete(plan_id=plan_id)
+        return TestResponse.successful(msg="删除成功 ！", data=data)
+    except Exception as ex:
+        return TestResponse.defeated(msg=str(ex.args[0]))
+
+
+async def plan_execute(case_id: plan_schemas.PlanData, db: Session = Depends(session_local)):
+    """
+    批量执行计划中的测试用例
+    :param case_id:
+    :param db:
+    :return:
+    """
+    try:
+        databases_datas = plan_crud.DatabasesPlan(db=db)
+        data = databases_datas.plan_execute(case_id=case_id)
+        return TestResponse.successful(msg="用例运行完毕 ！", data=data)
     except Exception as ex:
         return TestResponse.defeated(msg=str(ex.args[0]))

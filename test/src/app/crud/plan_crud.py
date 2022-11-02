@@ -5,6 +5,9 @@
 # @Site    : 
 # @File    : plan_crud.py
 # @Software: PyCharm
+import typing
+
+import typing_extensions
 
 from sqlalchemy.orm import Session
 from src.app.models import plan_model
@@ -48,7 +51,43 @@ class DatabasesPlan:
             return results_info
 
         except Exception as ex:
-            do_logger.error(f"测试计划添加失败: {str(ex)}")
+            do_logger.error(f"计划添加失败: {str(ex)}")
+            raise ex
+
+    def plan_update(self, *, plan: plan_schemas.PlanUpdate):
+        """
+        更新测试计划
+        :param plan:
+        :return:
+        """
+        try:
+            # 查询数据是否存在
+            datas_info = self._session.execute(select(self._plan).where(self._plan.id == plan.plan_id))
+            # 如果数据存在则抛出异常
+            if not datas_info.scalars().first():
+                raise Exception("测试计划不存在 ！")
+
+            # 执行数据更新操作
+            datas_info = self._session.execute(
+                update(self._plan).values(name=plan.name, principal=plan.principal).where(self._plan.id == plan.plan_id)
+            )
+            # 提交并更新数据库
+            self._session.add(datas_info)
+            self._session.commit()
+            self._session.refresh(datas_info)
+
+            # 查询更新后的数据
+            results_info = self._session.execute(
+                select(
+                    [self._plan.id, self._plan.name, self._plan.principal]
+                ).where(self._plan.id == plan.plan_id)
+            ).fetchone()
+
+            return self._plan.is_json(results=results_info)
+
+
+        except Exception as ex:
+            do_logger.error(ex)
             raise ex
 
     def plan_list(self, *, skip: int, limit: int):
@@ -61,9 +100,7 @@ class DatabasesPlan:
         try:
             db_datas = self._session.execute(
                 select(
-                    [
-                        self._plan.id, self._plan.name, self._plan.principal, self._plan.created_time
-                    ]
+                    [self._plan.id, self._plan.name, self._plan.principal, self._plan.created_time]
                 ).where(self._plan.is_active == 0).offset(skip).limit(limit)
             ).all()
 
@@ -72,3 +109,26 @@ class DatabasesPlan:
         except Exception as ex:
             do_logger.error(f"测试计划列表为空: {ex}")
             raise ex
+
+    def plan_delete(self, *, plan_id: int):
+        try:
+            data_info = self._session.execute(select(self._plan).where(self._plan.id == plan_id)).fetchone()
+
+            if not data_info:
+                raise Exception("数据不存在 ！")
+
+            # 执行删除数据的SQL方法
+            self._session.execute(delete(self._plan).where(self._plan.id == plan_id))
+            # 提交并更新数据库
+            self._session.commit()
+            data_info = self._session.execute(select(self._plan).where(self._plan.id == plan_id)).fetchone()
+
+            if data_info:
+                raise Exception("删除失败")
+
+            return
+        except Exception as ex:
+            raise ex
+
+    def plan_execute(self, *, case_id:plan_schemas.PlanData):
+        pass

@@ -20,7 +20,8 @@ class Plan(Base):
     # 测试计划表
     id = Column(Integer, primary_key=True)
     name = Column(String(50), unique=True, nullable=False, comment="计划名称")
-    principal = Column(String(50), nullable=False, comment="项目负责人名称")
+    domain_name = Column(String(50), nullable=False, comment="域名")
+    environment = Column(String(50), nullable=False, comment="运行环境")
     is_active = Column(Boolean, default=False, comment="是否被删除")
     created_time = Column(TIMESTAMP, nullable=False, default=datetime.now())
     updated_time = Column(TIMESTAMP, nullable=False, default=datetime.now())

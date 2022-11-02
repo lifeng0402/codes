@@ -5,6 +5,7 @@
 # @Site    : 
 # @File    : plan_schemas.py
 # @Software: PyCharm
+import typing
 
 from pydantic import validator
 from pydantic import BaseModel
@@ -18,6 +19,28 @@ class PlanAdd(BaseModel):
 
     @classmethod
     @validator("name", "principal")
+    def name_not_empty(cls, v):
+        if isinstance(v, str) and len(v.strip()) == 0:
+            raise ValueError(f"{v} 不能为空")
+        return v
+
+
+class PlanUpdate(PlanAdd):
+    plan_id: int
+
+    @classmethod
+    @validator("plan_id")
+    def name_not_empty(cls, v):
+        if isinstance(v, str) and len(v.strip()) == 0:
+            raise ValueError(f"{v} 不能为空")
+        return v
+
+
+class PlanData(BaseModel):
+    case_id: typing.List[int]
+
+    @classmethod
+    @validator("plan_id")
     def name_not_empty(cls, v):
         if isinstance(v, str) and len(v.strip()) == 0:
             raise ValueError(f"{v} 不能为空")

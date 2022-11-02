@@ -54,8 +54,6 @@ class ExecuteRun:
         cookies = datas.get("cookies")
         body_type = datas.get("body_type")
 
-        defeated = ""
-
         try:
             # 开始请求接口
             results = self._http.request(

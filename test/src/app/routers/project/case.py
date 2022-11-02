@@ -85,21 +85,3 @@ async def case_update(case: cases_schemas.CaseDatas, db: Session = Depends(sessi
         return TestResponse.successful(msg="数据删除成功 ！")
     except Exception as ex:
         return TestResponse.defeated(msg=str(ex.args[0]))
-
-
-@router.post("/execute")
-async def case_execute(case: cases_schemas.CaseDatas, db: Session = Depends(session_local)):
-    """
-    执行用例接口
-    :param case:
-    :param db:
-    :return:
-    """
-    try:
-        execute = ExecuteRun(db=db)
-        results = execute.execute_cases(datas=case.case_id)
-        # databases_datas = cases_crud.DatabasesCases(db=db)
-        # data = databases_datas.select_case_request(case_id=case.case_id)
-        return TestResponse.successful(msg="查询数据成功", data=results)
-    except Exception as ex:
-        TestResponse.defeated(msg=str(ex))

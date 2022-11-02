@@ -97,9 +97,6 @@ class DatabasesCases:
             datas = select_(self._cases.id, case.case_id)
             if not datas:
                 raise Exception(f"数据不存在 ！")
-            elif datas:
-                if select_(self._cases.name, case.name):
-                    raise Exception(f"{self._cases.name} 已经存在 !")
 
             body_type = self._body_type_value_mode(body_type=case.body_type)
 

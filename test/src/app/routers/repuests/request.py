@@ -9,17 +9,14 @@ import json
 
 from fastapi import Depends
 from fastapi import APIRouter
-from sqlalchemy.orm import Session
 from src.app.handler.client import HttpRequest
-from src.app.crud.http_crud import DatabasesHttp
 from src.app.handler.fatcory import TestResponse
-from src.app.public.databases import session_local
-from src.app.schemas.http.http_schemas import HttpBody, HttpBodySave
+from src.app.schemas.http.http_schemas import HttpBody
 from src.app.dependencies.access_token import AccessToken
 
 router = APIRouter(
     prefix="/http",
-    # dependencies=[Depends(AccessToken.verify_token)]
+    dependencies=[Depends(AccessToken.verify_token)]
 )
 
 

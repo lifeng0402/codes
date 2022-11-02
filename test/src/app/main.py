@@ -15,14 +15,12 @@ from src.app.routers.repuests import request
 from src.app.routers.project import case, plan
 
 app = FastAPI(
-    title="Test测试平台接口文档",
-    version="0.0.1",
-    description="接口文档",
-    openapi_tags=tags_metadata
+    title="Test测试平台接口文档", version="0.0.1", description="接口文档", openapi_tags=tags_metadata
 )
+
 app.include_router(router=user.router, tags=["用户模块"])
 app.include_router(router=index.router, tags=["首页模块"])
-app.include_router(router=request.router, tags=["请求模块"])
+app.include_router(router=request.router, tags=["接口测试模块"])
 app.include_router(router=case.router, tags=["测试用例模块"])
 app.include_router(router=plan.router, tags=["测试计划模块"])
 
