@@ -5,9 +5,6 @@
 # @Site    : 
 # @File    : plan_crud.py
 # @Software: PyCharm
-import typing
-
-import typing_extensions
 
 from sqlalchemy.orm import Session
 from src.app.models import plan_model
