@@ -57,8 +57,8 @@ class ExecuteRun:
         try:
             # 开始请求接口
             results = self._http.request(
-                method=method, url=url, headers=headers, body_type=body_type, body=body,
-                params=params, cookies=cookies
+                method=method, url=url, headers=headers,
+                body_type=body_type, body=body, params=params, cookies=cookies
             )
             # 如果是json就返回json格式，否则返回文本格式
             response = results.json() if body_type == BodyType.json else results.text.encode("utf-8")

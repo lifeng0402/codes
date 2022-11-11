@@ -5,7 +5,7 @@
 # @Site    : 
 # @File    : plan.py
 # @Software: PyCharm
-
+import typing
 
 from src.app.schemas.project import plan_schemas
 from fastapi import Depends
@@ -85,6 +85,11 @@ async def plan_delete(plan_id: int, db: Session = Depends(session_local)):
         return TestResponse.successful(msg="删除成功 ！", data=data)
     except Exception as ex:
         return TestResponse.defeated(msg=str(ex.args[0]))
+
+
+@router.post("/cases")
+async def plan_cases(case_id: plan_schemas.PlanData, db: Session = Depends(session_local)):
+    pass
 
 
 async def plan_execute(case_id: plan_schemas.PlanData, db: Session = Depends(session_local)):
