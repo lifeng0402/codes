@@ -1,15 +1,12 @@
+import os, sys
 from logging.config import fileConfig
-
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
-
 from alembic import context
-import sys, os
 
 curPath = os.path.abspath(os.path.dirname(__file__))
 rootPath = os.path.split(curPath)[0]
 sys.path.append(os.path.split(rootPath)[0])
-from src.app.models.users_model import Base
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -25,7 +22,11 @@ if config.config_file_name is not None:
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 # target_metadata = None
-target_metadata = Base.metadata
+from src.app.models.users_model import Base as user_base
+from src.app.models.datas_model import Base as data_base
+from src.app.models.case_model import Base as case_base
+
+target_metadata = [user_base.metadata, data_base.metadata, case_base.metadata]
 
 
 # other values from the config, defined by the needs of env.py,
