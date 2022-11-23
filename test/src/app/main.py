@@ -6,6 +6,7 @@
 # @File    : main.py
 # @Software: PyCharm
 
+
 import uvicorn
 from fastapi import FastAPI
 from src.app.docs import tags_metadata
@@ -13,6 +14,7 @@ from src.app.routers.users import user
 from src.app.routers.home import index
 from src.app.routers.repuests import request
 from src.app.routers.project import case, plan
+
 
 app = FastAPI(
     title="Test测试平台接口文档", version="0.0.1", description="接口文档", openapi_tags=tags_metadata
