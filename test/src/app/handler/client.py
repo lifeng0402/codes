@@ -11,8 +11,9 @@ import json
 import os.path
 import httpx
 import typing
+import asyncio
+import nest_asyncio
 from httpx import Response
-from functools import wraps
 from json import JSONDecodeError
 from src.app.public.logger import do_logger
 from src.app.enumeration.request_enum import BodyType
@@ -20,29 +21,12 @@ from httpx import HTTPStatusError, RequestError, InvalidURL
 
 __all__ = ["HttpRequest"]
 
-
-# def _response(func):
-#     @wraps(func)
-#     def response_wraps(*args, **kwargs):
-#         results = func(*args, **kwargs)
-#         try:
-#             return results.json()
-#         except JSONDecodeError:
-#             return results.text.encode("utf-8")
-#         except Exception as ex:
-#             do_logger.error(f"非json和text类型返回值: {ex}")
-#             raise ex
-#
-#     return response_wraps
+_loop = asyncio.get_event_loop()
 
 
 class HttpRequest:
     def __init__(self):
         self.verify = False
-
-    @classmethod
-    def _log_request(cls, request):
-        do_logger.info(f"Request event hook: [ {request.method} : {request.url} ] - Waiting for response")
 
     @classmethod
     def _log_response(cls, response):
@@ -111,54 +95,20 @@ class HttpRequest:
                     # 判断数据类型是不是字典，不是就转下，是就是直接返回
                     return kwargs.get("body") if isinstance(body, dict) else json.loads(body)
                 except JSONDecodeError:
-                    raise Exception("非json数据无法解析")
+                    raise Exception("非json类型数据无法进行解析")
             else:
                 pass
 
     @classmethod
     def _default_params(cls, **kwargs: typing.Any):
         """
-        处理
+        处理url后面的参数
         :param kwargs:
         :return:
         """
         if not hasattr(kwargs, "params"):
             params = kwargs.get("params")
             return params if params else None
-
-    def request(self, *, method: str, url: str, body_type: BodyType, **kwargs: typing.Any):
-
-        # 判断url开头是不是http、https开头
-        if not url.startswith(("http://", "https://")):
-            raise Exception("请输入正确的url, 记得带上http或https")
-
-        body, params = self._default_body(**kwargs), self._default_params(**kwargs)
-        headers, files = self._default_headers(body_type=body_type, **kwargs), self._default_files(**kwargs)
-
-        # 根据传参类型判断，然后执行请求接口操作
-        match body_type:
-            case BodyType.json:
-                return self._response(
-                    self._send_request_safe(method=method, url=url, json=body, params=params, headers=headers)
-                )
-            case BodyType.form_urlencoded:
-                return self._response(
-                    self._send_request_safe(method=method, url=url, data=body, params=params, headers=headers)
-                )
-            case (BodyType.binary, BodyType.form_data.value):
-                if not files:
-                    return self._response(
-                        self._send_request_safe(method=method, url=url, data=body, params=params, headers=headers)
-                    )
-                else:
-                    return self._response(
-                        self._send_request_safe(
-                            method=method, url=url, data=body, params=params, files=files, headers=headers
-                        ))
-            case BodyType.graphQL:
-                pass
-            case _:
-                return self._response(self._send_request_safe(method=method, url=url, **kwargs))
 
     @classmethod
     def _response(cls, response: Response):
@@ -177,7 +127,7 @@ class HttpRequest:
                 ----------------------------------------------------------------------
                 请求方式：{response.request.method}
                 请求 URL：{response.request.url}
-                请求Header：{response.request.headers.multi_items()}
+                请求Header：{dict((k, v) for k, v in response.request.headers.multi_items())}
                 请求参数：{ast.literal_eval(response.request.content.decode("utf-8"))}
                 请求结果：{ast.literal_eval(response.content.decode("utf-8"))}
                 ----------------------------------------------------------------------
@@ -185,7 +135,70 @@ class HttpRequest:
             )
             return response
 
-    def _send_request_safe(self, *, method: str, url: str, **kwargs: typing.Any):
+    def request(self, *, method: str, url: str, body_type: BodyType, **kwargs: typing.Any):
+        """
+        根据类型调用请求方法
+        :param method:
+        :param url:
+        :param body_type:
+        :param kwargs:
+        :return:
+        """
+        # 判断url开头是不是http、https开头
+        if not url.startswith(("http://", "https://")):
+            raise Exception("请输入正确的url, 记得带上http或https")
+
+        body, params = self._default_body(**kwargs), self._default_params(**kwargs)
+        headers, files = self._default_headers(body_type=body_type, **kwargs), self._default_files(**kwargs)
+
+        # 根据传参类型判断，然后执行请求接口操作
+        match body_type:
+            case BodyType.json:
+                return self._common_request_safe(method=method, url=url, json=body, params=params, headers=headers)
+            case (BodyType.binary, BodyType.form_data.value, BodyType.form_urlencoded):
+                if not files:
+                    return self._common_request_safe(method=method, url=url, data=body, params=params, headers=headers)
+                else:
+                    return self._common_request_safe(method=method, url=url, data=body, files=files, headers=headers)
+            case BodyType.graphQL:
+                pass
+            case _:
+                return self._common_request_safe(method=method, url=url, **kwargs)
+
+    def _common_request_safe(self, method: str, url: str, json=None, data=None, params=None, **kwargs):
+        """
+        异步请求公共方法
+        :param method:
+        :param url:
+        :param json:
+        :param data:
+        :param params:
+        :param kwargs:
+        :return:
+        """
+        # 解决asyncio不允许它的事件循环被嵌套。允许嵌套使用asyncio.run和loop.run_until_complete。
+        nest_asyncio.apply()
+        return self._response(
+            response=_loop.run_until_complete(
+                self._send_request_safe(method=method, url=url, json=json, data=data, params=params, **kwargs)
+            )
+        )
+
+    async def _send_request_safe(self, *, method: str, url: str, **kwargs: typing.Any):
+        """
+        接口请求方法
+        :param method:
+        :param url:
+        :param kwargs:
+        :return:
+        """
+
+        def _log_request(request):
+            do_logger.info(f"Request: [ {request.method} : {request.url} ] ")
+
+        def _log_response(response):
+            request = response.request
+            do_logger.info(f"Response: [ {request.method} : {request.url} ] - Status [ {response.status_code} ]")
 
         # 转化成大写
         methods = method.upper()
@@ -194,11 +207,10 @@ class HttpRequest:
 
         try:
             # 调用httpx库用于请求接口
-            with httpx.Client(
-                    event_hooks={'requests': [self._log_request], 'response': [self._log_response]}
-            ) as client:
+            event_hooks = {'requests': [_log_request], 'response': [_log_response]}
+            async with httpx.AsyncClient(event_hooks=event_hooks) as client:
                 client.verify = self.verify
-                return client.send(client.build_request(methods, url, **kwargs))
+                return await client.send(client.build_request(methods, url, **kwargs))
         except (RequestError, InvalidURL) as ex:
             do_logger.error(f"请检查URL是否正确：{ex}")
             raise ex
@@ -209,7 +221,7 @@ class HttpRequest:
             raise ex
 
 
-if __name__ == '__main__':
+# if __name__ == '__main__':
     # res = HttpRequest().request(
     #     method="POST",
     #     url="https://api-lms3.9first.com/user/auth",
@@ -223,9 +235,9 @@ if __name__ == '__main__':
     #     })
     # print(res)
 
-    res = HttpRequest().request(
-        method="get",
-        url="https://api-lms3.9first.com/user/auth",
-        body_type=BodyType.json,
-        headers={"token": "74b354c22a87cab8c9cf6d80d5d9b018"})
-    print(res)
+    # res = HttpRequest().request(
+    #     method="get",
+    #     url="https://api-lms3.9first.com/user/auth",
+    #     body_type=BodyType.json,
+    #     headers={"token": "74b354c22a87cab8c9cf6d80d5d9b018"})
+    # print(res)

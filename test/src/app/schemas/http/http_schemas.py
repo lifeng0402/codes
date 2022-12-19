@@ -37,7 +37,7 @@ class HttpBodySave(HttpBody):
     expect: Optional[Union[str, dict]] = None
 
     @classmethod
-    @validator("title", "method", "url", "headers")
+    @validator("title")
     def name_not_empty(cls, v):
         if isinstance(v, str) and len(v.strip()) == 0:
             raise ValueError(f"{v} 不能为空")

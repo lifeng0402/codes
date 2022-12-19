@@ -1,8 +1,8 @@
-"""创建cases表
+"""创建新表
 
-Revision ID: c70910e4fada
-Revises: be84012a0895
-Create Date: 2022-09-30 09:53:43.869078
+Revision ID: 471be68f6096
+Revises: 
+Create Date: 2022-10-31 17:33:34.171467
 
 """
 from alembic import op
@@ -10,8 +10,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'c70910e4fada'
-down_revision = 'be84012a0895'
+revision = '471be68f6096'
+down_revision = None
 branch_labels = None
 depends_on = None
 

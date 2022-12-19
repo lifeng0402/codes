@@ -11,3 +11,4 @@ alembic
 flet
 httpx[cli]
 jsonpath
+nest-asyncio

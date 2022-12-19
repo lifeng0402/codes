@@ -41,6 +41,11 @@ class _Redispy:
 
         return self._connect.get(name).decode('utf-8')
 
+    def delete_value(self, name: str, is_data: bool = False):
+        if is_data:
+            name = f"token:{name}"
+        return self._connect.delete(name)
+
     def get_exists(self, name, is_data: bool = False):
         """
         判断redis中的key是否存在

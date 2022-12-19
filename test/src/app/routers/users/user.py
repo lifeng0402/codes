@@ -24,7 +24,7 @@ router = APIRouter(
 )
 
 
-@router.post("/register")
+@router.post("/register", name="注册接口")
 async def register_user(user: UserPwd, db: Session = Depends(session_local)):
     """
     注册接口
@@ -42,7 +42,7 @@ async def register_user(user: UserPwd, db: Session = Depends(session_local)):
         return TestResponse.defeated(msg=str(e.args[0]), data={})
 
 
-@router.post("/login")
+@router.post("/login", name="登录接口")
 async def login_user(user: UserPwd, background_tasks: BackgroundTasks, db: Session = Depends(session_local)):
     """
     登录接口
@@ -65,3 +65,6 @@ async def login_user(user: UserPwd, background_tasks: BackgroundTasks, db: Sessi
         )
     except Exception as e:
         return TestResponse.defeated(msg=str(e.args[0]), data={})
+
+async def logout_user():
+    pass

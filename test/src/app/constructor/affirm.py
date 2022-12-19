@@ -32,13 +32,14 @@ def self_include(*, expect: typing.Any, actual: typing.Any, msg: str = ""):
         traceback.print_exc()
 
 
-def self_main(*, comparison: str, expect: typing.Any, actual: typing.Any):
+
+def self_main(*, comparison: str, expect: typing.Any, response: typing.Any):
     match comparison:
         case "==":
-            self_equal(expect=expect, actual=actual)
+            self_equal(expect=expect, actual=response)
         case "!=":
-            self_not_equal(expect=expect, actual=actual)
+            self_not_equal(expect=expect, actual=response)
         case "in":
-            self_include(expect=expect, actual=actual)
+            self_include(expect=expect, actual=response)
         case _:
             pass
