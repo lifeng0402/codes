@@ -7,11 +7,11 @@
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import HelloWorldVue from './components/HelloWorld.vue'
 export default {
   name: 'App',
-  comments: {
-    HelloWorld
+  components: {
+    HelloWorldVue
   }
 }
 </script>
