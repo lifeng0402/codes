@@ -30,5 +30,10 @@ npm run test:e2e
 npm run lint
 ```
 
+### Lints and fix files
+```
+yarn run lint --fix
+```
+
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
