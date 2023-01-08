@@ -1,4 +1,4 @@
-# vue3-elementplus-demo
+# vue3-element-plus-test
 
 ## Project setup
 ```
@@ -20,19 +20,9 @@ npm run build
 npm run test:unit
 ```
 
-### Run your end-to-end tests
-```
-npm run test:e2e
-```
-
 ### Lints and fixes files
 ```
 npm run lint
-```
-
-### Lints and fix files
-```
-yarn run lint --fix
 ```
 
 ### Customize configuration
