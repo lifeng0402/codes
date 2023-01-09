@@ -138,3 +138,12 @@ dmypy.json
 cython_debug/
 .idea/
 .vscode/
+
+[http]
+ 
+ sslverify = false
+
+[https]
+
+ sslverify = false
+ 
