@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2022/9/23 10:45
 # @Author  : debugfeng
-# @Site    : 
+# @Site    :
 # @File    : client.py
 # @Software: PyCharm
 
@@ -21,94 +21,11 @@ from httpx import HTTPStatusError, RequestError, InvalidURL
 
 __all__ = ["HttpRequest"]
 
-_loop = asyncio.get_event_loop()
-
 
 class HttpRequest:
+
     def __init__(self):
-        self.verify = False
-
-    @classmethod
-    def _log_response(cls, response):
-        request = response.request
-        do_logger.info(f"Response event hook: [ {request.method} : {request.url} ] - Status [ {response.status_code} ]")
-
-    @classmethod
-    def _handle_default_value(cls, *, params, **kwargs: typing.Any):
-        # 判断params字段是否存在
-        if not hasattr(kwargs, str(params)):
-            results = kwargs.get(str(params))
-            # 如果为真，则返回对应数据
-            return results
-
-    @classmethod
-    def _default_headers(cls, *, body_type: BodyType, **kwargs: typing.Any):
-        if not hasattr(kwargs, "headers"):
-            # 把获取的数据转成字典
-            headers = dict(kwargs.get("headers"))
-            # 如果为真
-            if headers:
-                # 根据body_type的进行对比，然后执行更新操作
-                match body_type:
-                    case BodyType.json:
-                        headers.update({"Content-Type": "application/json"})
-                    case BodyType.form_urlencoded:
-                        headers.update({"Content-Type": "application/x-www-form-urlencoded"})
-                    case BodyType.form_data:
-                        headers.update({"Content-Type": "multipart/form-data"})
-                    case BodyType.binary:
-                        headers.update({"Content-Type": "binary"})
-                    case BodyType.graphQL:
-                        headers.update({"Content-Type": "binary"})
-                    case _:
-                        pass
-                return headers
-            else:
-                raise Exception("headers必须要存在")
-
-    @classmethod
-    def _default_files(cls, **kwargs: typing.Any):
-        # 判断files字段是否存在
-        if not hasattr(kwargs, "files"):
-            files = kwargs.get("files")
-            # 如果为真，则返回文件路径
-            if files:
-                # 判断路径是否为真
-                if os.path.exists(files):
-                    return files
-                else:
-                    raise Exception("请检查路径格式...")
-            else:
-                pass
-
-    @classmethod
-    def _default_body(cls, **kwargs: typing.Any):
-        """
-        处理body传参
-        :param kwargs:
-        :return:
-        """
-        if not hasattr(kwargs, "body"):
-            body = kwargs.get("body")
-            if body:
-                try:
-                    # 判断数据类型是不是字典，不是就转下，是就是直接返回
-                    return kwargs.get("body") if isinstance(body, dict) else json.loads(body)
-                except JSONDecodeError:
-                    raise Exception("非json类型数据无法进行解析")
-            else:
-                pass
-
-    @classmethod
-    def _default_params(cls, **kwargs: typing.Any):
-        """
-        处理url后面的参数
-        :param kwargs:
-        :return:
-        """
-        if not hasattr(kwargs, "params"):
-            params = kwargs.get("params")
-            return params if params else None
+        self.verify: bool = False
 
     @classmethod
     def _response(cls, response: Response):
@@ -122,52 +39,20 @@ class HttpRequest:
         except (RequestError, Exception) as ex:
             raise ex
         else:
-            do_logger.info(
-                f"""
+            do_logger.info(f"""
                 ----------------------------------------------------------------------
-                请求方式：{response.request.method}
-                请求 URL：{response.request.url}
-                请求Header：{dict((k, v) for k, v in response.request.headers.multi_items())}
+                请求方式:{response.request.method}
+                请求 URL:{response.request.url}
+                请求Header:{dict((k, v) for k, v in response.request.headers.multi_items())}
                 请求参数：{ast.literal_eval(response.request.content.decode("utf-8"))}
                 请求结果：{ast.literal_eval(response.content.decode("utf-8"))}
                 ----------------------------------------------------------------------
-                """
-            )
+                """)
             return response
 
-    def request(self, *, method: str, url: str, body_type: BodyType, **kwargs: typing.Any):
+    def request_safe(self, method: str, url: str, json=None, data=None, params=None, headers=None, **kwargs):
         """
-        根据类型调用请求方法
-        :param method:
-        :param url:
-        :param body_type:
-        :param kwargs:
-        :return:
-        """
-        # 判断url开头是不是http、https开头
-        if not url.startswith(("http://", "https://")):
-            raise Exception("请输入正确的url, 记得带上http或https")
-
-        body, params = self._default_body(**kwargs), self._default_params(**kwargs)
-        headers, files = self._default_headers(body_type=body_type, **kwargs), self._default_files(**kwargs)
-
-        # 根据传参类型判断，然后执行请求接口操作
-        match body_type:
-            case BodyType.json:
-                return self._common_request_safe(method=method, url=url, json=body, params=params, headers=headers)
-            case (BodyType.binary, BodyType.form_data.value, BodyType.form_urlencoded):
-                if not files:
-                    return self._common_request_safe(method=method, url=url, data=body, params=params, headers=headers)
-                else:
-                    return self._common_request_safe(method=method, url=url, data=body, files=files, headers=headers)
-            case BodyType.graphQL:
-                pass
-            case _:
-                return self._common_request_safe(method=method, url=url, **kwargs)
-
-    def _common_request_safe(self, method: str, url: str, json=None, data=None, params=None, **kwargs):
-        """
-        异步请求公共方法
+        异步请求方法
         :param method:
         :param url:
         :param json:
@@ -176,11 +61,18 @@ class HttpRequest:
         :param kwargs:
         :return:
         """
+        # 判断url开头是不是http、https开头
+        if not url.startswith(("http://", "https://")):
+            raise Exception("请输入正确的url, 记得带上http或https")
+
+        _loop = asyncio.get_event_loop()
         # 解决asyncio不允许它的事件循环被嵌套。允许嵌套使用asyncio.run和loop.run_until_complete。
         nest_asyncio.apply()
         return self._response(
             response=_loop.run_until_complete(
-                self._send_request_safe(method=method, url=url, json=json, data=data, params=params, **kwargs)
+                self._send_request_safe(
+                    method=method, url=url, json=json, data=data, params=params, headers=headers, **kwargs
+                )
             )
         )
 
@@ -198,7 +90,9 @@ class HttpRequest:
 
         def _log_response(response):
             request = response.request
-            do_logger.info(f"Response: [ {request.method} : {request.url} ] - Status [ {response.status_code} ]")
+            do_logger.info(
+                f"Response: [ {request.method} : {request.url} ] - Status [ {response.status_code} ]"
+            )
 
         # 转化成大写
         methods = method.upper()
@@ -207,37 +101,40 @@ class HttpRequest:
 
         try:
             # 调用httpx库用于请求接口
-            event_hooks = {'requests': [_log_request], 'response': [_log_response]}
+            event_hooks = {
+                'requests': [_log_request], 'response': [_log_response]
+            }
             async with httpx.AsyncClient(event_hooks=event_hooks) as client:
                 client.verify = self.verify
-                return await client.send(client.build_request(methods, url, **kwargs))
+                return await client.send(
+                    client.build_request(methods, url, **kwargs))
         except (RequestError, InvalidURL) as ex:
-            do_logger.error(f"请检查URL是否正确：{ex}")
+            do_logger.error(f"请检查URL是否正确:{ex}")
             raise ex
         except HTTPStatusError as ex:
             raise ex
         except Exception as ex:
-            do_logger.error(f"异常错误：{ex}")
+            do_logger.error(f"异常错误:{ex}")
             raise ex
 
 
 # if __name__ == '__main__':
-    # res = HttpRequest().request(
-    #     method="POST",
-    #     url="https://api-lms3.9first.com/user/auth",
-    #     body_type=BodyType.json,
-    #     headers={"Content-Type": "application/json; charset=UTF-8"},
-    #     body={
-    #         "user_name": "account01",
-    #         "password": "account01",
-    #         "scenario": "web",
-    #         "day": 1
-    #     })
-    # print(res)
+# res = HttpRequest().request(
+#     method="POST",
+#     url="https://api-lms3.9first.com/user/auth",
+#     body_type=BodyType.json,
+#     headers={"Content-Type": "application/json; charset=UTF-8"},
+#     body={
+#         "user_name": "account01",
+#         "password": "account01",
+#         "scenario": "web",
+#         "day": 1
+#     })
+# print(res)
 
-    # res = HttpRequest().request(
-    #     method="get",
-    #     url="https://api-lms3.9first.com/user/auth",
-    #     body_type=BodyType.json,
-    #     headers={"token": "74b354c22a87cab8c9cf6d80d5d9b018"})
-    # print(res)
+# res = HttpRequest().request(
+#     method="get",
+#     url="https://api-lms3.9first.com/user/auth",
+#     body_type=BodyType.json,
+#     headers={"token": "74b354c22a87cab8c9cf6d80d5d9b018"})
+# print(res)
