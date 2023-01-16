@@ -1,0 +1,60 @@
+.container{
+      margin: 0 auto;
+      margin-top: 70;
+      text-align: center;
+      width: 300px;
+}
+.subTitle{
+      color: gray;
+      font-size: 14px;
+}
+.title{
+      font-size: 45px;
+}
+.input{
+      width: 90%;
+      border-radius: 6px;
+      height: 25px;
+      margin-top: 10px;
+      border-color: silver;
+      border-style: solid;
+      background-color: cornsilk;
+}
+.inputContainer{
+      text-align: left;
+      margin-bottom: 20px;
+}
+.subContainer{
+      text-align: left;
+}
+.field{
+      font-size: 14px;
+}
+.tip{
+      margin-top: 5px;
+      font-size: 12px;
+      color: gray;
+}
+.setting{
+      font-size: 9px;
+      color: black;
+}
+.label{
+      font-size: 12px;
+      margin-left: 5px;
+      height: 20px;
+      vertical-align: middle;
+}
+.checkbox{
+      height: 20px;
+      vertical-align: middle;
+}
+.btn{
+      border-radius: 10px;
+      height: 40px;
+      width: 300px;
+      margin-top: 30px;
+      background-color: deepskyblue;
+      border-color: blue;
+      color: white;
+}
