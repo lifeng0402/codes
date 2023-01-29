@@ -1,65 +1,106 @@
 <template>
-      <div>
-            登录页面
-      </div>
-      <div class="login">
-            <h1>{{ title }}</h1>
-            <div v-if="noLogin">账号:<input v-model="username" type="text"></div>
-            <div v-if="noLogin">密码:<input v-model="password" type="password"></div>
-            <div class="button-title" v-on:click="click">{{ buttonTitle }}</div>
+      <div id="login">
+            <div class="login-wrap">
+                  <el-form ref="ruleFormRef" :model="ruleForm" status-icon :rules="rules" class="demo-ruleForm" size="large">
+                        <el-form-item prop="pass">
+                              <label>邮箱</label>
+                              <el-input v-model="ruleForm.pass" type="password" autocomplete="off" />
+                        </el-form-item>
+
+                        <el-form-item prop="checkPass">
+                              <label>账号</label>
+                              <el-input v-model="ruleForm.checkPass" type="password" autocomplete="off" />
+                        </el-form-item>
+
+                        <el-form-item prop="age">
+                              <label>密码</label>
+                              <el-input v-model.number="ruleForm.age" />
+                        </el-form-item>
+                        <el-form-item>
+                              <el-button type="primary" @click="submitForm(ruleFormRef)">Submit</el-button>
+                              <el-button @click="resetForm(ruleFormRef)">Reset</el-button>
+                        </el-form-item>
+                  </el-form>
+            </div>
       </div>
 </template>
-<script>
-export default {
-      data() {
-            return {
-                  title: "欢迎您，未登录",
-                  noLogin: true,
-                  username: "",
-                  password: "",
-                  buttonTitle: "登录"
-            }
-      },
-      methods: {
-            click() {
-                  if (this.noLogin) {
-                        this.login()
+
+<script lang="ts" setup>
+import { reactive, ref } from 'vue'
+import type { FormInstance } from 'element-plus'
+
+const ruleFormRef = ref<FormInstance>()
+
+const checkAge = (rule: any, value: any, callback: any) => {
+      if (!value) {
+            return callback(new Error('Please input the age'))
+      }
+      setTimeout(() => {
+            if (!Number.isInteger(value)) {
+                  callback(new Error('Please input digits'))
+            } else {
+                  if (value < 18) {
+                        callback(new Error('Age must be greater than 18'))
                   } else {
-                        this.logout()
+                        callback()
                   }
-            },
-            // 登录
-            login() {
-                  if (this.username.length > 0 && this.password.length > 0) {
-                        // 登录后刷新页面
-                        alert(`username: ${this.username}`)
-                        this.noLogin = false
-                        this.title = `欢迎您: ${this.username}`
-                        this.buttonTitle = "注销"
-                        // 点击注销后，把用户名和密码置空字符串
-                        this.username = ""
-                        this.password = ""
-                  } else {
-                        alert("请输入账号或密码！")
-                  }
-            },
-            // 登出
-            logout() {
-                  // 清空数据
-                  this.noLogin = true
-                  this.title = "欢迎您：未登录"
-                  this.buttonTitle = "登录"
             }
+      }, 1000)
+}
+
+const validatePass = (rule: any, value: any, callback: any) => {
+      if (value === '') {
+            callback(new Error('Please input the password'))
+      } else {
+            if (ruleForm.checkPass !== '') {
+                  if (!ruleFormRef.value) return
+                  ruleFormRef.value.validateField('checkPass', () => null)
+            }
+            callback()
       }
 }
+const validatePass2 = (rule: any, value: any, callback: any) => {
+      if (value === '') {
+            callback(new Error('Please input the password again'))
+      } else if (value !== ruleForm.pass) {
+            callback(new Error("Two inputs don't match!"))
+      } else {
+            callback()
+      }
+}
+
+const ruleForm = reactive({
+      pass: '',
+      checkPass: '',
+      age: '',
+})
+
+const rules = reactive({
+      pass: [{ validator: validatePass, trigger: 'blur' }],
+      checkPass: [{ validator: validatePass2, trigger: 'blur' }],
+      age: [{ validator: checkAge, trigger: 'blur' }],
+})
+
+const submitForm = (formEl: FormInstance | undefined) => {
+      if (!formEl) return
+      formEl.validate((valid) => {
+            if (valid) {
+                  console.log('submit!')
+            } else {
+                  console.log('error submit!')
+                  return false
+            }
+      })
+}
+
+const resetForm = (formEl: FormInstance | undefined) => {
+      if (!formEl) return
+      formEl.resetFields()
+}
 </script>
-<style scoped lang="scss">
-// 登录按钮的样式
-div.button-title {
-      border-radius: 30px;
-      width: 100px;
-      margin: 20px auto;
-      color: white;
-      background-color: blue;
+<style scoped>
+.login-wrap{
+      margin: auto;
+      width: 330px;
 }
 </style>
