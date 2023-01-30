@@ -29,13 +29,13 @@ export default {
             return {
                   fields: [
                         {
-                              title: "账号",
-                              required: true,
+                              title: "邮箱",
+                              required: false,
                               type: "text"
                         },
                         {
-                              title: "邮箱地址",
-                              required: false,
+                              title: "账号",
+                              required: true,
                               type: "text"
                         },
                         {
