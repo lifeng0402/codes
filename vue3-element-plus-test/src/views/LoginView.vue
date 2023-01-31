@@ -12,6 +12,15 @@
                         <el-input v-model="ruleForm.checkPass" type="password" autocomplete="off" />
                   </el-form-item>
 
+                  <el-row class="block el-element">
+                        <el-col :span="12">
+                              <el-button type="success" :icon="Check" circle/>
+                        </el-col>
+                        <el-col :span="12">
+                              <el-button type="success">忘记密码？</el-button>
+                        </el-col>
+                  </el-row>
+
                   <el-form-item>
                         <el-button type="primary" @click="submitForm(ruleFormRef)" class="block">登录</el-button>
                   </el-form-item>
@@ -78,5 +87,10 @@ const submitForm = (formEl: FormInstance | undefined) => {
 .block {
       width: 100%;
       display: block;
+}
+.el-element{
+      width: 100%;
+      margin-bottom: 10%;
+
 }
 </style>
