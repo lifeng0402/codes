@@ -12,12 +12,14 @@
                         <el-input v-model="ruleForm.checkPass" type="password" autocomplete="off" />
                   </el-form-item>
 
-                  <el-row class="block el-element">
-                        <el-col :span="12">
-                              <el-button type="success" :icon="Check" circle/>
+                  <el-row class="el-element">
+                        <el-col>
+                              <el-button type="success" :icon="Check" circle size="small"/>
                         </el-col>
-                        <el-col :span="12">
-                              <el-button type="success">忘记密码？</el-button>
+                        <el-col :span="6">
+                              <el-button v-for="button in buttons" :key="button.text" :type="button.type" link>
+                                    {{ button.text }}
+                              </el-button>
                         </el-col>
                   </el-row>
 
@@ -76,6 +78,10 @@ const submitForm = (formEl: FormInstance | undefined) => {
             }
       })
 }
+
+const buttons = [
+      { type: 'forget_password', text: '忘记密码?' },
+] as const
 </script>
     
 <style scoped>
@@ -88,9 +94,11 @@ const submitForm = (formEl: FormInstance | undefined) => {
       width: 100%;
       display: block;
 }
-.el-element{
+
+.el-element {
       width: 100%;
       margin-bottom: 10%;
+      display: block;
 
 }
 </style>

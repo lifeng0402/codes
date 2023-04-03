@@ -2,42 +2,31 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2022/9/22 15:46
 # @Author  : debugfeng
-# @Site    : 
+# @Site    :
 # @File    : config.py
 # @Software: PyCharm
 
+
 from starlette.config import Config
-from starlette.datastructures import CommaSeparatedStrings
-from pathlib import Path
+from starlette.datastructures import (
+    CommaSeparatedStrings, Secret
+)
 
 
-__all__ = ["ReadConfig"]
+_config = Config(".env")
+
+# token加密方式
+SECRET_KEY = _config('SECRET_KEY', cast=Secret)
+# 获取程序运行环境
+ENVIRONMENT = _config("ENVIRONMENT", cast=bool, default=False)
+# 获取redis数据库URL
+REDIS_URL, R_ = _config('REDIS_HOST_URL', cast=CommaSeparatedStrings)
+# 获取数据库URL
+DATABASE_URL, D_ = _config('DATABASE_URL', cast=CommaSeparatedStrings)
+
+# 判断环境返回对应数据连接
+if ENVIRONMENT:
+    DATABASE_URL, REDIS_URL = D_, R_
 
 
-class ReadConfig:
-    _config = Config(".env")
-
-    @classmethod
-    def value(cls, *, variable: str):
-        """
-        读取配置文件中的数据，返回数据
-        :param variable:
-        :return:
-        """
-        return cls._config(variable)
-
-    @classmethod
-    def value_array(cls, *, variable: str):
-        """
-        读取配置文件中的数据，返回列表
-        :param variable:
-        :return:
-        """
-        variable = cls.value(variable=variable)
-        return list(CommaSeparatedStrings(variable))
-
-
-if __name__ == '__main__':
-    print(ReadConfig.value_array(variable="ENCRYPTION"))
-
-
+print(REDIS_URL)
