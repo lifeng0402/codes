@@ -8,7 +8,7 @@
 
 
 from sqlalchemy.orm import Session
-from src.app.models import report_model
+from src.app.models import reportModels
 from sqlalchemy import insert
 
 __all__ = ["DatabasesReport"]
@@ -17,7 +17,7 @@ __all__ = ["DatabasesReport"]
 class DatabasesReport:
     def __init__(self, *, db: Session):
         self._session = db
-        self._report = report_model.Reposts
+        self._report = reportModels.Reposts
 
     def insert_reports_info(self, **kwargs):
         results = self._session.execute(

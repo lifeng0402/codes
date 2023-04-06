@@ -6,7 +6,7 @@
 # @File    : __init__.py
 # @Software: PyCharm
 
-from . import global_settings
+from . import globalSettings
 
 __all__ = ["setting"]
 
@@ -14,11 +14,11 @@ __all__ = ["setting"]
 class _Settings:
 
     def __init__(self):
-        for name in dir(global_settings):
+        for name in dir(globalSettings):
             # 判断是不是大写
             if name.isupper():
                 # 读取到值后赋值给value
-                value = getattr(global_settings, name)
+                value = getattr(globalSettings, name)
                 # 再把value成name的值
                 setattr(self, name, value)
 

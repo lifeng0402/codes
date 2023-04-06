@@ -2,16 +2,17 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2022/9/20 11:50
 # @Author  : debugfeng
-# @Site    : 
+# @Site    :
 # @File    : users_model.py
 # @Software: PyCharm
 
+
 from src.app.models import *
 
-# 定义一个ORM模型基类
-Base = declarative_base(Engine)
 
 __all__ = ["Users", "Items"]
+
+Base = declarative_base()
 
 
 class Users(Base):

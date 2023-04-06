@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2022/9/22 15:28
 # @Author  : debugfeng
-# @Site    : 
+# @Site    :
 # @File    : access_token.py
 # @Software: PyCharm
 
@@ -10,19 +10,20 @@ from jose import jwt
 from jose import JWTError
 from fastapi import Header
 from typing import Optional
-from src.app.config import ReadConfig
+from src.app.config import settings
+# from src.app.config import ReadConfig
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
-from src.app.public.redispy import redispy
+from src.app.public.operationalRedis import redispy
 from jose.exceptions import ExpiredSignatureError
+
 
 __all__ = ["AccessToken"]
 
 
 class AccessToken:
-    # _KEY, _ALGORITHM, _TOKEN_EXPIRE_DAYS = ReadConfig.value_array(variable="ENCRYPTION")
-    _KEY, _ALGORITHM, _TOKEN_EXPIRE_DAYS = ("123789 & ^ % $abcdefg", "HS256", 3)
-    _ENCRYPTION_PWD = CryptContext(schemes=["sha256_crypt", "md5_crypt", "des_crypt"])
+    _KEY, _ALGORITHM, _TOKEN_EXPIRE_DAYS = settings.ENCRYPTION.split(",")
+    _ENCRYPTION_PWD = CryptContext(schemes=settings.CRYPTCONTEXT.split(","))
 
     @classmethod
     def generate_access_token(cls, data: dict, expiration: Optional[timedelta] = None):
@@ -33,9 +34,11 @@ class AccessToken:
         :return:
         """
         to_encode = data.copy()
-        expire = datetime.utcnow() + expiration if expiration else datetime.utcnow() + timedelta(days=3)
+        expire = datetime.utcnow() + expiration if expiration else datetime.utcnow() + \
+            timedelta(days=3)
         to_encode.update({"exp": expire})
-        to_encode_jwt = jwt.encode(to_encode, key=cls._KEY, algorithm=cls._ALGORITHM)
+        to_encode_jwt = jwt.encode(
+            to_encode, key=cls._KEY, algorithm=cls._ALGORITHM)
         return to_encode_jwt, expire
 
     @classmethod
@@ -48,7 +51,8 @@ class AccessToken:
 
         try:
             #   解析token值
-            payload = jwt.decode(token, key=cls._KEY, algorithms=cls._ALGORITHM)
+            payload = jwt.decode(token, key=cls._KEY,
+                                 algorithms=cls._ALGORITHM)
             username: str = payload["username"]
             exception_info = Exception(" 凭证错误或失效啦...... ")
             #   判断用户是不是空值

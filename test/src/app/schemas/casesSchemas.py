@@ -1,20 +1,32 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @Time    : 2022/9/23 17:27
+# @Time    : 2022/9/28 15:52
 # @Author  : debugfeng
 # @Site    : 
-# @File    : http_schemas.py
+# @File    : cases_schemas.py
 # @Software: PyCharm
 
-from pydantic import validator
 from typing import Union, Optional
+from pydantic import validator
 from pydantic import BaseModel, HttpUrl
-from src.app.enumeration.request_enum import BodyType
+from src.app.enumeration.requestEnum import BodyType
 
-__all__ = ["HttpBody", "HttpBodySave"]
+__all__ = ["CaseDatas", "CaseUpdate", "CaseAdd"]
 
 
-class HttpBody(BaseModel):
+class CaseDatas(BaseModel):
+    case_id: list[int]
+
+    @classmethod
+    @validator("case_id")
+    def name_not_empty(cls, v):
+        if isinstance(v, str) and len(v.strip()) == 0:
+            raise ValueError(f"{v} 不能为空")
+        return v
+
+
+class CaseAdd(BaseModel):
+    name: str
     method: str
     url: HttpUrl
     headers: dict
@@ -22,22 +34,22 @@ class HttpBody(BaseModel):
     body: Optional[Union[str, dict]] = None
     params: Optional[Union[str, dict]] = None
     cookies: Optional[Union[str, dict]] = None
+    comparison: Optional[Union[str, dict]] = None
+    expect: Optional[Union[str, dict]] = None
 
     @classmethod
-    @validator("method", "url", "headers")
+    @validator("case_name", "method", "url", "headers", "body_type")
     def name_not_empty(cls, v):
         if isinstance(v, str) and len(v.strip()) == 0:
             raise ValueError(f"{v} 不能为空")
         return v
 
 
-class HttpBodySave(HttpBody):
-    title: str
-    actual: Optional[Union[str, dict]] = None
-    expect: Optional[Union[str, dict]] = None
+class CaseUpdate(CaseAdd):
+    case_id: int
 
     @classmethod
-    @validator("title")
+    @validator("case_id")
     def name_not_empty(cls, v):
         if isinstance(v, str) and len(v.strip()) == 0:
             raise ValueError(f"{v} 不能为空")

@@ -7,23 +7,23 @@
 # @Software: PyCharm
 import typing
 
-from src.app.schemas.project import plan_schemas
+from src.app.schemas import planSchemas
 from fastapi import Depends
 from fastapi import APIRouter
 from sqlalchemy.orm import Session
-from src.app.crud import plan_crud
-from src.app.handler.fatcory import TestResponse
-from src.app.public.databases import session_local
-from src.app.dependencies.access_token import AccessToken
+from src.app.crud import planCrud
+from src.app.utilClass.fatcory import TestResponse
+from src.app.public.operationalDatabase import operDatabase
+from src.app.dependencies.accessToken import AccessToken
 
 router = APIRouter(
     prefix="/plan",
-    # dependencies=[Depends(AccessToken.verify_token)]
+    dependencies=[Depends(AccessToken.verify_token)]
 )
 
 
 @router.post("/add")
-async def plan_create(plan: plan_schemas.PlanAdd, db: Session = Depends(session_local)):
+async def plan_create(plan: planSchemas.PlanAdd, db: Session = Depends(operDatabase)):
     """
     新增测试计划
     :param plan:
@@ -31,15 +31,15 @@ async def plan_create(plan: plan_schemas.PlanAdd, db: Session = Depends(session_
     :return:
     """
     try:
-        databases_datas = plan_crud.DatabasesPlan(db=db)
+        databases_datas = planCrud.DatabasesPlan(db=db)
         data = databases_datas.plan_add(plan=plan)
-        return TestResponse.successful(msg="添加成功 ！", data=data)
+        return TestResponse.successful(msg="添加成功!", data=data)
     except Exception as ex:
         return TestResponse.defeated(msg=str(ex.args[0]))
 
 
 @router.put("/update")
-async def plan_update(plan: plan_schemas.PlanUpdate, db: Session = Depends(session_local)):
+async def plan_update(plan: planSchemas.PlanUpdate, db: Session = Depends(operDatabase)):
     """
     修改测试计划
     :param plan:
@@ -47,15 +47,15 @@ async def plan_update(plan: plan_schemas.PlanUpdate, db: Session = Depends(sessi
     :return:
     """
     try:
-        databases_datas = plan_crud.DatabasesPlan(db=db)
+        databases_datas = planCrud.DatabasesPlan(db=db)
         data = databases_datas.plan_update(plan=plan)
-        return TestResponse.successful(msg="修改成功 ！", data=data)
+        return TestResponse.successful(msg="修改成功!", data=data)
     except Exception as ex:
         return TestResponse.defeated(msg=str(ex.args[0]))
 
 
 @router.get("/plan")
-async def plan_list(skip: int = 0, limit: int = 10, db: Session = Depends(session_local)):
+async def plan_list(skip: int = 0, limit: int = 10, db: Session = Depends(operDatabase)):
     """
     测试计划列表
     :param skip:
@@ -64,15 +64,15 @@ async def plan_list(skip: int = 0, limit: int = 10, db: Session = Depends(sessio
     :return:
     """
     try:
-        databases_datas = plan_crud.DatabasesPlan(db=db)
+        databases_datas = planCrud.DatabasesPlan(db=db)
         data = databases_datas.plan_list(skip=skip, limit=limit)
-        return TestResponse.successful(msg="查询成功 ！", data=data)
+        return TestResponse.successful(msg="查询成功!", data=data)
     except Exception as ex:
         return TestResponse.defeated(msg=str(ex.args[0]))
 
 
 @router.delete("/delete/{plan_id}")
-async def plan_delete(plan_id: int, db: Session = Depends(session_local)):
+async def plan_delete(plan_id: int, db: Session = Depends(operDatabase)):
     """
     删除测试计划
     :param plan_id:
@@ -80,19 +80,19 @@ async def plan_delete(plan_id: int, db: Session = Depends(session_local)):
     :return:
     """
     try:
-        databases_datas = plan_crud.DatabasesPlan(db=db)
+        databases_datas = planCrud.DatabasesPlan(db=db)
         data = databases_datas.plan_delete(plan_id=plan_id)
-        return TestResponse.successful(msg="删除成功 ！", data=data)
+        return TestResponse.successful(msg="删除成功!", data=data)
     except Exception as ex:
         return TestResponse.defeated(msg=str(ex.args[0]))
 
 
 @router.post("/cases")
-async def plan_cases(case_id: plan_schemas.PlanData, db: Session = Depends(session_local)):
+async def plan_cases(case_id: planSchemas.PlanData, db: Session = Depends(operDatabase)):
     pass
 
 
-async def plan_execute(case_id: plan_schemas.PlanData, db: Session = Depends(session_local)):
+async def plan_execute(case_id: planSchemas.PlanData, db: Session = Depends(operDatabase)):
     """
     批量执行计划中的测试用例
     :param case_id:
@@ -100,8 +100,8 @@ async def plan_execute(case_id: plan_schemas.PlanData, db: Session = Depends(ses
     :return:
     """
     try:
-        databases_datas = plan_crud.DatabasesPlan(db=db)
+        databases_datas = planCrud.DatabasesPlan(db=db)
         data = databases_datas.plan_execute(case_id=case_id)
-        return TestResponse.successful(msg="用例运行完毕 ！", data=data)
+        return TestResponse.successful(msg="用例运行完毕!", data=data)
     except Exception as ex:
         return TestResponse.defeated(msg=str(ex.args[0]))

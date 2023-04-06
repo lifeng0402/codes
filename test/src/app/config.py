@@ -9,34 +9,27 @@
 
 from pydantic import BaseSettings
 
+__all__ = [
+    "settings"
+]
+
+# 从配置文件中读取信息
+
 
 class Settings(BaseSettings):
-    encryption: str
-    environment: bool
-    database_url: str
-    redis_url: str
+    ENCRYPTION: str
+    CRYPTCONTEXT: str
+    ENVIRONMENT: bool
+    DATABASE_URL: str
+    REDIS_URL: str
+    REDIS_PORT: int
+    REDIS_DB: int
 
+    # 指定配置文件
     class Config:
-        env_file = "test.env"
+        env_file = ".env"
 
 
-class TestSettings(BaseSettings):
-    encryption: str
-    environment: bool
-    database_url: str
-    redis_url: str
+settings = Settings()
 
-    class Config:
-        env_file = "test.env"
-
-class TestSettings(BaseSettings):
-    encryption: str
-    environment: bool
-    database_url: str
-    redis_url: str
-
-    class Config:
-        env_file = "test.env"
-
-
-print(TestSettings())
+# print(settings.REDIS_PORT)

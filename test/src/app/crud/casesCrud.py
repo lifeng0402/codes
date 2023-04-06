@@ -2,19 +2,21 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2022/9/29 15:04
 # @Author  : debugfeng
-# @Site    : 
+# @Site    :
 # @File    : cases_crud.py
 # @Software: PyCharm
 
 import json
 import typing
 from sqlalchemy.orm import Session
-from src.app.models import case_model
+from src.app.models import caseModels
 from src.app.public.logger import do_logger
-from src.app.schemas.project import cases_schemas
-from src.app.enumeration.request_enum import BodyType
-from src.app.public.databases import database_commit
-from sqlalchemy import select, and_, or_, update, delete
+from src.app.schemas import casesSchemas
+from src.app.enumeration.requestEnum import BodyType
+from src.app.public.operationalDatabase import databaseCommit
+from sqlalchemy import (
+    select, and_, or_, update, delete
+)
 
 __all__ = ["DatabasesCases"]
 
@@ -22,7 +24,7 @@ __all__ = ["DatabasesCases"]
 class DatabasesCases:
     def __init__(self, *, db: Session):
         self._session = db
-        self._cases = case_model.Cases
+        self._cases = caseModels.Cases
 
     @classmethod
     def _body_type_value_mode(cls, *, body_type: BodyType):
@@ -45,7 +47,7 @@ class DatabasesCases:
             case _:
                 return body_type.none.value
 
-    def cases_add(self, *, case: cases_schemas.CaseAdd):
+    def cases_add(self, *, case: casesSchemas.CaseAdd):
         """
         添加用例，新增到cases表中
         :param case:
@@ -54,7 +56,8 @@ class DatabasesCases:
 
         try:
             # 查询数据是否存在
-            datas_info = self._session.execute(select(self._cases).where(self._cases.name == case.name))
+            datas_info = self._session.execute(
+                select(self._cases).where(self._cases.name == case.name))
             # 如果数据存在则抛出异常
             if datas_info.scalars().first():
                 raise Exception(f"{case.name} - 名称已存在 ！")
@@ -69,10 +72,11 @@ class DatabasesCases:
                 ]), actual=case.comparison, expect=case.expect
             )
             # 提交数据成功后执行刷新
-            database_commit(_session=self._session, _datas=db_datas)
+            databaseCommit(_session=self._session, _datas=db_datas)
 
             results_info = self._session.execute(
-                select([self._cases.id, self._cases.name, self._cases.datas, self._cases.expect])
+                select([self._cases.id, self._cases.name,
+                       self._cases.datas, self._cases.expect])
             ).fetchall()
 
             return self._cases.is_json(results=results_info)
@@ -81,7 +85,7 @@ class DatabasesCases:
             do_logger.error(f"用例数据添加失败: {str(ex)}")
             raise ex
 
-    def cases_update(self, *, case: cases_schemas.CaseUpdate):
+    def cases_update(self, *, case: casesSchemas.CaseUpdate):
         """
         修改用例，更新到cases表中
         :param case:
@@ -117,7 +121,8 @@ class DatabasesCases:
             # 查询更新后的数据
             results_info = self._session.execute(
                 select(
-                    [self._cases.id, self._cases.name, self._cases.datas, self._cases.expect]
+                    [self._cases.id, self._cases.name,
+                        self._cases.datas, self._cases.expect]
                 ).where(self._cases.id == case.case_id)
             )
 
@@ -151,7 +156,7 @@ class DatabasesCases:
             do_logger.error(f"列表数据为空: {ex}")
             raise ex
 
-    def cases_delete(self, *, case: cases_schemas.CaseDatas):
+    def cases_delete(self, *, case: casesSchemas.CaseDatas):
         """
         删除用例，把数据从表中删除
         :param case:
@@ -196,7 +201,8 @@ class DatabasesCases:
         """
         try:
             results = self._session.execute(
-                update(self._cases).where(self._cases.id == case_id).values(**kwargs)
+                update(self._cases).where(
+                    self._cases.id == case_id).values(**kwargs)
             )
             self._session.commit()
             self._session.refresh(results)
@@ -211,7 +217,8 @@ class DatabasesCases:
         """
         results = self._session.execute(
             select(
-                [self._cases.id, self._cases.is_success, self._cases.is_error, self._cases.is_fail]
+                [self._cases.id, self._cases.is_success,
+                    self._cases.is_error, self._cases.is_fail]
             ).where(self._cases.id.in_(case_id))
         ).all()
         # datas = results.scalars().first()

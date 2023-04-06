@@ -24,12 +24,12 @@ if config.config_file_name is not None:
 # target_metadata = None
 
 from src.app.models import (
-    users_model, datas_model, case_model, report_model, plan_model, project_model
+    caseModels, datasModels, planModels, projectModels, reportModels, usersModels
 )
 
 target_metadata = [
-    users_model.Base.metadata, datas_model.Base.metadata, case_model.Base.metadata, report_model.Base.metadata,
-    plan_model.Base.metadata, project_model.Base.metadata
+    usersModels.Base.metadata, datasModels.Base.metadata, caseModels.Base.metadata, reportModels.Base.metadata,
+    planModels.Base.metadata, projectModels.Base.metadata
 ]
 
 

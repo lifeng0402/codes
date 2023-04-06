@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2022/10/9 10:10
 # @Author  : debugfeng
-# @Site    : 
+# @Site    :
 # @File    : report_model.py
 # @Software: PyCharm
 
@@ -10,8 +10,7 @@ from src.app.models import *
 
 __all__ = ["Reposts"]
 
-# 定义一个ORM模型基类
-Base = declarative_base(Engine)
+Base = declarative_base()
 
 
 class Reposts(Base):

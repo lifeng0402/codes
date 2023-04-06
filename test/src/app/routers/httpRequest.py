@@ -9,10 +9,10 @@ import json
 
 from fastapi import Depends
 from fastapi import APIRouter
-from src.app.handler.client import HttpRequest
-from src.app.handler.fatcory import TestResponse
-from src.app.schemas.http.http_schemas import HttpBody
-from src.app.dependencies.access_token import AccessToken
+from src.app.utilClass.client import HttpRequest
+from src.app.utilClass.fatcory import TestResponse
+from src.app.schemas.httpSchemas import HttpBody
+from src.app.dependencies.accessToken import AccessToken
 
 router = APIRouter(
     prefix="/http",

@@ -12,3 +12,4 @@ flet
 httpx[cli]
 jsonpath
 nest-asyncio
+databases

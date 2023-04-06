@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2022/9/26 09:36
 # @Author  : debugfeng
-# @Site    : 
+# @Site    :
 # @File    : datas_model.py
 # @Software: PyCharm
 
@@ -10,8 +10,7 @@ from src.app.models import *
 
 __all__ = ["Datas"]
 
-# 定义一个ORM模型基类
-Base = declarative_base(Engine)
+Base = declarative_base()
 
 
 class Datas(Base):
@@ -30,5 +29,7 @@ class Datas(Base):
     expect = Column(TEXT, comment="断言使用-接口的预期结果")
     comparison = Column(TEXT, comment="断言比较符号")
     is_active = Column(Boolean, default=True, comment="是否被删除")
-    created_time = Column(TIMESTAMP, nullable=False, default=datetime.now(), comment="创建时间")
-    updated_time = Column(TIMESTAMP, nullable=False, default=datetime.now(), comment="更新时间")
+    created_time = Column(TIMESTAMP, nullable=False,
+                          default=datetime.now(), comment="创建时间")
+    updated_time = Column(TIMESTAMP, nullable=False,
+                          default=datetime.now(), comment="更新时间")

@@ -16,7 +16,7 @@ import nest_asyncio
 from httpx import Response
 from json import JSONDecodeError
 from src.app.public.logger import do_logger
-from src.app.enumeration.request_enum import BodyType
+from src.app.enumeration.requestEnum import BodyType
 from httpx import HTTPStatusError, RequestError, InvalidURL
 
 __all__ = ["HttpRequest"]

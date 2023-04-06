@@ -14,10 +14,10 @@ from pydantic import HttpUrl
 from fastapi import status
 from sqlalchemy.orm import Session
 from src.app.constructor import affirm
-from src.app.crud.cases_crud import DatabasesCases
-from src.app.crud.report_crud import DatabasesReport
-from src.app.handler.client import HttpRequest
-from src.app.enumeration.request_enum import BodyType
+from src.app.crud.casesCrud import DatabasesCases
+from src.app.crud.reportCrud import DatabasesReport
+from src.app.utilClass.client import HttpRequest
+from src.app.enumeration.requestEnum import BodyType
 
 
 class ExecuteRun:

@@ -2,16 +2,18 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2022/9/28 15:42
 # @Author  : debugfeng
-# @Site    : 
+# @Site    :
 # @File    : case_model.py
 # @Software: PyCharm
 
+import json
+from typing import Any
 from src.app.models import *
+
 
 __all__ = ["Cases"]
 
-# 定义一个ORM模型基类
-Base = declarative_base(Engine)
+Base = declarative_base()
 
 
 class Cases(Base):
@@ -33,7 +35,7 @@ class Cases(Base):
     updated_time = Column(TIMESTAMP, nullable=False, default=datetime.now())
 
     @staticmethod
-    def is_json(*, results: typing.Any):
+    def is_json(*, results: Any):
         data_list = []
         for data in results:
             results = dict(zip(data.keys(), data))

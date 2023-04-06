@@ -7,15 +7,18 @@
 """
 
 import redis
-from src.app import setting as st
+from redis import Redis
+from src.app.config import settings as st
 
 __all__ = ["redispy"]
 
 
-class _Redispy:
+class _OperRedis:
     def __init__(self):
-        _connect_ip = st.REDIS_DATABASES["PRO"] if st.ENVIRONMENT else st.REDIS_DATABASES["TEST"]
-        self._connect = redis.Redis(host=_connect_ip, port=6379, db=1)
+        self._connect = Redis(
+            host=st.REDIS_URL if st.ENVIRONMENT else st.REDIS_URL,
+            port=st.REDIS_PORT, db=st.REDIS_DB
+        )
 
     def set_value(self, name: str, value: str, is_data: bool = False):
         """
@@ -61,4 +64,4 @@ class _Redispy:
         self._connect.close()
 
 
-redispy = _Redispy()
+redispy = _OperRedis()

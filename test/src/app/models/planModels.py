@@ -2,16 +2,16 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2022/10/18 18:10
 # @Author  : debugfeng
-# @Site    : 
+# @Site    :
 # @File    : plan_model.py
 # @Software: PyCharm
 
+from typing import Any
 from src.app.models import *
 
 __all__ = ["Plan"]
 
-# 定义一个ORM模型基类
-Base = declarative_base(Engine)
+Base = declarative_base()
 
 
 class Plan(Base):
@@ -27,7 +27,7 @@ class Plan(Base):
     updated_time = Column(TIMESTAMP, nullable=False, default=datetime.now())
 
     @staticmethod
-    def is_json(*, results: typing.Any):
+    def is_json(*, results: Any):
         data_list = []
         for data in results:
             results = dict(zip(data.keys(), data))
