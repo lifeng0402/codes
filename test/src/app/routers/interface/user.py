@@ -13,7 +13,7 @@ from fastapi import APIRouter
 from sqlalchemy.orm import Session
 from fastapi import BackgroundTasks
 from src.app.public.operationalRedis import redispy
-from src.app.utilClass.fatcory import TestResponse
+from src.app.utils.fatcory import TestResponse
 from src.app.public.operationalDatabase import operDatabase
 from src.app.crud.usersCrud import DatabasesUsers
 from src.app.schemas.userSchemas import UserPwd

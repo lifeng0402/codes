@@ -12,7 +12,7 @@ from fastapi import Depends
 from fastapi import APIRouter
 from sqlalchemy.orm import Session
 from src.app.crud import planCrud
-from src.app.utilClass.fatcory import TestResponse
+from src.app.utils.fatcory import TestResponse
 from src.app.public.operationalDatabase import operDatabase
 from src.app.dependencies.accessToken import AccessToken
 

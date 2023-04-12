@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Time    : 2022/9/29 14:18
 # @Author  : debugfeng
@@ -16,7 +15,7 @@ from sqlalchemy.orm import Session
 from src.app.constructor import affirm
 from src.app.crud.casesCrud import DatabasesCases
 from src.app.crud.reportCrud import DatabasesReport
-from src.app.utilClass.client import HttpRequest
+from src.app.utils.client import HttpRequest
 from src.app.enumeration.requestEnum import BodyType
 
 

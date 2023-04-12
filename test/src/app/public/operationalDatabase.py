@@ -30,7 +30,7 @@ def operDatabase():
         autocommit=False, autoflush=False,
         # 连接数据库
         bind=sqlalchemy.create_engine(
-            url=st.DATABASE_URL, pool_pre_ping=True
+            url=st.SQLALCHEMY_DATABASE_URI, pool_pre_ping=True
         )
     )
     # 初始化对象

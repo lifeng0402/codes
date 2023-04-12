@@ -8,7 +8,7 @@
 
 from fastapi import Depends
 from fastapi import APIRouter
-from src.app.utilClass.fatcory import TestResponse
+from src.app.utils.fatcory import TestResponse
 from src.app.dependencies.accessToken import AccessToken
 
 router = APIRouter(

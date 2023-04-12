@@ -11,7 +11,6 @@ from jose import JWTError
 from fastapi import Header
 from typing import Optional
 from src.app.config import settings
-# from src.app.config import ReadConfig
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from src.app.public.operationalRedis import redispy
@@ -22,8 +21,8 @@ __all__ = ["AccessToken"]
 
 
 class AccessToken:
-    _KEY, _ALGORITHM, _TOKEN_EXPIRE_DAYS = settings.ENCRYPTION.split(",")
-    _ENCRYPTION_PWD = CryptContext(schemes=settings.CRYPTCONTEXT.split(","))
+    _KEY, _ALGORITHM, _TOKEN_EXPIRE_DAYS = settings.ENCRYPTION
+    _ENCRYPTION_PWD = CryptContext(schemes=settings.CRYPTCONTEXT)
 
     @classmethod
     def generate_access_token(cls, data: dict, expiration: Optional[timedelta] = None):
@@ -38,7 +37,8 @@ class AccessToken:
             timedelta(days=3)
         to_encode.update({"exp": expire})
         to_encode_jwt = jwt.encode(
-            to_encode, key=cls._KEY, algorithm=cls._ALGORITHM)
+            to_encode, key=cls._KEY, algorithm=cls._ALGORITHM
+        )
         return to_encode_jwt, expire
 
     @classmethod
@@ -51,8 +51,9 @@ class AccessToken:
 
         try:
             #   解析token值
-            payload = jwt.decode(token, key=cls._KEY,
-                                 algorithms=cls._ALGORITHM)
+            payload = jwt.decode(
+                token, key=cls._KEY, algorithms=cls._ALGORITHM
+            )
             username: str = payload["username"]
             exception_info = Exception(" 凭证错误或失效啦...... ")
             #   判断用户是不是空值

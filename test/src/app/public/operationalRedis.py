@@ -15,10 +15,7 @@ __all__ = ["redispy"]
 
 class _OperRedis:
     def __init__(self):
-        self._connect = Redis(
-            host=st.REDIS_URL if st.ENVIRONMENT else st.REDIS_URL,
-            port=st.REDIS_PORT, db=st.REDIS_DB
-        )
+        self._connect = Redis(**st.REDIS_DATABASE_URI)
 
     def set_value(self, name: str, value: str, is_data: bool = False):
         """
@@ -28,9 +25,12 @@ class _OperRedis:
         :param is_data:
         :return:
         """
-        if is_data:
-            name = f"token:{name}"
-        self._connect.set(name, value)
+        try:
+            if is_data:
+                name = f"token:{name}"
+            self._connect.set(name, value)
+        finally:
+            self._connect.close()
 
     def get_value(self, name: str, is_data: bool = False):
         """
@@ -39,15 +39,20 @@ class _OperRedis:
         :param is_data:
         :return:
         """
-        if is_data:
-            name = f"token:{name}"
-
-        return self._connect.get(name).decode('utf-8')
+        try:
+            if is_data:
+                name = f"token:{name}"
+            return self._connect.get(name).decode('utf-8')
+        finally:
+            self._connect.close()
 
     def delete_value(self, name: str, is_data: bool = False):
-        if is_data:
-            name = f"token:{name}"
-        return self._connect.delete(name)
+        try:
+            if is_data:
+                name = f"token:{name}"
+            return self._connect.delete(name)
+        finally:
+            self._connect.close()
 
     def get_exists(self, name, is_data: bool = False):
         """
@@ -56,12 +61,14 @@ class _OperRedis:
         :param is_data:
         :return:
         """
-        if is_data:
-            name = f"token:{name}"
-        return self._connect.exists(name)
+        try:
+            if is_data:
+                name = f"token:{name}"
+            return self._connect.exists(name)
+        finally:
+            self._connect.close()
 
-    def __del__(self):
-        self._connect.close()
 
 
 redispy = _OperRedis()
+
