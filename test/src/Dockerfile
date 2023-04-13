@@ -8,11 +8,11 @@ COPY ../requirements.txt /code/requirements.txt
 
 RUN  python -m pip install --upgrade pip && pip install --no-cache-dir --upgrade -r /code/requirements.txt -i https://pypi.douban.com/simple/
 
-COPY ./sc_app /code/sc_app
+COPY ../src /code/src
 
 EXPOSE 8085
 
-CMD ["uvicorn", "sc_app.main:app", "--proxy-headers", "--host", "0.0.0.0", "--port", "8085"]
+CMD ["uvicorn", "src.app.main:app", "--proxy-headers", "--host", "0.0.0.0", "--port", "8085"]
 
 
 

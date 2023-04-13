@@ -7,10 +7,9 @@
 # @Software: PyCharm
 
 
-from pathlib import Path
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, Tuple
 from pydantic import BaseSettings, validator
-from src.app.utils.workes import MysqlDsn, ReadEnvConfig
+from src.app.utils.configRead import MysqlDsn, ReadEnvConfig
 
 __all__ = [
     "settings"
@@ -20,9 +19,40 @@ __all__ = [
 
 
 class Settings(BaseSettings):
-    ENVIRONMENT: bool = False
-    ENCRYPTION: tuple = ("123789&^%$abcdefg", "HS256", 3)
-    CRYPTCONTEXT: tuple = ("sha256_crypt", "md5_crypt", "des_crypt")
+    # 区分运行环境
+    ENVIRONMENT: bool
+
+    # Token过期天数和加密算法
+    TOKEN_KEY: str
+    TOKEN_ALGORITHM: str
+    TOKEN_EXPIRE_DAYS: str
+    ACCESS_TOKEN_EXPIRE: Optional[Tuple] = None
+
+    @validator("ACCESS_TOKEN_EXPIRE", pre=True)
+    def _assemble_expire(cls, v: Optional[str], values: Dict[str, Any]) -> Any:
+        if isinstance(v, str):
+            return v
+        return ReadEnvConfig.expire_build(
+            key=values.get("TOKEN_KEY"),
+            algorithm=values.get("TOKEN_ALGORITHM"),
+            expire_day=values.get("TOKEN_EXPIRE_DAYS"),
+        )
+
+    # Token加密方式
+    TOKEN_ENCRYPTION_MD5: str
+    TOKEN_ENCRYPTION_DSC: str
+    TOKEN_ENCRYPTION_SHA: str
+    TOKEN_ENCRYPTION: Optional[Tuple] = None
+
+    @validator("TOKEN_ENCRYPTION", pre=True)
+    def _assemble_encryption(cls, v: Optional[str], values: Dict[str, Any]) -> Any:
+        if isinstance(v, str):
+            return v
+        return ReadEnvConfig.encryption_build(
+            encryption_sha=values.get("TOKEN_ENCRYPTION_SHA"),
+            encryption_md5=values.get("TOKEN_ENCRYPTION_MD5"),
+            encryption_dsc=values.get("TOKEN_ENCRYPTION_DSC"),
+        )
 
     # 数据库连接地址
     MYSQL_SERVER: str
@@ -124,5 +154,4 @@ class Settings(BaseSettings):
 
 settings = Settings()
 
-
-print(settings.FASTAPI_DATA_DICT)
+print(settings.ENVIRONMENT)

@@ -21,8 +21,8 @@ __all__ = ["AccessToken"]
 
 
 class AccessToken:
-    _KEY, _ALGORITHM, _TOKEN_EXPIRE_DAYS = settings.ENCRYPTION
-    _ENCRYPTION_PWD = CryptContext(schemes=settings.CRYPTCONTEXT)
+    _KEY, _ALGORITHM, _TOKEN_EXPIRE_DAYS = settings.ACCESS_TOKEN_EXPIRE
+    _ENCRYPTION_PWD = CryptContext(schemes=settings.TOKEN_ENCRYPTION)
 
     @classmethod
     def generate_access_token(cls, data: dict, expiration: Optional[timedelta] = None):
