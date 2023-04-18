@@ -10,16 +10,17 @@ import os
 import sys
 import asyncio
 import uvicorn
+from config import Confing
 from fastapi import FastAPI
-from src.app.docs.doc import TagMetadata
-from src.app.routers.api import api_router
-from src.app.config import settings as st
+from docs.doc import TagMetadata
+from src.app.routers.apiRouter import api_router
+
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.getcwd())))
-print(sys.path)
+# print(sys.path)
 
 app = FastAPI(
-    **st.FASTAPI_TEXT_DICT,
+    **Confing.FASTAPI_TEXT_DICT,
     openapi_tags=TagMetadata.tags_metadata
 )
 
@@ -29,7 +30,10 @@ app.include_router(router=api_router)
 async def main():
     server = uvicorn.Server(
         config=uvicorn.Config(
-            app="src.app.main:app", host="10.10.29.245", port=8085,  log_level="info", reload=True
+            app=Confing.SERVER_APP, 
+            host=Confing.SERVER_HOST, 
+            port=Confing.SERVER_PORT,  
+            log_level=Confing.SERVER_LOG_LEVEL, reload=True
         )
     )
     await server.serve()

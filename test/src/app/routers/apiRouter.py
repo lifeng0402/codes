@@ -8,7 +8,7 @@
 """
 
 from fastapi import APIRouter
-from src.app.routers.interface import (
+from app.routers.interfaces import (
     user, project, plan, index, httpRequest, case
 )
 

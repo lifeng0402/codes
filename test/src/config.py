@@ -7,20 +7,22 @@
 # @Software: PyCharm
 
 
+import os
+from pathlib import Path
 from typing import Optional, Dict, Any, Tuple
 from pydantic import BaseSettings, validator
 from src.app.utils.configRead import MysqlDsn, ReadEnvConfig
 
 __all__ = [
-    "settings"
+    "Confing"
 ]
 
 # 从配置文件中读取信息
 
+DIR = Path(__file__).parent
+
 
 class Settings(BaseSettings):
-    # 区分运行环境
-    ENVIRONMENT: bool
 
     # Token过期天数和加密算法
     TOKEN_KEY: str
@@ -114,7 +116,7 @@ class Settings(BaseSettings):
     # Fastapi服务启动配置信息
     SERVER_APP: str
     SERVER_HOST: str
-    SERVER_PORT: str
+    SERVER_PORT: int
     SERVER_LOG_LEVEL: str
     FASTAPI_DATA_DICT: Optional[Dict] = None
 
@@ -147,11 +149,27 @@ class Settings(BaseSettings):
             description=values.get('SERVER_DESCRIPTION'),
         )
 
+
+# settings = Settings(_env_file="./docs/prod.env", _env_file_encoding="utf-8")
+# settings = Settings()
+
+
+class SettingsDevd(Settings):
+    # 开发环境读取配置
     class Config:
-        env_file = ".env"
-        env_file_encoding = 'utf-8'
+        case_sensitive = True
+        env_file = DIR.joinpath("conf", "devd.env")
 
 
-settings = Settings()
+class SettingsProd(Settings):
+    # 线上环境读取配置
+    class Config:
+        case_sensitive = True
+        env_file = DIR.joinpath("conf", "prod.env")
 
-print(settings.ENVIRONMENT)
+
+_PY_ENV = os.getenv("PY_ENV", "DEV")
+
+Confing = SettingsProd() if (_PY_ENV and _PY_ENV.isupper()) else SettingsDevd()
+
+# print(Confing.FASTAPI_DATA_DICT)

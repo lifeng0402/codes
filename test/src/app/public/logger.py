@@ -8,7 +8,7 @@
 
 import logging
 from pathlib import Path
-from src.app.config import settings as st
+from config import Confing
 
 __all_ = ["do_logger"]
 
@@ -16,14 +16,14 @@ __all_ = ["do_logger"]
 class _Logger:
 
     def __init__(self):
-        data = st.LOGGING_DATA_DICT
+        data = Confing.LOGGING_DATA_DICT
         self._logger = logging.getLogger()  # 日志收集器
         self._logger.setLevel(data.get("level"))  # 设置日志级别
 
         # 日志输入渠道，输出到控制台及日志文件中
         _console_log = logging.StreamHandler()
         _write_file_log = logging.FileHandler(
-            filename=Path(__file__).parent.parent.joinpath("logs").joinpath(data.get("file_name")),
+            filename=Path(__file__).parent.parent.parent.joinpath("logs", data.get("file_name")),
             encoding='utf-8'
         )  # 写入文件
 

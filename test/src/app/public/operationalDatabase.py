@@ -9,8 +9,8 @@
 
 import sqlalchemy
 from typing import Any
+from config import Confing
 from sqlalchemy.orm import sessionmaker
-from src.app.config import settings as st
 
 
 # DATABASE_URL = "mysql+pymysql://root:123456@10.10.12.199:3307/api_test"
@@ -30,7 +30,7 @@ def operDatabase():
         autocommit=False, autoflush=False,
         # 连接数据库
         bind=sqlalchemy.create_engine(
-            url=st.SQLALCHEMY_DATABASE_URI, pool_pre_ping=True
+            url=Confing.SQLALCHEMY_DATABASE_URI, pool_pre_ping=True
         )
     )
     # 初始化对象

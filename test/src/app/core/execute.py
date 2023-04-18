@@ -12,7 +12,7 @@ import typing
 from pydantic import HttpUrl
 from fastapi import status
 from sqlalchemy.orm import Session
-from src.app.constructor import affirm
+from src.app.core import affirm
 from src.app.crud.casesCrud import DatabasesCases
 from src.app.crud.reportCrud import DatabasesReport
 from src.app.utils.client import HttpRequest

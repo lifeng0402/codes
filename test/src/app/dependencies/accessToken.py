@@ -10,7 +10,7 @@ from jose import jwt
 from jose import JWTError
 from fastapi import Header
 from typing import Optional
-from src.app.config import settings
+from config import Confing
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from src.app.public.operationalRedis import redispy
@@ -21,8 +21,8 @@ __all__ = ["AccessToken"]
 
 
 class AccessToken:
-    _KEY, _ALGORITHM, _TOKEN_EXPIRE_DAYS = settings.ACCESS_TOKEN_EXPIRE
-    _ENCRYPTION_PWD = CryptContext(schemes=settings.TOKEN_ENCRYPTION)
+    _KEY, _ALGORITHM, _TOKEN_EXPIRE_DAYS = Confing.ACCESS_TOKEN_EXPIRE
+    _ENCRYPTION_PWD = CryptContext(schemes=Confing.TOKEN_ENCRYPTION)
 
     @classmethod
     def generate_access_token(cls, data: dict, expiration: Optional[timedelta] = None):

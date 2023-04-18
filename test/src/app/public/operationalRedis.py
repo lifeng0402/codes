@@ -8,14 +8,14 @@
 
 import redis
 from redis import Redis
-from src.app.config import settings as st
+from config import Confing
 
 __all__ = ["redispy"]
 
 
 class _OperRedis:
     def __init__(self):
-        self._connect = Redis(**st.REDIS_DATABASE_URI)
+        self._connect = Redis(**Confing.REDIS_DATABASE_URI)
 
     def set_value(self, name: str, value: str, is_data: bool = False):
         """

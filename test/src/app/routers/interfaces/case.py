@@ -14,7 +14,7 @@ from src.app.utils.fatcory import TestResponse
 from src.app.public.operationalDatabase import operDatabase
 from src.app.schemas import casesSchemas
 from src.app.crud import casesCrud
-from src.app.constructor.execute import ExecuteRun
+from src.app.core.execute import ExecuteRun
 from src.app.dependencies.accessToken import AccessToken
 
 router = APIRouter(
