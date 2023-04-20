@@ -10,7 +10,7 @@ from jose import jwt
 from jose import JWTError
 from fastapi import Header
 from typing import Optional
-from config import Confing
+from src.config import Confing
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from src.app.public.operationalRedis import redispy

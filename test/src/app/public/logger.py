@@ -8,7 +8,7 @@
 
 import logging
 from pathlib import Path
-from config import Confing
+from src.config import Confing
 
 __all_ = ["do_logger"]
 

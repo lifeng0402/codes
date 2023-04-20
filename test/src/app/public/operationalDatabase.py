@@ -9,7 +9,7 @@
 
 import sqlalchemy
 from typing import Any
-from config import Confing
+from src.config import Confing
 from sqlalchemy.orm import sessionmaker
 
 

@@ -10,9 +10,9 @@ import os
 import sys
 import asyncio
 import uvicorn
-from config import Confing
 from fastapi import FastAPI
-from docs.doc import TagMetadata
+from src.config import Confing
+from src.docs.doc import TagMetadata
 from src.app.routers.apiRouter import api_router
 
 

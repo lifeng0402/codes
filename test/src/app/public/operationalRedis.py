@@ -8,7 +8,7 @@
 
 import redis
 from redis import Redis
-from config import Confing
+from src.config import Confing
 
 __all__ = ["redispy"]
 
