@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+      <meta charset="UTF-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>函数式组件/类式组件</title>
+
+
+</head>
+
+<body>
+      <div id="test"></div>
+      <div id="ctest"></div>
+      <div id="jtest"></div>
+
+      <!-- 引用react和核心库 -->
+      <script type="text/javascript" src="./vendor/react.js"></script>
+      <!-- 引入react-dom -->
+      <script type="text/javascript" src="./vendor/react-dom.js"></script>
+      <!-- 引入babel.js -->
+      <script type="text/javascript" src="./vendor/babel.min.js"></script>
+
+      <script type="text/babel">
+            // 函数式组件
+            function MyDemo() {
+                  return <h2>我定义的函数式组件</h2>
+            }
+            // 渲染组件到页面
+            ReactDOM.render(<MyDemo />, document.getElementById("test"))
+
+            // 类式组件
+            class MyComponent extends React.Component {
+                  render() {
+                        return (
+                              <h2>我定义的类式组件</h2>
+                        )
+                  }
+            }
+            // 渲染组件到页面
+            ReactDOM.render(<MyComponent />, document.getElementById("ctest"))
+
+            class Weather extends React.Component {
+                  constructor(props) {
+                        super(props)
+                        this.state = { isHot: false, wind: "微风" }
+                        // 解决changeWeather中的this指向问题
+                        this.changeWeather = this.changeWeather.bind(this)
+                  }
+
+                  render() {
+                        // 读取状态
+                        const { isHot } = this.state
+                        return <h1 onClick={this.changeWeather}>今天天气很{isHot ? "炎热" : "凉爽"}, {wind}</h1>
+                  }
+                  changeWeather() {
+                        // 获取原来的isHot的值
+                        const isHot = this.state.isHot
+                        // 修改值 取反
+                        this.setState({ isHot: !isHot })
+                        console.log(this);
+                  }
+            }
+            ReactDOM.render(<Weather />, document.getElementById("jtest"))
+      </script>
+
+</body>
+
+</html>
