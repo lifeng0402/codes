@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+      <meta charset="UTF-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Document</title>
+</head>
+
+<body>
+      <div id="test"></div>
+      <!-- 引用react和核心库 -->
+      <script type="text/javascript" src="../public/js/react.js"></script>
+      <!-- 引入react-dom -->
+      <script type="text/javascript" src="../public/js/react-dom.js"></script>
+      <!-- 引入babel.js -->
+      <script type="text/javascript" src="../public/js/babel.min.js"></script>
+
+      <script type="text/babel">
+            const myID = "JHJkkk"
+            const myData = "Hello React"
+            const data = ["Angular", "React", "Vue"]
+            // 创建虚拟DOM
+            const VDOM = (
+                  <div>
+                        <h2 className={myID.toLocaleLowerCase()}>
+                              <span>{myData.toLocaleLowerCase()}</span>
+                        </h2>
+                        <h2 className={myID.toLocaleLowerCase()}>
+                              <span>{myData.toLocaleLowerCase()}</span>
+                        </h2>
+                        <input type="text" />
+                        <good>123456</good>
+                        <div>
+                              <h1>前端js框架列表</h1>
+                              <ul>
+                                    {     //遍历必须要唯一值
+                                          data.map((item, index) => {
+                                                return <li key={index}>{item}</li>
+                                          })
+                                    }
+                              </ul>
+                        </div>
+                  </div>
+            )
+            ReactDOM.render(VDOM, document.getElementById("test"))
+      </script>
+</body>
+
+</html>

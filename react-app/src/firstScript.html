@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+      <meta charset="UTF-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>编写第一个js代码</title>
+      <script src="./js/myFunction.js"></script>
+      <script>
+            function myFunction() {
+                  document.getElementById("demo").innerHTML = "我是第一个 javaScript 函数"
+            }
+      </script>
+</head>
+
+<body>
+      <!-- 引用head中的javaScript函数 -->
+      <div>
+            <h1>我的web页面</h1>
+            <p id="demo">一个段落</p>
+            <button type="button" onclick="myFunction()">尝试一下</button>
+      </div>
+      <!-- 引用body中的javaScript函数 -->
+      <div>
+            <h1>我的第二个web页面</h1>
+            <p id="test">又是一个段落</p>
+            <button type="button" onclick="myFunction1()">再次尝试一下</button>
+      </div>
+      <!-- 引用外部javaScript函数 -->
+      <div>
+            <h1>我的第三个web页面</h1>
+            <p id="ctest">这又是一个段落</p>
+            <button type="button" onclick="myFunction2()">再再次尝试一下</button>
+      </div>
+      <script>
+            function myFunction1() {
+                  document.getElementById("test").innerHTML = "这是我的第二个 javaScrip 函数"
+            }
+
+            a = 5
+            b = 6
+            c = a + b
+            console.log(c)
+
+            var person = {
+                  firstName: "John",
+                  lastName: "Doe",
+                  age: 50,
+                  eyeColor: "blue"
+            };
+            console.log(person["lastName"])
+            console.log(person.firstName)
+      </script>
+</body>
+
+</html>
