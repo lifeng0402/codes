@@ -32,6 +32,7 @@
             <h1>我的第三个web页面</h1>
             <p id="ctest">这又是一个段落</p>
             <button type="button" onclick="myFunction2()">再再次尝试一下</button>
+            <button type="button" onclick="myFunction(name='hahah', job='测试工程师')">再再再次尝试一下</button>
       </div>
       <script>
             function myFunction1() {
@@ -51,6 +52,16 @@
             };
             console.log(person["lastName"])
             console.log(person.firstName)
+
+            function myFunction(name, job) {
+                  alert("Welcome" + name + job)
+            }
+            var var1 = 1
+            var2 = 2
+            console.log(this.var1)
+            console.log(window.var2)
+            delete var2
+            console.log(var2)
       </script>
 </body>
 
