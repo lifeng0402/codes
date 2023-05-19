@@ -28,21 +28,22 @@
                         username: '', //用户名
                         password: '' //密码
                   }
+                  // 保存表单中的数据
                   saveData = (datasType) => {
                         return (event) => {
-                              this.setState({[datasType]:event.target.value})
+                              this.setState({ [datasType]: event.target.value })
                         }
                   }
-                  // 保存用户名到状态中
-                  saveUsername = (event) => {
-                        // console.log('@');
-                        this.setState({ username: event.target.value })
-                  }
-                  // 保存密码到状态中
-                  savePassword = (event) => {
-                        // console.log('@');
-                        this.setState({ password: event.target.value })
-                  }
+                  // // 保存用户名到状态中
+                  // saveUsername = (event) => {
+                  //       // console.log('@');
+                  //       this.setState({ username: event.target.value })
+                  // }
+                  // // 保存密码到状态中
+                  // savePassword = (event) => {
+                  //       // console.log('@');
+                  //       this.setState({ password: event.target.value })
+                  // }
                   // 表单提交回调数据
                   handleSubmit = (event) => {
                         event.preventDefault() //阻止表单提交
@@ -52,8 +53,8 @@
                   render() {
                         return (
                               <form onSubmit={this.handleSubmit}>
-                                    用户名：<input onChange={this.saveUsername} type="text" name="username" />
-                                    密码：<input onChange={this.savePassword} type="text" name="password" />
+                                    用户名：<input onChange={this.saveData("username")} type="text" name="username" />
+                                    密码：<input onChange={this.saveData("password")} type="text" name="password" />
                                     <button>登录</button>
                               </form>
                         )
