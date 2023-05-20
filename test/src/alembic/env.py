@@ -1,4 +1,6 @@
-import os, sys
+from src.app.public.base import Base
+import os
+import sys
 from logging.config import fileConfig
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
@@ -23,14 +25,17 @@ if config.config_file_name is not None:
 # target_metadata = mymodel.Base.metadata
 # target_metadata = None
 
-from src.app.models import (
-    users_model, datas_model, case_model, report_model, plan_model, project_model
-)
+# from src.app.models import (
+#     caseModels, datasModels, planModels, projectModels, reportModels, usersModels
+# )
 
-target_metadata = [
-    users_model.Base.metadata, datas_model.Base.metadata, case_model.Base.metadata, report_model.Base.metadata,
-    plan_model.Base.metadata, project_model.Base.metadata
-]
+# target_metadata = [
+#     usersModels.Base.metadata, datasModels.Base.metadata, caseModels.Base.metadata, reportModels.Base.metadata,
+#     planModels.Base.metadata, projectModels.Base.metadata
+# ]
+
+
+target_metadata = Base.metadata
 
 
 # other values from the config, defined by the needs of env.py,

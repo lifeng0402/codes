@@ -2,14 +2,18 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2022/9/16 09:39
 # @Author  : debugfeng
-# @Site    : 
+# @Site    :
 # @File    : __init__.py
 # @Software: PyCharm
 
-import json
-import typing
+
 from datetime import datetime
+from sqlalchemy import Column
 from sqlalchemy.orm import relationship
-from src.app.public.databases import Engine
+# from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Table, Boolean, Column, ForeignKey, Integer, String, TIMESTAMP, INT, TEXT
+from sqlalchemy import (
+    Integer, String, Boolean, TIMESTAMP, ForeignKey, TEXT, INT
+)
+
+# ----------------------------------------------------------------------

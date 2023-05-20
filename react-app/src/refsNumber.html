@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+      <meta charset="UTF-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>回调函数refs调用多次的问题</title>
+</head>
+
+<body>
+      <div id="test"></div>
+
+      <!-- 引用react和核心库 -->
+      <script type="text/javascript" src="../public/js/react.js"></script>
+      <!-- 引入react-dom -->
+      <script type="text/javascript" src="../public/js/react-dom.js"></script>
+      <!-- 引入babel.js -->
+      <script type="text/javascript" src="../public/js/babel.min.js"></script>
+      <!-- 引入prop-types.js 限制类型-->
+      <script type="text/javascript" src="../public/js/prop-types.js"></script>
+
+      <script type="text/babel">
+            // 创建组件
+            class DemoComponent extends React.Component {
+                  constructor(props) {
+                        super(props)
+                        this.state = { isHot: false }
+                        // 解决changeWeather中的this指向问题
+                        this.changeWeather = this.changeWeather.bind(this)
+
+                  }
+                  changeWeather = () => {
+                        const isHot = this.state.isHot
+                        this.setState({ isHot: !isHot })
+                  }
+                  saveInput = (c) => {
+                        this.input1 = c;
+                        console.log(c)
+                  }
+                  // 展示左侧输入框的数据
+                  showData = () => {
+                        alert(this.input1.value)
+                  }
+                  // 回调函数形式的的获取数据
+                  render() {
+                        const { isHot } = this.state
+                        return (
+                              <div>
+                                    <h2>今天天气很{isHot ? "炎热" : "凉爽"}</h2>
+                                    {/*<input ref={c => this.input1 = c} type="text" placeholder="点击按钮提示数据" />*/}
+                                    <input ref={this.saveInput} type="text" placeholder="点击按钮提示数据" />
+                                    <button onClick={this.showData}>点我提示输入的数据</button>
+                                    <button onClick={this.changeWeather}>点我切换天气</button>
+                              </div>
+                        )
+                  }
+            }
+            ReactDOM.render(<DemoComponent />, document.getElementById("test"))
+      </script>
+</body>
+
+</html>
