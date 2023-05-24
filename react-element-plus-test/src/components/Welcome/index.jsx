@@ -1,7 +1,8 @@
 import React, { Component } from "react";
+import './index.css'
 
 export default class Welcome extends Component {
       render() {
-            return <h2 className="title">Welcome, React!</h2>
+            return <h2 className="dome">Welcome, React!</h2>
       }
 }
