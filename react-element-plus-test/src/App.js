@@ -1,6 +1,4 @@
 import React, { Component } from 'react';
-// import Hello from './components/Hello';
-// import Welcome from './components/Welcome';
 import Header from './components/Header';
 import List from './components/List';
 import Footer from './components/Footer';
@@ -13,9 +11,9 @@ export default class App extends Component {
   // 初始化数据
   state = {
     todos: [
-      { id: 1, name: "吃饭", done: true },
-      { id: 2, name: "睡觉", done: true },
-      { id: 3, name: "敲代码", done: false },
+      { id: "1", name: "吃饭", done: true },
+      { id: "2", name: "睡觉", done: true },
+      { id: "3", name: "敲代码", done: false },
     ]
   }
 
@@ -42,13 +40,25 @@ export default class App extends Component {
     this.setState({ todos: newTodos })
   }
 
+  // deleteTdo用于删除一个todo对象
+  deleteTodo = (id) => {
+    // 获取原来的todos
+    const { todos } = this.state
+    // 删除指定ID的todo对象
+    const newTodos = todos.filter((todoObj) => {
+      return todoObj.id !== id
+    })
+    // 更新状态
+    this.setState({ todos: newTodos })
+  }
+
   render() {
     const { todos } = this.state
     return (
       <div className="todo-container">
         <div className="todo-wrap">
           <Header addTodo={this.addTodo} />
-          <List todos={todos} updateTodo={this.updateTodo}/>
+          <List todos={todos} updateTodo={this.updateTodo} deleteTodo={this.deleteTodo} />
           <Footer />
         </div>
       </div >

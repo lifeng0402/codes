@@ -19,8 +19,6 @@ __all__ = [
 
 # 从配置文件中读取信息
 
-DIR = Path(__file__).parent
-
 
 class Settings(BaseSettings):
 
@@ -158,14 +156,14 @@ class SettingsDevd(Settings):
     # 开发环境读取配置
     class Config:
         case_sensitive = True
-        env_file = DIR.joinpath("conf", "devd.env")
+        env_file = Path(__file__).parent.joinpath("conf", "devd.env")
 
 
 class SettingsProd(Settings):
     # 线上环境读取配置
     class Config:
         case_sensitive = True
-        env_file = DIR.joinpath("conf", "prod.env")
+        env_file = Path(__file__).parent.joinpath("conf", "prod.env")
 
 
 _PY_ENV = os.getenv("PY_ENV", "DEV")
