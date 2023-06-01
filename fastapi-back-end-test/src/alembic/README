@@ -1,0 +1,5 @@
+Generic single-database configuration.
+
+
+alembic revision --autogenerate -m "提交表结构"
+alembic upgrade head

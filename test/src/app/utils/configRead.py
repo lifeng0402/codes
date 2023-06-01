@@ -7,7 +7,7 @@
 @说明:
 """
 
-from pydantic import AnyUrl
+from pydantic import AnyUrl, PostgresDsn
 
 __all__ = [
     "MysqlDsn",
