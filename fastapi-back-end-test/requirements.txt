@@ -2,3 +2,4 @@ fastapi[all]
 databases
 alembic
 pymysql
+verify-email

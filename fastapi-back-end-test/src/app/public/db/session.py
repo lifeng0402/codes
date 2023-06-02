@@ -17,27 +17,26 @@ __all__ = [
 ]
 
 
-class Csession:
-
+class SessionContextManager:
     def __init__(self) -> None:
         # 创建一个持久对象
-        self._db = sessionmaker(
+        db_session = sessionmaker(
             autocommit=False, autoflush=False,
             # 连接数据库
             bind=create_engine(
                 url=settings.SQLALCHEMY_DATABASE_URI, pool_pre_ping=True
             )
         )
+        # 新建一个session对象
+        self._db = db_session()
 
-    def session(self):
-        # 初始化对象
-        session = self._db()
-        try:
-            yield session
-        except Exception as exc:
-            raise exc
-        finally:
-            session.close()
+    def __enter__(self):
+        return self._db
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        return self._db.close()
 
 
-session = Csession().session
+async def session():
+    with SessionContextManager() as db:
+        yield db
