@@ -8,11 +8,26 @@
 """
 
 import uvicorn
+from fastapi import Depends
 from fastapi import FastAPI
+from fastapi import Request
+from fastapi import Response
+from typing import Optional, Callable, Any
 from src.app.routers.api_router import api_router
 
 app = FastAPI()
+
+
+@app.middleware
+async def add_header(request: Request, response: Response, next: Optional[Callable[..., Any]]):
+    headers = {"Content-Type": "application/json"}
+    request.headers.update(headers)
+    response.headers.update(headers)
+    return await next(response)
+
+
 app.include_router(router=api_router)
+
 
 if __name__ == "__main__":
     uvicorn.run(app="src.main:app", reload=True)

@@ -3,3 +3,6 @@ databases
 alembic
 pymysql
 verify-email
+python-jose[cryptography]
+passlib[bcrypt]
+redis

@@ -9,8 +9,16 @@
 
 
 from fastapi import APIRouter
-from src.app.routers.users import register
+from src.app.routers.users import (
+    register,
+    login
+)
+from src.app.routers.home import (
+    index
+)
 
 
 api_router = APIRouter()
 api_router.include_router(router=register.router, tags=["注册接口"])
+api_router.include_router(router=login.router, tags=["登录接口"])
+api_router.include_router(router=index.router, tags=["首页接口"])

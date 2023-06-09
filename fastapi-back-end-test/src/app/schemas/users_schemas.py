@@ -15,3 +15,13 @@ class UsersSchemas(BaseModel):
     username: str
     password: str
     mailbox: EmailStr
+
+
+class UserToken(BaseModel):
+    username: str
+    token: str
+
+
+class UsersLogin(BaseModel):
+    username: str
+    password: str

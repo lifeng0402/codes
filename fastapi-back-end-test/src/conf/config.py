@@ -11,7 +11,8 @@ import os
 from typing import (
     Optional,
     Dict,
-    Any
+    Any,
+    List
 )
 from pydantic import (
     BaseSettings,
@@ -26,6 +27,14 @@ __all__ = [
 
 
 class Settings(BaseSettings):
+
+    SECRET: str
+    ALGORITHM: str
+
+    # Redis连接信息
+    REDIS_SERVER: str
+    REDIS_PORT: int
+    REDIS_DB: int
 
     # 数据库连接信息
     MYSQL_SERVER: str
@@ -71,5 +80,3 @@ class SettingsDevd(Settings):
 # _PY_ENV = os.getenv("PY_ENV", "DEV")
 # settings = SettingsProd() if (_PY_ENV and _PY_ENV.isupper()) else SettingsDevd()
 settings = SettingsDevd()
-
-# print(settings.SQLALCHEMY_DATABASE_URI)
