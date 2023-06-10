@@ -15,8 +15,9 @@ from sqlalchemy import (
     or_
 )
 from src.app.models.users_models import Users
+from src.app.schemas.users_schemas import UsersLogin
 from src.app.schemas.users_schemas import UsersSchemas
-from src.app.public.verification import VerificationData
+from src.app.utils.verification import VerificationData
 
 __all__ = [
     "UsersCrud"
@@ -86,5 +87,31 @@ class UsersCrud:
                 )
             ).first()
             return update_results
+        except Exception as exc:
+            raise exc
+
+    def login_user(self, user: UsersLogin):
+        """
+        登录接口查询数据并返回
+        @param  :
+        @return  :
+        """
+
+        def select_username(*, db: Session):
+            results = db.execute(
+                select(Users.id, Users.mobile, Users.username, Users.mailbox).where(
+                    and_(
+                        Users.password == user.password,
+                        Users.username == user.username
+                    )
+                )
+            )
+            return results
+
+        try:
+            if not select_username(db=self.db).scalars().first():
+                raise Exception("账号或密码错误...")
+
+            return select_username(db=self.db).fetchone()
         except Exception as exc:
             raise exc

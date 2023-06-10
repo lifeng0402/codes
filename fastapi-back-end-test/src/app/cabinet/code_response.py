@@ -7,8 +7,13 @@
 @说明: 
 """
 
-
+from fastapi.exceptions import HTTPException
 from fastapi.encoders import jsonable_encoder
+
+
+__all__ = [
+    "CodeResponse"
+]
 
 
 class CodeResponse:
@@ -23,7 +28,7 @@ class CodeResponse:
         return jsonable_encoder(
             dict(
                 status=status,
-                data=data,
+                data=data if data else {},
                 err_code=0,
                 err_msg=""
             )
@@ -38,10 +43,11 @@ class CodeResponse:
         @param  :
         @return  :
         """
+
         return jsonable_encoder(
             dict(
                 status=status,
-                data=data,
+                data=data if data else {},
                 err_code=err_code,
                 err_msg=err_msg
             )
