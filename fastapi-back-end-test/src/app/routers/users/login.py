@@ -16,7 +16,7 @@ from src.app.public.db.session import session
 from src.app.public.base_redis import redis_client
 from src.app.schemas.users_schemas import UsersLogin
 from src.app.cabinet.code_response import CodeResponse
-from src.app.public.access_token import AccessToken
+from src.app.core.access_token import AccessToken
 
 
 router = APIRouter(
@@ -36,7 +36,7 @@ async def user_login(users: UsersLogin, db: Session = Depends(session)):
         if not response:
             raise
 
-        access_token = AccessToken.encryption_token(data=users)
+        access_token = AccessToken.token_encrypt(data=users)
         await redis_client.set(f"access_token:{users.username}", access_token)
 
         return CodeResponse.succeed(

@@ -19,7 +19,7 @@ from pydantic import (
     validator
 )
 from pathlib import Path
-from src.app.public.dantic import DatabasesDsn
+from src.app.utils.dantic import DatabasesDsn
 
 __all__ = [
     "settings"

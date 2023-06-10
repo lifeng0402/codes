@@ -11,8 +11,7 @@
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import status
-from fastapi.exceptions import HTTPException
-from src.app.public.access_token import AccessToken
+from src.app.core.access_token import AccessToken
 from src.app.cabinet.code_response import CodeResponse
 
 
@@ -27,9 +26,7 @@ async def home_index():
         result = CodeResponse.succeed(
             data=dict(info="Welcome to the home page")
         )
-        print(55, result)
         return result
-      # raise HTTPException(status_code=401, detail="333")
     except Exception as exc:
         return CodeResponse.defeated(
             err_msg=str(exc.args[0]),

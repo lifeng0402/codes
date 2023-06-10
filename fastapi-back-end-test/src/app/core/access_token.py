@@ -18,6 +18,7 @@ from datetime import (
     datetime
 )
 from fastapi import Header
+from fastapi.exceptions import HTTPException
 from src.conf.config import settings as st
 from src.app.public.base_redis import redis_client
 
@@ -30,7 +31,7 @@ __all__ = [
 class AccessToken:
 
     @staticmethod
-    def encryption_token(*, data: dict, expires_delta: Union[timedelta, None] = None):
+    def token_encrypt(*, data: dict, expires_delta: Union[timedelta, None] = None):
         """
         Token加密
         @param  :
@@ -42,12 +43,25 @@ class AccessToken:
             else:
                 expire = datetime.utcnow() + timedelta(days=50)
 
+            # 对token进行加密
             results = jwt.encode(
                 dict(data, **{"exp": expire}), st.SECRET, algorithm=st.ALGORITHM
             )
             return results
         except JWTError as exc:
-            raise exc
+            raise HTTPException(status_code=401, detail=exc)
+
+    @staticmethod
+    def token_decode(*, token: str):
+        """
+        解密Token
+        @param  :
+        @return  :
+        """
+        try:
+            return jwt.decode(token, st.SECRET, algorithms=st.ALGORITHM)
+        except JOSEError or JWTError:
+            raise HTTPException(status_code=401, detail="凭证校验失败...")
 
     @staticmethod
     async def verify_token(token: str = Header(...)):
@@ -56,24 +70,18 @@ class AccessToken:
         @param  :
         @return  :
         """
-        def token_decode(*, n_token: str):
-            return jwt.decode(n_token, st.SECRET, algorithms=st.ALGORITHM)
 
         try:
             # Token解密
-            results = token_decode(n_token=token)
-
-            username: str = results.get("username")
-
+            handle_token = AccessToken.token_decode(token=token)
+            username: str = handle_token.get("username")
             if not username:
-                raise Exception("凭证错误或验证失效...")
-
+                raise HTTPException(status_code=401, detail="凭证错误或验证失效...")
             # 从redis中获取Token再进行解密
-            access_token = token_decode(
-                n_token=await redis_client.get(f"access_token:{username}")
+            access_token = AccessToken.token_decode(
+                token=await redis_client.get(f"access_token:{username}")
             )
-
-            if token != access_token or not access_token or username != access_token["username"]:
-                raise Exception("凭证已失效, 请重新登录...")
-        except Exception or JOSEError as exc:
+            if (handle_token != access_token) or (not access_token) or (username != access_token["username"]):
+                raise HTTPException(status_code=401, detail="凭证已失效, 请重新登录...")
+        except Exception as exc:
             raise exc

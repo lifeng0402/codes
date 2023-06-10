@@ -6,3 +6,5 @@ verify-email
 python-jose[cryptography]
 passlib[bcrypt]
 redis
+httpx
+pytest

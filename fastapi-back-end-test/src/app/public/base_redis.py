@@ -8,7 +8,6 @@
 """
 
 
-import asyncio
 import redis.asyncio as redis
 from src.conf.config import settings
 
