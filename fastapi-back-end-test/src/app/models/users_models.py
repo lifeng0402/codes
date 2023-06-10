@@ -12,7 +12,7 @@ from sqlalchemy import (
     Integer,
     String,
     Boolean,
-    TIMESTAMP
+    DateTime
 )
 from datetime import datetime
 from src.app.public.db.base import Base
@@ -32,5 +32,5 @@ class Users(Base):
     password = Column(String(50), nullable=True)
     mailbox = Column(String(100), nullable=True)
     is_delete = Column(Boolean, default=False)
-    created_time = Column(TIMESTAMP, nullable=False, default=datetime.now())
-    updated_time = Column(TIMESTAMP, nullable=False, default=datetime.now())
+    created_time = Column(DateTime, default=datetime.now())
+    updated_time = Column(DateTime, onupdate=datetime.now, default=datetime.now())

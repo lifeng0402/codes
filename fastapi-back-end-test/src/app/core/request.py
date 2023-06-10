@@ -7,5 +7,12 @@
 @说明: 
 """
 
+
+from httpx import AsyncClient
+
 class RequestHttp:
-    pass
+    def __init__(self) -> None:
+        self._session = AsyncClient()
+
+    async def requests(self):
+        self._session.build_request()

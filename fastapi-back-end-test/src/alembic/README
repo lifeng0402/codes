@@ -1,5 +1,10 @@
 Generic single-database configuration.
 
 
-alembic revision --autogenerate -m "提交表结构"
+lembic revision -m "create account table"
+
+迁移提交表结构
+alembic revision --autogenerate -m "first commit"
+
+更新表到数据库
 alembic upgrade head
