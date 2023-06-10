@@ -5,12 +5,14 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 from alembic import context
+
+
+
+curPath = os.path.abspath(os.path.dirname(__file__))
+rootPath = os.path.split(curPath)[0]
+sys.path.append(os.path.split(rootPath)[0])
+
 from src.app.public.db.base import Base
-
-
-# curPath = os.path.abspath(os.path.dirname(__file__))
-# rootPath = os.path.split(curPath)[0]
-# sys.path.append(os.path.split(rootPath)[0])
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
