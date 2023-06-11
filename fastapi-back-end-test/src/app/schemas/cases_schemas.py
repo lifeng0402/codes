@@ -7,18 +7,32 @@
 @说明: 
 """
 
-import typing as ty
+import typing
+from typing import (
+    Optional,
+    Any
+)
 from dataclasses import dataclass
 from pydantic import (
     BaseModel,
     HttpUrl
 )
 
+__all__ = [
+    "RequestSchemas"
+]
+
 
 @dataclass
 class RequestSchemas(BaseModel):
     method: str
     url: HttpUrl
-    headers: ty.Dict
-    params: ty.Any
-    body: ty.Dict
+    content: Optional[Any] = None
+    data: Optional[Any] = None
+    files: Optional[Any] = None
+    body: Optional[Any] = None   # json传参
+    params: Optional[Any] = None
+    headers: Optional[Any] = None
+    cookies: Optional[Any] = None
+    timeout: Optional[Any] = None
+    extensions: Optional[Any] = None
