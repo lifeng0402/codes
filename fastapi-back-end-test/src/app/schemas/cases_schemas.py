@@ -23,16 +23,17 @@ __all__ = [
 ]
 
 
-@dataclass
 class RequestSchemas(BaseModel):
     method: str
     url: HttpUrl
     content: Optional[Any] = None
     data: Optional[Any] = None
     files: Optional[Any] = None
-    body: Optional[Any] = None   # json传参
+    json_data: Optional[Any] = None   # json传参
     params: Optional[Any] = None
     headers: Optional[Any] = None
     cookies: Optional[Any] = None
+    auth: Optional[Any] = None
+    follow_redirects: Optional[Any] = None
     timeout: Optional[Any] = None
     extensions: Optional[Any] = None

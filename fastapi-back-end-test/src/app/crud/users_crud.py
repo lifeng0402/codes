@@ -17,7 +17,7 @@ from sqlalchemy import (
 from src.app.models.users_models import Users
 from src.app.schemas.users_schemas import UsersLogin
 from src.app.schemas.users_schemas import UsersSchemas
-from src.app.utils.verification import VerificationData
+from src.app.cabinet.verification import VerificationData
 
 __all__ = [
     "UsersCrud"
