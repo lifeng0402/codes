@@ -15,7 +15,7 @@ from sqlalchemy import (
     DateTime
 )
 from datetime import datetime
-from src.app.public.db.base import Base
+from src.app.core.db.base import Base
 
 
 __all__ = [

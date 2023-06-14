@@ -12,9 +12,9 @@ from fastapi import Depends
 from fastapi import status
 from sqlalchemy.orm import Session
 from src.app.crud.users_crud import UsersCrud
-from src.app.public.db.session import session
+from src.app.core.db.session import session
 from src.app.schemas.users_schemas import UsersSchemas
-from src.app.cabinet.code_response import CodeResponse
+from src.app.core.code_response import CodeResponse
 
 
 router = APIRouter(

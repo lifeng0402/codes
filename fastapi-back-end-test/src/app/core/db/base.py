@@ -7,5 +7,5 @@
 @说明: 
 """
 
-from src.app.public.db.base_class import Base
-from src.app.public.db.session import session
+from src.app.core.db.base_class import Base
+from src.app.core.db.session import session

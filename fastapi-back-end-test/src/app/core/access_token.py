@@ -20,7 +20,7 @@ from datetime import (
 from fastapi import Header
 from fastapi.exceptions import HTTPException
 from src.conf.config import settings as st
-from src.app.public.base_redis import redis_client
+from src.app.core.base_redis import redis_client
 
 
 __all__ = [

@@ -20,7 +20,8 @@ class RequestBody(Enum):
     raw: int = 1
     graphql: int = 2
     form_data: int = 3
-    x_www_form_urlencoded: int = 4
+    binary: int = 4
+    x_www_form_urlencoded: int = 5
 
 
 @unique

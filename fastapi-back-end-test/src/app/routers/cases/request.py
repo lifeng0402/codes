@@ -11,9 +11,9 @@ from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import status
 from src.app.core.access_token import AccessToken
-from src.app.schemas.cases_schemas import RequestSchemas
-from src.app.cabinet.code_response import CodeResponse
-from src.app.public.send_request import RequestHttp
+from src.app.core.code_response import CodeResponse
+from src.app.core.http_request import safe_request
+from src.app.schemas.cases_schemas import BodySchemas
 
 
 router = APIRouter(
@@ -23,27 +23,11 @@ router = APIRouter(
 
 
 @router.post("/request")
-async def cases_resuest(datas: RequestSchemas):
+async def cases_resuest(datas: BodySchemas):
     try:
-        async with RequestHttp() as client:
-            resutls = await client.safe_request(
-                method=datas.method,
-                url=datas.url,
-                content=datas.content,
-                data=datas.data,
-                files=datas.files,
-                json=datas.json_data,
-                params=datas.params,
-                headers=datas.headers,
-                cookies=datas.cookies,
-                timeout=datas.timeout,
-                auth=datas.auth,
-                follow_redirects=datas.follow_redirects,
-                extensions=datas.extensions,
-            )
-            return resutls.json()
+        return await safe_request(datas=datas)
     except Exception as exc:
-        return CodeResponse.defeated(
+        return await CodeResponse.defeated(
             err_msg=str(exc.args[0]),
-            err_code=status.HTTP_400_BAD_REQUEST
+            err_code=status.HTTP_422_UNPROCESSABLE_ENTITY
         )

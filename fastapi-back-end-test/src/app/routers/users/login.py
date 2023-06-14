@@ -12,10 +12,10 @@ from fastapi import Depends
 from fastapi import status
 from sqlalchemy.orm import Session
 from src.app.crud.users_crud import UsersCrud
-from src.app.public.db.session import session
-from src.app.public.base_redis import redis_client
+from src.app.core.db.session import session
+from src.app.core.base_redis import redis_client
 from src.app.schemas.users_schemas import UsersLogin
-from src.app.cabinet.code_response import CodeResponse
+from src.app.core.code_response import CodeResponse
 from src.app.core.access_token import AccessToken
 
 

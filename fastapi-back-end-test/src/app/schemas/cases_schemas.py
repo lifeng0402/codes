@@ -7,19 +7,20 @@
 @说明: 
 """
 
-import typing
 from typing import (
     Optional,
-    Any
+    Any,
+    Union,
+    Mapping
 )
-from dataclasses import dataclass
 from pydantic import (
-    BaseModel,
-    HttpUrl
+    BaseModel, HttpUrl
 )
+from src.app.cabinet.code_enum import RequestBody
 
 __all__ = [
-    "RequestSchemas"
+    "RequestSchemas",
+    "BodySchemas"
 ]
 
 
@@ -29,7 +30,7 @@ class RequestSchemas(BaseModel):
     content: Optional[Any] = None
     data: Optional[Any] = None
     files: Optional[Any] = None
-    json_data: Optional[Any] = None   # json传参
+    json_data: Optional[Any] = None
     params: Optional[Any] = None
     headers: Optional[Any] = None
     cookies: Optional[Any] = None
@@ -37,3 +38,8 @@ class RequestSchemas(BaseModel):
     follow_redirects: Optional[Any] = None
     timeout: Optional[Any] = None
     extensions: Optional[Any] = None
+
+
+class BodySchemas(BaseModel):
+    body: RequestSchemas
+    expected_result: Optional[Mapping[str, Any]] = None

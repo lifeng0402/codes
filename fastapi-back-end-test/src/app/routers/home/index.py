@@ -12,7 +12,7 @@ from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import status
 from src.app.core.access_token import AccessToken
-from src.app.cabinet.code_response import CodeResponse
+from src.app.core.code_response import CodeResponse
 
 
 router = APIRouter(
