@@ -1,3 +1,5 @@
+from src.app.models.cases_models import Cases
+from src.app.models.users_models import Users
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
@@ -10,8 +12,7 @@ curPath = os.path.abspath(os.path.dirname(__file__))
 rootPath = os.path.split(curPath)[0]
 sys.path.append(os.path.split(rootPath)[0])
 
-# from src.app.public.db.base import Base
-from src.app.models.users_models import Users
+# from src.app.core.db.base import Base
 
 
 # this is the Alembic Config object, which provides
@@ -29,7 +30,9 @@ if config.config_file_name is not None:
 # target_metadata = mymodel.Base.metadata
 # target_metadata = None
 # target_metadata = Base.metadata
-target_metadata = [Users.metadata]
+target_metadata = [
+    Cases.metadata
+]
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

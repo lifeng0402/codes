@@ -16,13 +16,14 @@ from src.app.routers.users import (
 from src.app.routers.home import (
     index
 )
-from src.app.routers.cases import (
-    request
+from src.app.routers.case import (
+    request,
+    cases
 )
-
 
 api_router = APIRouter()
 api_router.include_router(router=register.router, tags=["注册接口"])
 api_router.include_router(router=login.router, tags=["登录接口"])
 api_router.include_router(router=index.router, tags=["首页接口"])
 api_router.include_router(router=request.router, tags=["请求接口"])
+api_router.include_router(router=cases.router, tags=["测试用例模块"])

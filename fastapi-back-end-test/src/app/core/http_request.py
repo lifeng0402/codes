@@ -16,7 +16,9 @@ from typing import (
     Optional,
     Dict,
     Any,
-    Union
+    Union,
+    List,
+    Tuple
 )
 from httpx import (
     URL,
@@ -27,20 +29,35 @@ from httpx import (
     Request,
     AsyncClient
 )
+from ssl import SSLContext
 from pydantic import HttpUrl
 from src.app.cabinet.code_enum import RequestBody
 from src.app.schemas.cases_schemas import RequestSchemas
 
 
 __all__ = [
-    "safe_request"
+    "SafeRequest"
 ]
 
 
 class RequestHttp:
-    def __init__(self, method: str, url: HttpUrl, is_response: bool = False) -> None:
-        self._method:str = method
-        self._url: HttpUrl = url
+    def __init__(
+            self,
+            method: str,
+            url: HttpUrl,
+            headers: Optional[Dict[str, str]],
+            cookies: Optional[
+                Union[Dict[str, str], List[Tuple[str, str]]]] = None,
+            timeout: Optional[float] = None,
+            verify: bool = False,
+            is_response: bool = False
+    ) -> None:
+        self._method = method
+        self._url = url
+        self._headers = headers
+        self._cookies = cookies
+        self._timeout = timeout
+        self._verify = verify
         self._is_response = is_response
 
     async def safe_request(
@@ -48,8 +65,6 @@ class RequestHttp:
         data: Optional[Union[bytes, str]] = None,
         json: Optional[Dict[str, Any]] = None,
         params: Optional[Dict[str, Any]] = None,
-        headers: Optional[Dict[str, str]] = None,
-        timeout: Optional[float] = None,
         **kwargs
     ) -> Dict[str, Any]:
         """
@@ -81,19 +96,13 @@ class RequestHttp:
                 }
             }
 
-        url = self._url
-        method = self._method.upper()
+        method, url = self._method.upper(), self._url
+        headers, cookies, timeout = self._headers, self._cookies, self._timeout
 
-        async with AsyncClient() as client:
+        async with AsyncClient(verify=self._verify) as client:
             request = await client.request(
-                method,
-                url,
-                data=data,
-                json=json,
-                params=params,
-                headers=headers,
-                timeout=timeout,
-                **kwargs
+                method, url, data=data, json=json, params=params,
+                headers=headers, cookies=cookies, timeout=timeout, **kwargs
             )
 
             # 如果为真则直接返回结果, 否则就是返回收集后的返回结果
@@ -116,77 +125,77 @@ class RequestHttp:
             raise e
 
 
-async def safe_request(*, datas: RequestSchemas, is_response: bool = False):
-    """
-    调用继承后的基类, 用于请求接口
-    @param  :
-    @return  :
-    """
+class SafeRequest:
 
-    try:
-        # 初始化一个请求方法
-        request = RequestHttp(
-            url=datas.url,
-            method=datas.method,
-            is_response=is_response
-        )
+    @classmethod
+    def proof_json(cls, data: str):
+        try:
+            if not data:
+                return data
+            return js.dumps(data, indent=4)
+        except js.JSONDecodeError:
+            raise js.JSONDecodeError("请求参数非json类型")
 
-        if RequestBody.raw == datas.body_type:
-            response = await request.safe_request(
-                json=datas.body,
-                params=datas.params,
+    @classmethod
+    async def safe_request(cls, *, datas: RequestSchemas, is_response: bool = False):
+        """
+        调用继承后的基类, 用于请求接口
+        @param  :
+        @return  :
+        """
+
+        try:
+            # 初始化一个请求方法
+            request = RequestHttp(
+                url=datas.url,
+                method=datas.method,
                 headers=datas.headers,
                 cookies=datas.cookies,
                 timeout=datas.timeout,
-                extensions=datas.extensions
+                is_response=is_response
             )
-        elif RequestBody.binary == datas.body_type:
-            response = await request.safe_request(
-                json=datas.body,
-                params=datas.params,
-                headers=datas.headers,
-                cookies=datas.cookies,
-                timeout=datas.timeout,
-                extensions=datas.extensions
-            )
-        elif RequestBody.graphql == datas.body_type:
-            response = await request.safe_request(
-                json=datas.body,
-                params=datas.params,
-                headers=datas.headers,
-                cookies=datas.cookies,
-                timeout=datas.timeout,
-                extensions=datas.extensions
-            )
-        elif RequestBody.form_data == datas.body_type or RequestBody.x_www_form_urlencoded == datas.body_type:
-            response = await request.safe_request(
-                data=datas.body,
-                files=datas.files,
-                params=datas.params,
-                headers=datas.headers,
-                cookies=datas.cookies,
-                timeout=datas.timeout,
-                extensions=datas.extensions
-            )
-        else:
-            response = await request.safe_request(
-                params=datas.params,
-                headers=datas.headers,
-                cookies=datas.cookies,
-                timeout=datas.timeout,
-                extensions=datas.extensions
-            )
+            # 判断body_type的类型是否符合
+            match datas.body_type:
+                case RequestBody.raw:
+                    json_data = cls.proof_json(datas.body)
+                    response = await request.safe_request(
+                        json=json_data,
+                        params=datas.params,
+                        extensions=datas.extensions
+                    )
+
+                case RequestBody.binary:
+                    response = await request.safe_request(
+                        json=datas.body,
+                        params=datas.params,
+                        extensions=datas.extensions
+                    )
+
+                case RequestBody.graphql:
+                    response = await request.safe_request(
+                        json=datas.body,
+                        params=datas.params,
+                        extensions=datas.extensions
+                    )
+
+                case [RequestBody.form_data, RequestBody.x_www_form_urlencoded]:
+                    response = await request.safe_request(
+                        data=datas.body,
+                        files=datas.files,
+                        params=datas.params,
+                        extensions=datas.extensions
+                    )
+
+                case _:
+                    response = await request.safe_request(
+                        params=datas.params,
+                        extensions=datas.extensions
+                    )
             # 返回值
-        return response
+            return response
 
-    except Exception as exc:
-        raise exc
-
-
-# async def requests():
-#     response = await RequestHttp().safe_request(method="GET", url="https://www.baidu.com/")
-#     print("Response code:", response)
-#     return response
+        except Exception as exc:
+            raise exc
 
 
 if __name__ == "__main__":

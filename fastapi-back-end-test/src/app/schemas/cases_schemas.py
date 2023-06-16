@@ -19,21 +19,21 @@ from pydantic import (
 from src.app.cabinet.code_enum import RequestBody
 
 __all__ = [
-    "RequestSchemas",
-    "BodySchemas"
+    "RequestSchemas"
 ]
 
 
 class RequestSchemas(BaseModel):
     method: str
     url: HttpUrl
-    body_type: RequestBody = RequestBody.none
+    body_type: RequestBody = RequestBody.none.value
     content: Optional[Any] = None
     body: Optional[Any] = None
     files: Optional[Any] = None
     params: Optional[Any] = None
     headers: Optional[Any] = None
     cookies: Optional[Any] = None
+    expected_result: Optional[Any] = None
     auth: Optional[Any] = None
     follow_redirects: Optional[Any] = None
     timeout: Optional[Any] = None
@@ -44,9 +44,3 @@ class RequestSchemas(BaseModel):
         if isinstance(v, str) and len(v.strip()) == 0:
             raise Exception(f"{v} 不能为空")
         return v
-
-
-class BodySchemas(BaseModel):
-    body: RequestSchemas
-    body_type: RequestBody = RequestBody.none
-    expected_result: Optional[Mapping[str, Any]] = None

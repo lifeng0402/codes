@@ -12,12 +12,11 @@ from fastapi import Depends
 from fastapi import status
 from src.app.core.access_token import AccessToken
 from src.app.core.code_response import CodeResponse
-from src.app.core.http_request import safe_request
+from src.app.core.http_request import SafeRequest
 from src.app.schemas.cases_schemas import RequestSchemas
 
 
 router = APIRouter(
-    prefix="/cases",
     #     dependencies=[Depends(AccessToken.verify_token)]
 )
 
@@ -25,9 +24,9 @@ router = APIRouter(
 @router.post("/request")
 async def cases_resuest(datas: RequestSchemas):
     try:
-        return await safe_request(datas=datas, is_response=True)
+        return await SafeRequest.safe_request(datas=datas, is_response=True)
     except Exception as exc:
         return await CodeResponse.defeated(
-            err_msg=str(exc.args[0]),
+            err_msg=str(exc.args),
             err_code=status.HTTP_422_UNPROCESSABLE_ENTITY
         )

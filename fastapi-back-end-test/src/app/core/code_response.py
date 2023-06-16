@@ -19,7 +19,7 @@ __all__ = [
 class CodeResponse:
 
     @staticmethod
-    async def succeed(status: int = 1, data: dict = None):
+    def succeed(status: int = 1, data: dict = None):
         """
         接口成功需要返回的固定数据
         @param  :
@@ -35,7 +35,7 @@ class CodeResponse:
         )
 
     @staticmethod
-    async def defeated(
+    def defeated(
         status: int = 0, data: dict = None, err_code: int = 1000, err_msg: str = "数据失败或被移除"
     ):
         """

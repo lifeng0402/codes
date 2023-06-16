@@ -7,16 +7,19 @@
 @说明:
 """
 
+import json
 from sqlalchemy import (
     Column,
     Integer,
     String,
     Boolean,
     DateTime,
-    JSON
+    JSON,
+    Float,
+    VARBINARY
 )
 from datetime import datetime
-from src.app.public.db.base import Base
+from src.app.core.db.base import Base
 
 __all__ = [
     "Users"
@@ -27,19 +30,30 @@ class Cases(Base):
     __tablename__ = "cases"
 
     id = Column(Integer, primary_key=True, index=True)
-    method = Column(String(10), nullable=True)
-    url = Column(String(200), nullable=True)
+    method = Column(String(10), nullable=False)
+    url = Column(String(200), nullable=False)
+    body_type = Column(String(10), nullable=False)
+    body = Column(String(500), nullable=True)
     content = Column(String(500), nullable=True)
-    data = Column(String(500), nullable=True)
-    files = Column(String(100), nullable=True)
-    json_data = Column(JSON, nullable=True)
-    params = Column(JSON, nullable=True)
-    headers = Column(JSON, nullable=True)
-    cookies = Column(JSON, nullable=True)
-    timeout = Column(Integer, nullable=True)
-    auth = Column(JSON, nullable=True)
-    follow_redirects = Column(JSON, nullable=True)
-    extensions = Column(JSON, nullable=True)
-    expected_result = Column(JSON, nullable=True)
+    files = Column(String(500), nullable=True)
+    params = Column(String(500), nullable=True)
+    headers = Column(String(500), nullable=True)
+    cookies = Column(String(500), nullable=True)
+    timeout = Column(Float, nullable=True)
+    auth = Column(String(500), nullable=True)
+    follow_redirects = Column(String(500), nullable=True)
+    extensions = Column(String(500), nullable=True)
+    expected_result = Column(String(500), nullable=True)
     created_time = Column(DateTime, default=datetime.now())
-    updated_time = Column(DateTime, onupdate=datetime.now, default=datetime.now())
+    updated_time = Column(DateTime, onupdate=datetime.now,
+                          default=datetime.now())
+
+    @staticmethod
+    def handle_data(results):
+        data = {
+            k: v for k, v in results.__dict__.items() if v is not None
+        }
+        if '"\"' not in str(data):
+            return data
+        data = str(data).replace('"\"', "")
+        return json.loads(data)
