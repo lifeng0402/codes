@@ -8,8 +8,7 @@
 """
 
 
-import json
-from ast import literal_eval
+import datetime
 from sqlalchemy.orm import Session
 from src.app.models.cases_models import Cases
 from src.app.schemas.cases_schemas import RequestSchemas
@@ -22,19 +21,15 @@ class CasesCrud:
     def save_cases(self, data: RequestSchemas):
         try:
             case_info = Cases(
-                method=data.method,
-                url=data.url,
-                auth=data.auth,
-                files=data.files,
-                content=data.content,
-                timeout=data.timeout,
-                body_type=data.body_type,
+                method=data.method, url=data.url,
+                body=self.transition(data.body),
+                auth=self.transition(data.auth),
+                files=data.files, content=data.content,
+                timeout=data.timeout, body_type=data.body_type,
                 extensions=data.extensions,
-                body=self.transition_json(data.body),
-                expected_result=data.expected_result,
                 follow_redirects=data.follow_redirects,
-                cookies=self.transition_json(data.cookies),
-                headers=self.transition_json(data.headers)
+                expected_result=self.transition(data.expected_result),
+                cookies=self.transition(data.cookies), headers=self.transition(data.headers)
             )
             # 往数据库添加数据
             self.db.add(case_info)
@@ -42,18 +37,17 @@ class CasesCrud:
             self.db.commit()
             # 刷新提交的数据
             self.db.refresh(case_info)
-            res = {k: v for k, v in case_info.__dict__.items() if v is not None}
-            return Cases.handle_data(case_info)
+            return Cases.as_dict(case_info)
         except Exception as e:
             raise e
 
     @staticmethod
-    def transition_json(data: dict or str):
+    def transition(data):
         """
-        把字典或者字符串类型转成json格式, 并把值返回
+        把字典或者字符串类型转成字符串格式, 并把值返回
         @param  :
         @return  :
         """
-        if not isinstance(data, dict) or isinstance(data, str):
-            return data
-        return json.dumps(data)
+        if data is not None:
+            return data if isinstance(data, str) else str(data)
+        return data

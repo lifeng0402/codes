@@ -81,4 +81,4 @@ class SettingsDevd(Settings):
 # _PY_ENV = os.getenv("PY_ENV", "DEV")
 # settings = SettingsProd() if (_PY_ENV and _PY_ENV.isupper()) else SettingsDevd()
 settings = SettingsDevd()
-print(settings.SQLALCHEMY_DATABASE_URI)
+# print(settings.SQLALCHEMY_DATABASE_URI)

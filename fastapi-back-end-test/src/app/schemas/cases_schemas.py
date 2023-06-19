@@ -10,8 +10,6 @@
 from typing import (
     Optional,
     Any,
-    Union,
-    Mapping
 )
 from pydantic import (
     BaseModel, HttpUrl, validator

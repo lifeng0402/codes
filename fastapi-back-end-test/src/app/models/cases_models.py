@@ -7,19 +7,19 @@
 @说明:
 """
 
-import json
 from sqlalchemy import (
     Column,
     Integer,
     String,
-    Boolean,
     DateTime,
-    JSON,
     Float,
-    VARBINARY
+)
+from json import (
+    dumps, loads
 )
 from datetime import datetime
 from src.app.core.db.base import Base
+from src.app.cabinet.json_datetime import DateTimeEncoder
 
 __all__ = [
     "Users"
@@ -48,12 +48,27 @@ class Cases(Base):
     updated_time = Column(DateTime, onupdate=datetime.now,
                           default=datetime.now())
 
-    @staticmethod
-    def handle_data(results):
-        data = {
-            k: v for k, v in results.__dict__.items() if v is not None
-        }
-        if '"\"' not in str(data):
-            return data
-        data = str(data).replace('"\"', "")
-        return json.loads(data)
+    def as_dict(self):
+        # 定义个字空字典
+        resutls_dicts = {}
+        # 循环表中的字段
+        for c in self.__table__.columns:
+            # 判断值是否为空
+            if getattr(self, c.name) is not None:
+                # 往字典中更新数据
+                resutls_dicts.update({c.name: getattr(self, c.name)})
+                # 如果数据为时间类型
+                if isinstance(getattr(self, c.name), datetime):
+                    # 把时间格式化后转成字典并更新到字典中
+                    resutls_dicts.update(
+                        loads(
+                            dumps(
+                                {c.name: getattr(self, c.name)},
+                                cls=DateTimeEncoder
+                            )
+                        )
+                    )
+            # 跳出本次循环
+            continue
+        # 返回一个新字典
+        return resutls_dicts
