@@ -10,7 +10,8 @@
 from enum import Enum, unique
 
 __all__ = [
-    "RequestBody"
+    "RequestBody",
+    "Environment"
 ]
 
 
@@ -25,5 +26,7 @@ class RequestBody(Enum):
 
 
 @unique
-class JsonRaw(Enum):
-    pass
+class Environment(Enum):
+    test: int = 0
+    pre: int = 1
+    pro: int = 2

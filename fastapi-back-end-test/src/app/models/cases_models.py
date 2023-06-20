@@ -13,13 +13,20 @@ from sqlalchemy import (
     String,
     DateTime,
     Float,
+    ForeignKey
 )
 from json import (
     dumps, loads
 )
+from sqlalchemy.orm import (
+    relationship,
+    backref
+)
 from datetime import datetime
 from src.app.core.db.base import Base
-from src.app.cabinet.json_datetime import DateTimeEncoder
+from src.app.models.plan_models import Plan
+from src.app.excpetions.datetime_excpetions import DateTimeEncoder
+
 
 __all__ = [
     "Users"
@@ -47,6 +54,20 @@ class Cases(Base):
     created_time = Column(DateTime, default=datetime.now())
     updated_time = Column(DateTime, onupdate=datetime.now,
                           default=datetime.now())
+
+    cases = relationship("Plan", backref="cases", lazy="dynamic")
+
+    def __repr__(self):
+        return f"""
+            <Cases(
+                  id='{self.id}', method='{self.method}', url='{self.url}', 
+                  body_type='{self.body_type}',body='{self.body}', content='{self.content}', 
+                  files='{self.files}', params='{self.params}', headers='{self.headers}', 
+                  cookies='{self.cookies}', timeout='{self.timeout}', auth='{self.auth}',
+                  follow_redirects='{self.follow_redirects}', extensions='{self.extensions}', 
+                  expected_result='{self.expected_result}'
+            )>
+        """
 
     def as_dict(self):
         # 定义个字空字典

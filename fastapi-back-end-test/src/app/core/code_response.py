@@ -19,7 +19,7 @@ __all__ = [
 class CodeResponse:
 
     @staticmethod
-    def succeed(status: int = 1, data: dict = None):
+    def succeed(status: int = 1, data: dict = None, err_msg=""):
         """
         接口成功需要返回的固定数据
         @param  :
@@ -30,7 +30,7 @@ class CodeResponse:
                 status=status,
                 data=data if data else {},
                 err_code=0,
-                err_msg=""
+                err_msg=err_msg
             )
         )
 

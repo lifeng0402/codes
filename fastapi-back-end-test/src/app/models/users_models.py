@@ -33,4 +33,13 @@ class Users(Base):
     mailbox = Column(String(100), nullable=True)
     is_delete = Column(Boolean, default=False)
     created_time = Column(DateTime, default=datetime.now())
-    updated_time = Column(DateTime, onupdate=datetime.now, default=datetime.now())
+    updated_time = Column(DateTime, onupdate=datetime.now,
+                          default=datetime.now())
+
+    def __repr__(self):
+        return f"""
+            <Users(
+                  id='{self.id}', mobile='{self.mobile}', username='{self.username}', 
+                  password='{self.password}', mailbox='{self.mailbox}', is_delete='{self.is_delete}'
+            )>
+        """

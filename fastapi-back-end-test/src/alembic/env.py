@@ -1,5 +1,7 @@
-from src.app.models.cases_models import Cases
+from src.app.models.plan_models import Plan
 from src.app.models.users_models import Users
+from src.app.models.cases_models import Cases
+from src.app.core.db.base import Base
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
@@ -29,10 +31,10 @@ if config.config_file_name is not None:
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 # target_metadata = None
-# target_metadata = Base.metadata
-target_metadata = [
-    Cases.metadata
-]
+target_metadata = Base.metadata
+# target_metadata = [
+#     Plan.metadata
+# ]
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

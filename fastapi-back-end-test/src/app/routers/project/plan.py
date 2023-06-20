@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 """
 @作者: debugfeng
-@文件: cases.py
-@时间: 2023/06/16 13:53:19
+@文件: plan.py
+@时间: 2023/06/20 19:04:15
 @说明: 
 """
 
@@ -17,17 +17,17 @@ from sqlalchemy.orm import Session
 from src.app.core.db.session import session
 from src.app.crud.cases_crud import CasesCrud
 from src.app.core.code_response import CodeResponse
-from src.app.schemas.cases_schemas import RequestSchemas
+from src.app.schemas.plan_schemas import PlanSchemas
 
 
 router = APIRouter(
-    prefix="/cases",
+    prefix="/plan",
     #     dependencies=[Depends(AccessToken.verify_token)]
 )
 
 
-@router.post("/save")
-async def save_case(data: RequestSchemas, db: Session = Depends(session)):
+@router.post("/create")
+async def plan_create(data: PlanSchemas, db: Session = Depends(session)):
     try:
         response = CasesCrud(db).save_cases(data)
 
@@ -41,15 +41,4 @@ async def save_case(data: RequestSchemas, db: Session = Depends(session)):
         return CodeResponse.defeated(
             err_msg=str([i for i in e.args]),
             err_code=status.HTTP_422_UNPROCESSABLE_ENTITY
-        )
-
-
-@router.get("/list")
-async def cast_list(db: Session = Depends(session)):
-    try:
-        response = CasesCrud(db).case_list()
-        return CodeResponse.succeed(data=response)
-    except Exception as e:
-        return CodeResponse.defeated(
-            err_msg=str([i for i in e.args])
         )

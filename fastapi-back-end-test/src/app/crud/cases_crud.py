@@ -9,6 +9,9 @@
 
 
 import datetime
+from sqlalchemy import (
+    select
+)
 from sqlalchemy.orm import Session
 from src.app.models.cases_models import Cases
 from src.app.schemas.cases_schemas import RequestSchemas
@@ -38,6 +41,18 @@ class CasesCrud:
             # 刷新提交的数据
             self.db.refresh(case_info)
             return Cases.as_dict(case_info)
+        except Exception as e:
+            raise e
+
+    def case_list(self, *, skip: int = 0, limit: int = 100):
+        """
+        测试用例列表查询
+        @param  :
+        @return  :
+        """
+        try:
+            results = self.db.query(Cases).offset(skip).limit(limit).all()
+            return {"list": results}
         except Exception as e:
             raise e
 

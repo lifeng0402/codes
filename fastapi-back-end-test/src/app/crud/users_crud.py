@@ -99,7 +99,7 @@ class UsersCrud:
 
         def select_username(*, db: Session):
             results = db.execute(
-                select(Users.id, Users.mobile, Users.username, Users.mailbox).where(
+                select().where(
                     and_(
                         Users.password == user.password,
                         Users.username == user.username
