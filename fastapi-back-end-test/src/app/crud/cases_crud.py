@@ -7,13 +7,12 @@
 @说明:
 """
 
-
-import datetime
 from sqlalchemy import (
     select
 )
 from sqlalchemy.orm import Session
 from src.app.models.cases_models import Cases
+from src.app.core.db.session import session_commit
 from src.app.schemas.cases_schemas import RequestSchemas
 
 
@@ -26,25 +25,20 @@ class CasesCrud:
             case_info = Cases(
                 method=data.method, url=data.url,
                 body=self.transition(data.body),
-                auth=self.transition(data.auth),
                 files=data.files, content=data.content,
                 timeout=data.timeout, body_type=data.body_type,
-                extensions=data.extensions,
-                follow_redirects=data.follow_redirects,
-                expected_result=self.transition(data.expected_result),
+                expected_result=self.transition(data.expected_result), plan_id=data.plan_id,
                 cookies=self.transition(data.cookies), headers=self.transition(data.headers)
             )
-            # 往数据库添加数据
-            self.db.add(case_info)
+            if not data.plan_id:
+                pass
             # 往数据库提交数据
-            self.db.commit()
-            # 刷新提交的数据
-            self.db.refresh(case_info)
-            return Cases.as_dict(case_info)
+            results = session_commit(self.db, datas=case_info)
+            return Cases.as_dict(results)
         except Exception as e:
             raise e
 
-    def case_list(self, *, skip: int = 0, limit: int = 100):
+    def case_list(self, *, skip: int, limit: int):
         """
         测试用例列表查询
         @param  :

@@ -12,19 +12,13 @@ from sqlalchemy import (
     Integer,
     String,
     DateTime,
-    Float,
-    ForeignKey
+    Float
 )
 from json import (
     dumps, loads
 )
-from sqlalchemy.orm import (
-    relationship,
-    backref
-)
 from datetime import datetime
 from src.app.core.db.base import Base
-from src.app.models.plan_models import Plan
 from src.app.excpetions.datetime_excpetions import DateTimeEncoder
 
 
@@ -47,15 +41,11 @@ class Cases(Base):
     headers = Column(String(500), nullable=True)
     cookies = Column(String(500), nullable=True)
     timeout = Column(Float, nullable=True)
-    auth = Column(String(500), nullable=True)
-    follow_redirects = Column(String(500), nullable=True)
-    extensions = Column(String(500), nullable=True)
     expected_result = Column(String(500), nullable=True)
+    plan_id = Column(Integer, nullable=True)
     created_time = Column(DateTime, default=datetime.now())
     updated_time = Column(DateTime, onupdate=datetime.now,
                           default=datetime.now())
-
-    cases = relationship("Plan", backref="cases", lazy="dynamic")
 
     def __repr__(self):
         return f"""
@@ -63,9 +53,7 @@ class Cases(Base):
                   id='{self.id}', method='{self.method}', url='{self.url}', 
                   body_type='{self.body_type}',body='{self.body}', content='{self.content}', 
                   files='{self.files}', params='{self.params}', headers='{self.headers}', 
-                  cookies='{self.cookies}', timeout='{self.timeout}', auth='{self.auth}',
-                  follow_redirects='{self.follow_redirects}', extensions='{self.extensions}', 
-                  expected_result='{self.expected_result}'
+                  cookies='{self.cookies}', timeout='{self.timeout}', expected_result='{self.expected_result}'
             )>
         """
 

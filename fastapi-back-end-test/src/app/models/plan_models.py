@@ -11,14 +11,18 @@ from sqlalchemy import (
     Column,
     Integer,
     String,
-    DateTime,
-    ForeignKey
+    DateTime
 )
 from json import (
     dumps, loads
 )
+from sqlalchemy.orm import (
+    relationship,
+    backref
+)
 from datetime import datetime
 from src.app.core.db.base import Base
+from src.app.models.cases_models import Cases
 
 
 class Plan(Base):
@@ -31,8 +35,8 @@ class Plan(Base):
     created_time = Column(DateTime, default=datetime.now())
     updated_time = Column(DateTime, onupdate=datetime.now,
                           default=datetime.now())
-
-    cases_id = Column(Integer, ForeignKey("cases.id"))
+    
+    plan = relationship("Cases", backref="plan", lazy="dynamic")
 
     def __repr__(self):
         return f"""

@@ -31,11 +31,9 @@ class RequestSchemas(BaseModel):
     params: Optional[Any] = None
     headers: Optional[Any] = None
     cookies: Optional[Any] = None
-    expected_result: Optional[Any] = None
-    auth: Optional[Any] = None
-    follow_redirects: Optional[Any] = None
     timeout: Optional[Any] = None
-    extensions: Optional[Any] = None
+    expected_result: Optional[Any] = None
+    plan_id: Optional[int] = None
 
     @validator('method', 'url')
     def name_not_empty(cls, v):

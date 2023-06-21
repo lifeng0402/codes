@@ -11,6 +11,7 @@ from fastapi import (
     APIRouter,
     Depends,
     status,
+    Query,
     HTTPException
 )
 from sqlalchemy.orm import Session
@@ -45,9 +46,13 @@ async def save_case(data: RequestSchemas, db: Session = Depends(session)):
 
 
 @router.get("/list")
-async def cast_list(db: Session = Depends(session)):
+async def cast_list(
+    skip: int = Query(default=1, min_length=1, ge=1),
+    limit: int = Query(default=10, min_length=2, ge=10),
+    db: Session = Depends(session)
+):
     try:
-        response = CasesCrud(db).case_list()
+        response = CasesCrud(db).case_list(skip=skip, limit=limit)
         return CodeResponse.succeed(data=response)
     except Exception as e:
         return CodeResponse.defeated(
