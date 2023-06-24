@@ -40,19 +40,16 @@ async def save_case(data: RequestSchemas, db: Session = Depends(session)):
         )
     except Exception as e:
         return CodeResponse.defeated(
-            err_msg=str([i for i in e.args]),
-            err_code=status.HTTP_422_UNPROCESSABLE_ENTITY
+            err_msg=str([i for i in e.args])
         )
 
 
 @router.get("/list")
 async def cast_list(
-    skip: int = Query(default=1, min_length=1, ge=1),
-    limit: int = Query(default=10, min_length=2, ge=10),
     db: Session = Depends(session)
 ):
     try:
-        response = CasesCrud(db).case_list(skip=skip, limit=limit)
+        response = CasesCrud(db).case_list()
         return CodeResponse.succeed(data=response)
     except Exception as e:
         return CodeResponse.defeated(

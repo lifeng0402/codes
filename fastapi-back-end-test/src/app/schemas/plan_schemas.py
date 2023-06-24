@@ -24,7 +24,6 @@ __all__ = [
 
 class PlanSchemas(BaseModel):
     title: str
-    cases_id: List[int]
     environment: Environment = Environment.test.value
     description: Optional[Any] = None
 

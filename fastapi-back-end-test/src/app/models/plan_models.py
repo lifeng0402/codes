@@ -36,7 +36,6 @@ class Plan(Base):
     updated_time = Column(DateTime, onupdate=datetime.now,
                           default=datetime.now())
     
-    plan = relationship("Cases", backref="plan", lazy="dynamic")
 
     def __repr__(self):
         return f"""
