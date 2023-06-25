@@ -12,14 +12,17 @@ from sqlalchemy import (
     Integer,
     String,
     DateTime,
-    Float
+    Float,
+    JSON
 )
 from json import (
     dumps, loads
 )
 from datetime import datetime
 from src.app.core.db.base import Base
-from src.app.excpetions.datetime_excpetions import DateTimeEncoder
+from src.app.excpetions.custom_json import (
+    DateTimeEncoder, CustomJSONEncoder
+)
 
 
 __all__ = [
@@ -47,6 +50,23 @@ class Cases(Base):
     updated_time = Column(DateTime, onupdate=datetime.now,
                           default=datetime.now())
 
+    def __init__(
+        self, method, url, body_type, body=None, content=None, files=None,
+        params=None, headers=None, cookies=None, timeout=None, expected_result=None, plan_id=None
+    ):
+        self.url = url
+        self.method = method
+        self.content = content
+        self.plan_id = plan_id
+        self.timeout = timeout
+        self.body_type = body_type
+        self.body = self.dumps_data(body)
+        self.files = self.dumps_data(files)
+        self.params = self.dumps_data(params)
+        self.headers = self.dumps_data(headers)
+        self.cookies = self.dumps_data(cookies)
+        self.expected_result = self.dumps_data(expected_result)
+
     def __repr__(self):
         return f"""
             <Cases(
@@ -57,27 +77,11 @@ class Cases(Base):
             )>
         """
 
-    def as_dict(self):
-        # 定义个字空字典
-        resutls_dicts = {}
-        # 循环表中的字段
-        for c in self.__table__.columns:
-            # 判断值是否为空
-            if getattr(self, c.name) is not None:
-                # 往字典中更新数据
-                resutls_dicts.update({c.name: getattr(self, c.name)})
-                # 如果数据为时间类型
-                if isinstance(getattr(self, c.name), datetime):
-                    # 把时间格式化后转成字典并更新到字典中
-                    resutls_dicts.update(
-                        loads(
-                            dumps(
-                                {c.name: getattr(self, c.name)},
-                                cls=DateTimeEncoder
-                            )
-                        )
-                    )
-            # 跳出本次循环
-            continue
-        # 返回一个新字典
-        return resutls_dicts
+    @classmethod
+    def dumps_data(data: dict):
+        """
+        如果为真则转换成json数据并返回,否则直接返空
+        @param  :
+        @return  :
+        """
+        return dumps(data, ensure_ascii=False, cls=CustomJSONEncoder) if data else None

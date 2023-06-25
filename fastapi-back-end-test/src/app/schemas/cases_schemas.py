@@ -9,7 +9,7 @@
 
 from typing import (
     Optional,
-    Any,
+    Any, Union
 )
 from pydantic import (
     BaseModel, HttpUrl, validator
@@ -36,6 +36,16 @@ class RequestSchemas(BaseModel):
     plan_id: Optional[int] = None
 
     @validator('method', 'url')
+    def name_not_empty(cls, v):
+        if isinstance(v, str) and len(v.strip()) == 0:
+            raise Exception(f"{v} 不能为空")
+        return v
+
+
+class DeleteCases(BaseModel):
+    case_id: list[int or str]
+
+    @validator('case_id')
     def name_not_empty(cls, v):
         if isinstance(v, str) and len(v.strip()) == 0:
             raise Exception(f"{v} 不能为空")

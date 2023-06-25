@@ -10,15 +10,15 @@
 from fastapi import (
     APIRouter,
     Depends,
-    status,
-    Query,
     HTTPException
 )
 from sqlalchemy.orm import Session
 from src.app.core.db.session import session
 from src.app.crud.cases_crud import CasesCrud
 from src.app.core.code_response import CodeResponse
-from src.app.schemas.cases_schemas import RequestSchemas
+from src.app.schemas.cases_schemas import (
+    RequestSchemas, DeleteCases
+)
 
 
 router = APIRouter(
@@ -40,18 +40,55 @@ async def save_case(data: RequestSchemas, db: Session = Depends(session)):
         )
     except Exception as e:
         return CodeResponse.defeated(
-            err_msg=str([i for i in e.args])
+            err_msg=str(e.args)
+        )
+
+
+@router.put("/{case_id}")
+async def update_case(case_id: int, data: RequestSchemas, db: Session = Depends(session)):
+    try:
+        response = CasesCrud(db).update_cases(case_id, data)
+
+        if not response:
+            return HTTPException(detail=response)
+
+        return CodeResponse.succeed(
+            data=response, err_msg="添加成功"
+        )
+    except Exception as e:
+        return CodeResponse.defeated(
+            err_msg=str(e.args)
         )
 
 
 @router.get("/list")
-async def cast_list(
-    db: Session = Depends(session)
-):
+async def list_case(skip: int = 0, limit: int = 10, db: Session = Depends(session)):
     try:
-        response = CasesCrud(db).case_list()
+        response = CasesCrud(db).case_list(skip=skip, limit=limit)
         return CodeResponse.succeed(data=response)
     except Exception as e:
         return CodeResponse.defeated(
-            err_msg=str([i for i in e.args])
+            err_msg=str(e.args)
+        )
+
+
+@router.delete("/{case_id}")
+async def delete_case(case_id: int, db: Session = Depends(session)):
+    try:
+        response, message = CasesCrud(db).case_delete(case_id=case_id)
+        return CodeResponse.succeed(data=response, err_msg=message)
+    except Exception as e:
+        return CodeResponse.defeated(
+            err_msg=str(e.args)
+        )
+
+
+@router.put("/batch")
+async def batch_delete_case(case_id: DeleteCases, db: Session = Depends(session)):
+    try:
+        response, message = CasesCrud(db).case_batch_delete(case_id=case_id)
+        return CodeResponse.succeed(data=response, err_msg=message)
+    except Exception as e:
+        return CodeResponse.defeated(
+            err_msg=str(e.args)
         )
