@@ -18,6 +18,7 @@ from src.app.core.db.session import session_commit
 from src.app.schemas.cases_schemas import (
     RequestSchemas, DeleteCases
 )
+from src.app.excpetions.custom_json import CustomJSONEncoder
 
 
 class CasesCrud:
@@ -76,12 +77,14 @@ class CasesCrud:
             @param  :
             @return  :
             """
-            if not isinstance(datas, dict):
-                return datas if datas else None
-            return json.dumps(datas, ensure_ascii=False)
+            return json.dumps(datas, ensure_ascii=False, cls=CustomJSONEncoder) if datas else datas
 
         try:
-            if self.db.execute(select(Cases)).scalars().first():
+            results = self.db.execute(
+                select(Cases.id).where(Cases.id == case_id)
+            ).scalars().first()
+
+            if not results:
                 raise Exception("case_id不存在...")
 
             # 执行更新语句
@@ -115,6 +118,7 @@ class CasesCrud:
             results = self.db.execute(
                 select(Cases).offset(skip).limit(limit)
             ).scalars().all()
+            
             return {"list": results}
         except Exception as e:
             raise e
@@ -132,8 +136,8 @@ class CasesCrud:
             ).scalars().first()
 
             # 不存在就抛异常提示
-            if case_id is None:
-                return None, "数据不存在或被移除..."
+            if not case_id:
+                return Exception("数据不存在或被移除...")
 
             # 执行删除操作
             self.db.execute(
@@ -146,25 +150,28 @@ class CasesCrud:
         except Exception as e:
             raise e
 
-    def case_batch_delete(self, *, case_id: DeleteCases):
+    def case_batch_delete(self, case: DeleteCases):
         """
         根据数组case_id查询到数据,再执行删除操作
         @param  :
         @return  :
         """
-        print(case_id, 222)
+
         try:
-            return case_id.case_id
-            # case_list = Cases.id.in_(case_id.case_id)
-            # # 判断数据是否存在
-            # if not case_list:
-            #     return None, "数据不存在或被移除..."
+            # 根据case_id查询全部数据
+            case_list = self.db.execute(
+                select(Cases.id).where(Cases.id.in_(case.case_id))
+            ).scalars().all()
 
-            # # 执行删除操作
-            # self.db.execute(delete(Cases).where(case_list))
-            # self.db.commit()
+            # 判断数据是否存在
+            if not case_list:
+                raise Exception("数据不存在或被移除...")
 
-            # return None, "删除成功..."
+            # 执行删除操作
+            self.db.execute(delete(Cases).where(Cases.id.in_(case.case_id)))
+            self.db.commit()
+
+            return None, "删除成功..."
 
         except Exception as e:
             raise e

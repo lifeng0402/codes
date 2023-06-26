@@ -15,7 +15,7 @@ from fastapi import (
 )
 from sqlalchemy.orm import Session
 from src.app.core.db.session import session
-from src.app.crud.cases_crud import CasesCrud
+from src.app.crud.plan_crud import PlanCrud
 from src.app.core.code_response import CodeResponse
 from src.app.schemas.plan_schemas import PlanSchemas
 
@@ -29,7 +29,7 @@ router = APIRouter(
 @router.post("/create")
 async def plan_create(data: PlanSchemas, db: Session = Depends(session)):
     try:
-        response = CasesCrud(db).save_cases(data)
+        response = PlanCrud(db).create_plan(data)
 
         if not response:
             return HTTPException(detail=response)
@@ -39,6 +39,22 @@ async def plan_create(data: PlanSchemas, db: Session = Depends(session)):
         )
     except Exception as e:
         return CodeResponse.defeated(
-            err_msg=str([i for i in e.args]),
-            err_code=status.HTTP_422_UNPROCESSABLE_ENTITY
+            err_msg=str(e.args),
+        )
+
+
+@router.get("/list")
+async def plan_list(skip: int = 0, limit: int = 10, db: Session = Depends(session)):
+    try:
+        response = PlanCrud(db).list_plan(skip=skip, limit=limit)
+
+        if not response:
+            return HTTPException(detail=response)
+
+        return CodeResponse.succeed(
+            data=response, err_msg="操作成功"
+        )
+    except Exception as e:
+        return CodeResponse.defeated(
+            err_msg=str(e.args),
         )

@@ -27,7 +27,7 @@ class PlanSchemas(BaseModel):
     environment: Environment = Environment.test.value
     description: Optional[Any] = None
 
-    @validator('title', 'cases_id')
+    @validator('title')
     def name_not_empty(cls, v):
         if isinstance(v, str) and len(v.strip()) == 0:
             raise Exception(f"{v} 不能为空")

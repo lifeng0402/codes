@@ -35,7 +35,11 @@ class Plan(Base):
     created_time = Column(DateTime, default=datetime.now())
     updated_time = Column(DateTime, onupdate=datetime.now,
                           default=datetime.now())
-    
+
+    def __init__(self, title, environment=None, description=None):
+        self.title = title
+        self.environment = environment
+        self.description = description
 
     def __repr__(self):
         return f"""

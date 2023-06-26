@@ -9,15 +9,17 @@
 
 from typing import (
     Optional,
-    Any, Union
+    Any
 )
 from pydantic import (
     BaseModel, HttpUrl, validator
 )
 from src.app.cabinet.code_enum import RequestBody
 
+
 __all__ = [
-    "RequestSchemas"
+    "RequestSchemas",
+    "DeleteCases"
 ]
 
 
@@ -43,7 +45,7 @@ class RequestSchemas(BaseModel):
 
 
 class DeleteCases(BaseModel):
-    case_id: list[int or str]
+    case_id: list
 
     @validator('case_id')
     def name_not_empty(cls, v):

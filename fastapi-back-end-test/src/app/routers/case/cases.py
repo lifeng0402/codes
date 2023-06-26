@@ -22,13 +22,18 @@ from src.app.schemas.cases_schemas import (
 
 
 router = APIRouter(
-    prefix="/cases",
+    prefix="/case",
     #     dependencies=[Depends(AccessToken.verify_token)]
 )
 
 
 @router.post("/save")
 async def save_case(data: RequestSchemas, db: Session = Depends(session)):
+    """
+    测试用例保存接口
+    @param  :
+    @return  :
+    """
     try:
         response = CasesCrud(db).save_cases(data)
 
@@ -46,14 +51,15 @@ async def save_case(data: RequestSchemas, db: Session = Depends(session)):
 
 @router.put("/{case_id}")
 async def update_case(case_id: int, data: RequestSchemas, db: Session = Depends(session)):
+    """
+    编辑测试用例接口
+    @param  :
+    @return  :
+    """
     try:
         response = CasesCrud(db).update_cases(case_id, data)
-
-        if not response:
-            return HTTPException(detail=response)
-
         return CodeResponse.succeed(
-            data=response, err_msg="添加成功"
+            data=response, err_msg="修改成功"
         )
     except Exception as e:
         return CodeResponse.defeated(
@@ -63,6 +69,11 @@ async def update_case(case_id: int, data: RequestSchemas, db: Session = Depends(
 
 @router.get("/list")
 async def list_case(skip: int = 0, limit: int = 10, db: Session = Depends(session)):
+    """
+    测试用例列表接口
+    @param  :
+    @return  :
+    """
     try:
         response = CasesCrud(db).case_list(skip=skip, limit=limit)
         return CodeResponse.succeed(data=response)
@@ -74,20 +85,34 @@ async def list_case(skip: int = 0, limit: int = 10, db: Session = Depends(sessio
 
 @router.delete("/{case_id}")
 async def delete_case(case_id: int, db: Session = Depends(session)):
+    """
+    删除单个用例接口
+    @param  :
+    @return  :
+    """
     try:
         response, message = CasesCrud(db).case_delete(case_id=case_id)
-        return CodeResponse.succeed(data=response, err_msg=message)
+        return CodeResponse.succeed(
+            data=response, err_msg=message
+        )
     except Exception as e:
         return CodeResponse.defeated(
             err_msg=str(e.args)
         )
 
 
-@router.put("/batch")
-async def batch_delete_case(case_id: DeleteCases, db: Session = Depends(session)):
+@router.post("/batch")
+async def batch_delete_case(case: DeleteCases, db: Session = Depends(session)):
+    """
+    批量删除用例接口
+    @param  :
+    @return  :
+    """
     try:
-        response, message = CasesCrud(db).case_batch_delete(case_id=case_id)
-        return CodeResponse.succeed(data=response, err_msg=message)
+        response, message = CasesCrud(db).case_batch_delete(case=case)
+        return CodeResponse.succeed(
+            data=response, err_msg=message
+        )
     except Exception as e:
         return CodeResponse.defeated(
             err_msg=str(e.args)

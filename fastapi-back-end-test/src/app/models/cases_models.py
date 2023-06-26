@@ -78,10 +78,10 @@ class Cases(Base):
         """
 
     @classmethod
-    def dumps_data(data: dict):
+    def dumps_data(cls, data: dict):
         """
         如果为真则转换成json数据并返回,否则直接返空
         @param  :
         @return  :
         """
-        return dumps(data, ensure_ascii=False, cls=CustomJSONEncoder) if data else None
+        return dumps(data, ensure_ascii=False, cls=CustomJSONEncoder) if data else data
