@@ -55,9 +55,7 @@ class CasesCrud:
                 return select_plan(db=self.db, plan_id=data.plan_id)
 
             # 往数据库提交数据
-            results = session_commit(self.db, datas=case_info)
-
-            return results
+            return session_commit(self.db, datas=case_info)
         except Exception as e:
             raise e
 
@@ -145,7 +143,7 @@ class CasesCrud:
             )
             self.db.commit()
 
-            return None, "删除成功..."
+            return 
 
         except Exception as e:
             raise e
@@ -171,7 +169,7 @@ class CasesCrud:
             self.db.execute(delete(Cases).where(Cases.id.in_(case.case_id)))
             self.db.commit()
 
-            return None, "删除成功..."
+            return
 
         except Exception as e:
             raise e

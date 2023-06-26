@@ -1,8 +1,8 @@
 """同步表结构
 
-Revision ID: 9d5f97e41532
+Revision ID: 56842e4f4d15
 Revises: 
-Create Date: 2023-06-25 11:14:02.941798
+Create Date: 2023-06-26 22:58:42.959907
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '9d5f97e41532'
+revision = '56842e4f4d15'
 down_revision = None
 branch_labels = None
 depends_on = None

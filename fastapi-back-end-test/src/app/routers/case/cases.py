@@ -41,7 +41,7 @@ async def save_case(data: RequestSchemas, db: Session = Depends(session)):
             return HTTPException(detail=response)
 
         return CodeResponse.succeed(
-            data=response, err_msg="添加成功"
+            data=response, err_msg="添加成功..."
         )
     except Exception as e:
         return CodeResponse.defeated(
@@ -59,7 +59,7 @@ async def update_case(case_id: int, data: RequestSchemas, db: Session = Depends(
     try:
         response = CasesCrud(db).update_cases(case_id, data)
         return CodeResponse.succeed(
-            data=response, err_msg="修改成功"
+            data=response, err_msg="修改成功..."
         )
     except Exception as e:
         return CodeResponse.defeated(
@@ -76,7 +76,9 @@ async def list_case(skip: int = 0, limit: int = 10, db: Session = Depends(sessio
     """
     try:
         response = CasesCrud(db).case_list(skip=skip, limit=limit)
-        return CodeResponse.succeed(data=response)
+        return CodeResponse.succeed(
+            data=response, err_msg="查询成功..."
+        )
     except Exception as e:
         return CodeResponse.defeated(
             err_msg=str(e.args)
@@ -91,9 +93,9 @@ async def delete_case(case_id: int, db: Session = Depends(session)):
     @return  :
     """
     try:
-        response, message = CasesCrud(db).case_delete(case_id=case_id)
+        response = CasesCrud(db).case_delete(case_id=case_id)
         return CodeResponse.succeed(
-            data=response, err_msg=message
+            data=response, err_msg="删除成功..."
         )
     except Exception as e:
         return CodeResponse.defeated(
@@ -109,9 +111,9 @@ async def batch_delete_case(case: DeleteCases, db: Session = Depends(session)):
     @return  :
     """
     try:
-        response, message = CasesCrud(db).case_batch_delete(case=case)
+        response = CasesCrud(db).case_batch_delete(case=case)
         return CodeResponse.succeed(
-            data=response, err_msg=message
+            data=response, err_msg="批量删除成功..."
         )
     except Exception as e:
         return CodeResponse.defeated(

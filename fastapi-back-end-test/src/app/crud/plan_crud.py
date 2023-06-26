@@ -13,6 +13,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Session
 from src.app.models.plan_models import Plan
+from src.app.core.db.session import session_commit
 from src.app.schemas.plan_schemas import (
     PlanSchemas
 )
@@ -37,11 +38,28 @@ class PlanCrud:
                 description=data.description
             )
             # 添加数据并提交, 最后刷新数据
-            self.db.add(plan_info)
-            self.db.commit()
-            self.db.refresh(plan_info)
+            return session_commit(self.db, datas=plan_info)
+        except Exception as e:
+            raise e
 
-            return plan_info
+    def update_plan(self, plan_id, data: PlanSchemas):
+        try:
+            results = self.db.execute(
+                select(Plan.id).where(Plan.id == plan_id)
+            ).scalars().first()
+
+            if not results:
+                raise Exception("plan_id不存在...")
+
+            self.db.execute(
+                update(Plan).where(Plan.id == plan_id).values(
+                    title=data.title,
+                    environment=data.environment,
+                    description=data.description
+                )
+            )
+            self.db.commit()
+            return
         except Exception as e:
             raise e
 
@@ -57,5 +75,22 @@ class PlanCrud:
             ).scalars().all()
 
             return {"list": plan_list}
+        except Exception as e:
+            raise e
+
+    def delete_plan(self, plan_id):
+        try:
+            results = self.db.execute(
+                select(Plan.id).where(Plan.id == plan_id)
+            ).scalars().first()
+
+            if not results:
+                raise Exception("数据不存在或被移除...")
+
+            self.db.execute(
+                delete(Plan).where(Plan.id == plan_id)
+            )
+            self.db.commit()
+            return
         except Exception as e:
             raise e

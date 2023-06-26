@@ -43,16 +43,41 @@ async def plan_create(data: PlanSchemas, db: Session = Depends(session)):
         )
 
 
+@router.put("/{plan_id}")
+async def plan_update(plan_id: int, data: PlanSchemas, db: Session = Depends(session)):
+    try:
+        response = PlanCrud(db).update_plan(plan_id, data)
+
+        return CodeResponse.succeed(
+            data=response, err_msg="修改成功"
+        )
+    except Exception as e:
+        return CodeResponse.defeated(
+            err_msg=str(e.args)
+        )
+
+
 @router.get("/list")
 async def plan_list(skip: int = 0, limit: int = 10, db: Session = Depends(session)):
     try:
         response = PlanCrud(db).list_plan(skip=skip, limit=limit)
 
-        if not response:
-            return HTTPException(detail=response)
+        return CodeResponse.succeed(
+            data=response, err_msg="查询成功"
+        )
+    except Exception as e:
+        return CodeResponse.defeated(
+            err_msg=str(e.args),
+        )
+
+
+@router.delete("/{plan_id}")
+async def plan_list(plan_id: int, db: Session = Depends(session)):
+    try:
+        response = PlanCrud(db).delete_plan(plan_id)
 
         return CodeResponse.succeed(
-            data=response, err_msg="操作成功"
+            data=response, err_msg="删除成功"
         )
     except Exception as e:
         return CodeResponse.defeated(
