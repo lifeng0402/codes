@@ -9,40 +9,23 @@
 
 import json
 import datetime
+import typing as ty
 
 
 class Transition:
 
     @classmethod
-    def string_json(cls):
-          pass
-    
-    
-    
-a = {
-    "status": 1,
-    "data": {
-        "method": "GET",
-        "body_type": "0",
-        "content": None,
-        "params": None,
-        "cookies": None,
-        "timeout": None,
-        "plan_id": None,
-        "updated_time": "2023-06-25T11:44:22",
-        "url": "https://api-lms3.9first.com/manager/index/index/list",
-        "body": None,
-        "id": 16,
-        "files": None,
-        "headers": "{\"token\": \"9d322f270932a2c3bcbbc532bbe899f8\", \"content_type\": \"application/json\"}",
-        "expected_result": None,
-        "created_time": "2023-06-25T11:44:22"
-    },
-    "err_code": 0,
-    "err_msg": "添加成功"
-}
+    def json_translation_dict(cls, data: ty.Any):
+        try:
+            return data if isinstance(data, dict) else json.loads(data)
+        except json.decoder.JSONDecodeError:
+            return data
 
-for k in a["data"]:
-      print(k)
-      # if r"{" in v and r"}" in v:
-      #       print(json.loads(k=v))
+    @classmethod
+    def json_translation_dict(cls, data: ty.Any):
+        try:
+            if not data:
+                return data
+            return json.dumps(data)
+        except json.decoder.JSONDecodeError:
+            return data

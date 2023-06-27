@@ -7,16 +7,18 @@
 @说明:
 """
 
+
 import json
+import typing
 from sqlalchemy import (
-    select, update, delete
+    select, update, delete, and_
 )
 from sqlalchemy.orm import Session
 from src.app.models.plan_models import Plan
 from src.app.models.cases_models import Cases
 from src.app.core.db.session import session_commit
 from src.app.schemas.cases_schemas import (
-    RequestSchemas, DeleteCases
+    RequestSchemas, DeleteCases, BatchTestCaseRequest
 )
 from src.app.excpetions.custom_json import CustomJSONEncoder
 
@@ -116,7 +118,7 @@ class CasesCrud:
             results = self.db.execute(
                 select(Cases).offset(skip).limit(limit)
             ).scalars().all()
-            
+
             return {"list": results}
         except Exception as e:
             raise e
@@ -143,7 +145,7 @@ class CasesCrud:
             )
             self.db.commit()
 
-            return 
+            return
 
         except Exception as e:
             raise e
@@ -170,6 +172,47 @@ class CasesCrud:
             self.db.commit()
 
             return
+
+        except Exception as e:
+            raise e
+
+    def cases_running(self, test_cases: BatchTestCaseRequest):
+        """
+        根据数组case_id查询到数据,再执行删除操作
+        @param  :
+        @return  :
+        """
+        def select_cases(condition: typing.Any):
+            stmt = select(
+                Cases.method, Cases.url, Cases.body_type, Cases.body,
+                Cases.params, Cases.headers, Cases.cookies, Cases.content,
+                Cases.files, Cases.expected_result
+            ).where(condition)
+
+            return stmt
+
+        try:
+            # 判断计划ID是否为真
+            if test_cases.plan_id:
+                case_list = self.db.execute(
+                    select_cases(
+                        condition=and_(
+                            Cases.id.in_(test_cases.test_cases),
+                            Cases.plan_id == test_cases.plan_id
+                        )
+                    )
+                ).all()
+                
+            # 根据case_id查询全部数据
+            case_list = self.db.execute(
+                select_cases(condition=Cases.id.in_(test_cases.test_cases))
+            ).all()
+
+            # 判断数据是否存在
+            if not case_list:
+                raise Exception("数据不存在或被移除...")
+
+            return case_list
 
         except Exception as e:
             raise e

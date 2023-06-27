@@ -17,8 +17,9 @@ from src.app.core.db.session import session
 from src.app.crud.cases_crud import CasesCrud
 from src.app.core.code_response import CodeResponse
 from src.app.schemas.cases_schemas import (
-    RequestSchemas, DeleteCases
+    RequestSchemas, DeleteCases, BatchTestCaseRequest
 )
+from src.app.core.execute import Execute
 
 
 router = APIRouter(
@@ -114,6 +115,26 @@ async def batch_delete_case(case: DeleteCases, db: Session = Depends(session)):
         response = CasesCrud(db).case_batch_delete(case=case)
         return CodeResponse.succeed(
             data=response, err_msg="批量删除成功..."
+        )
+    except Exception as e:
+        return CodeResponse.defeated(
+            err_msg=str(e.args)
+        )
+
+
+@router.post("/running")
+async def run_test_cases(test_cases: BatchTestCaseRequest, db: Session = Depends(session)):
+    """
+    批量运行用例接口
+    @param  :
+    @return  :
+    """
+    try:
+        response = CasesCrud(db).cases_running(test_cases)
+        results = await Execute().execute_run(response)
+        # print(type(response), response)
+        return CodeResponse.succeed(
+            data=results, err_msg="批量运行成功..."
         )
     except Exception as e:
         return CodeResponse.defeated(

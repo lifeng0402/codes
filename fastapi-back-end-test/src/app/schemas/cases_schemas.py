@@ -9,7 +9,8 @@
 
 from typing import (
     Optional,
-    Any
+    Any,
+    List
 )
 from pydantic import (
     BaseModel, HttpUrl, validator
@@ -19,7 +20,8 @@ from src.app.cabinet.code_enum import RequestBody
 
 __all__ = [
     "RequestSchemas",
-    "DeleteCases"
+    "DeleteCases",
+    "BatchTestCaseRequest"
 ]
 
 
@@ -52,3 +54,8 @@ class DeleteCases(BaseModel):
         if isinstance(v, str) and len(v.strip()) == 0:
             raise Exception(f"{v} 不能为空")
         return v
+
+
+class BatchTestCaseRequest(BaseModel):
+    test_cases: List[int]
+    plan_id: int = None
