@@ -8,11 +8,9 @@
 """
 
 
-import json as js
 import asyncio
 from typing import (
     Optional,
-    Mapping,
     Optional,
     Dict,
     Any,
@@ -20,23 +18,17 @@ from typing import (
     List,
     Tuple
 )
+import json as js
 from httpx import (
-    URL,
-    Headers,
-    Cookies,
-    Timeout,
-    Response,
-    Request,
-    AsyncClient
+    Response, AsyncClient
 )
-from ssl import SSLContext
 from pydantic import HttpUrl
 from src.app.cabinet.code_enum import RequestBody
-from src.app.schemas.cases_schemas import RequestSchemas
+from src.app.cabinet.transition import Transition
 
 
 __all__ = [
-    "SafeRequest"
+    "safe_request"
 ]
 
 
@@ -125,77 +117,44 @@ class RequestHttp:
             raise e
 
 
-class SafeRequest:
+async def safe_request(
+    method, url, body_type, body=None, params=None, headers=None, cookies=None, content=None,
+    files=None, timeout=None, is_response: bool = False
+):
+    """
+    调用继承后的基类, 用于请求接口
+    @param  :
+    @return  :
+    """
 
-    @classmethod
-    def proof_json(cls, data: str):
-        try:
-            if not data:
-                return data
-            return js.dumps(data, indent=4)
-        except js.JSONDecodeError:
-            raise js.JSONDecodeError("请求参数非json类型")
+    try:
+        # 初始化一个请求方法
+        request = RequestHttp(
+            url=url, method=method, headers=headers, cookies=cookies,
+            timeout=timeout, is_response=is_response
+        )
+        # 判断body_type的类型是否符合
+        match body_type:
+            case RequestBody.raw:
+                json = Transition.proof_json(body, json_error=True)
+                response = await request.safe_request(json=json, params=params)
 
-    @classmethod
-    async def safe_request(cls, *, datas: RequestSchemas, is_response: bool = False):
-        """
-        调用继承后的基类, 用于请求接口
-        @param  :
-        @return  :
-        """
+            case RequestBody.binary:
+                response = await request.safe_request(json=body, params=params)
 
-        try:
-            # 初始化一个请求方法
-            request = RequestHttp(
-                url=datas.url,
-                method=datas.method,
-                headers=datas.headers,
-                cookies=datas.cookies,
-                timeout=datas.timeout,
-                is_response=is_response
-            )
-            # 判断body_type的类型是否符合
-            match datas.body_type:
-                case RequestBody.raw:
-                    json_data = cls.proof_json(datas.body)
-                    response = await request.safe_request(
-                        json=json_data,
-                        params=datas.params,
-                        extensions=datas.extensions
-                    )
+            case RequestBody.graphql:
+                response = await request.safe_request(json=body, params=params)
 
-                case RequestBody.binary:
-                    response = await request.safe_request(
-                        json=datas.body,
-                        params=datas.params,
-                        extensions=datas.extensions
-                    )
+            case [RequestBody.form_data, RequestBody.x_www_form_urlencoded]:
+                response = await request.safe_request(data=body, files=files, params=params, content=content)
 
-                case RequestBody.graphql:
-                    response = await request.safe_request(
-                        json=datas.body,
-                        params=datas.params,
-                        extensions=datas.extensions
-                    )
+            case _:
+                response = await request.safe_request(params=params)
+        # 返回值
+        return response
 
-                case [RequestBody.form_data, RequestBody.x_www_form_urlencoded]:
-                    response = await request.safe_request(
-                        data=datas.body,
-                        files=datas.files,
-                        params=datas.params,
-                        extensions=datas.extensions
-                    )
-
-                case _:
-                    response = await request.safe_request(
-                        params=datas.params,
-                        extensions=datas.extensions
-                    )
-            # 返回值
-            return response
-
-        except Exception as exc:
-            raise exc
+    except Exception as exc:
+        raise exc
 
 
 if __name__ == "__main__":

@@ -19,13 +19,14 @@ from src.app.cabinet.code_enum import RequestBody
 
 
 __all__ = [
+    "RequestBase",
     "RequestSchemas",
     "DeleteCases",
     "BatchTestCaseRequest"
 ]
 
 
-class RequestSchemas(BaseModel):
+class RequestBase(BaseModel):
     method: str
     url: HttpUrl
     body_type: RequestBody = RequestBody.none.value
@@ -37,7 +38,6 @@ class RequestSchemas(BaseModel):
     cookies: Optional[Any] = None
     timeout: Optional[Any] = None
     expected_result: Optional[Any] = None
-    plan_id: Optional[int] = None
 
     @validator('method', 'url')
     def name_not_empty(cls, v):
@@ -46,16 +46,23 @@ class RequestSchemas(BaseModel):
         return v
 
 
-class DeleteCases(BaseModel):
-    case_id: list
+class RequestSchemas(RequestBase):
+    plan_id: Optional[int] = None
 
-    @validator('case_id')
+
+class DeleteCases(BaseModel):
+    case_ids: List[int]
+
+    @validator('case_ids')
     def name_not_empty(cls, v):
         if isinstance(v, str) and len(v.strip()) == 0:
             raise Exception(f"{v} 不能为空")
         return v
 
 
-class BatchTestCaseRequest(BaseModel):
-    test_cases: List[int]
+class TestCaseRequest(BaseModel):
+    case_ids: List[RequestBase]
+
+
+class BatchTestCaseRequest(DeleteCases):
     plan_id: int = None

@@ -123,16 +123,15 @@ async def batch_delete_case(case: DeleteCases, db: Session = Depends(session)):
 
 
 @router.post("/running")
-async def run_test_cases(test_cases: BatchTestCaseRequest, db: Session = Depends(session)):
+async def run_test_cases(case_ids: BatchTestCaseRequest, db: Session = Depends(session)):
     """
     批量运行用例接口
     @param  :
     @return  :
     """
     try:
-        response = CasesCrud(db).cases_running(test_cases)
-        results = await Execute().execute_run(response)
-        # print(type(response), response)
+        response = CasesCrud(db).cases_running(case_ids=case_ids)
+        results = await Execute.run(response)
         return CodeResponse.succeed(
             data=results, err_msg="批量运行成功..."
         )
