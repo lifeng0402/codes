@@ -12,9 +12,9 @@ import asyncio
 import typing as ty
 import concurrent.futures
 from fastapi.encoders import jsonable_encoder
-from src.app.schemas.cases_schemas import RequestBase
+from src.app.schemas.case import RequestBase
 from src.app.core.http_request import safe_request
-from src.app.schemas.cases_schemas import TestCaseRequest
+from src.app.schemas.case import TestCaseRequest
 from src.app.cabinet.transition import Transition
 
 

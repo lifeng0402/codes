@@ -23,7 +23,7 @@ from httpx import (
     Response, AsyncClient
 )
 from pydantic import HttpUrl
-from src.app.cabinet.code_enum import RequestBody
+from src.app.cabinet.enumerate import RequestBody
 from src.app.cabinet.transition import Transition
 
 
