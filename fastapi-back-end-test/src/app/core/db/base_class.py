@@ -7,9 +7,9 @@
 @说明: 
 """
 
-from typing import Any
+
 from sqlalchemy.ext.declarative import (
-    declarative_base, declared_attr, as_declarative
+    declared_attr, as_declarative
 )
 
 

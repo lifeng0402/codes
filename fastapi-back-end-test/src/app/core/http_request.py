@@ -73,7 +73,7 @@ class RequestHttp:
             """
             return {
                 "status": status,
-                "requet": {
+                "request": {
                     "method": response.request.method,
                     "url": response.request.url,
                     "headers": response.request.headers,
@@ -101,10 +101,10 @@ class RequestHttp:
             if self._is_response:
                 return RequestHttp.return_response(response=request)
 
-                # 如果请求不成功后返回status为假的收集结果
+            # 如果请求不成功后返回status为假的收集结果
             if not request.is_success:
                 return handle_response(False, request, request)
-                # 请求成功后返回status为真的收集结果
+            # 请求成功后返回status为真的收集结果
             return handle_response(True, request, request)
 
     @staticmethod

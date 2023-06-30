@@ -14,9 +14,9 @@ from sqlalchemy import (
     and_,
     or_
 )
-from src.app.models.models_users import Users
 from src.app.schemas.user import UsersLogin
 from src.app.schemas.user import UsersSchemas
+from src.app.models.models_user import User as u
 from src.app.cabinet.verification import VerificationData
 
 __all__ = [
@@ -54,10 +54,10 @@ class UsersCrud:
 
             # 首先查询手机号或者账号是否重复
             results = self.db.execute(
-                select(Users.mobile, Users.username).where(
+                select(u.mobile, u.username).where(
                     or_(
-                        Users.mobile == user.mobile,
-                        Users.username == user.username
+                        u.mobile == user.mobile,
+                        u.username == user.username
                     )
                 )
             )
@@ -66,7 +66,7 @@ class UsersCrud:
                 raise Exception("账号或手机号重复...")
 
             # 接收到数据并赋值给users_info
-            users_info = Users(
+            users_info = u(
                 mobile=user.mobile, username=user.username,
                 password=user.password, mailbox=user.mailbox
             )
@@ -79,10 +79,10 @@ class UsersCrud:
 
             # 查询新注册的账号信息
             update_results = self.db.execute(
-                select(Users.id, Users.mobile, Users.username, Users.mailbox).where(
+                select(u.id, u.mobile, u.username, u.mailbox).where(
                     and_(
-                        Users.mobile == user.mobile,
-                        Users.username == user.username
+                        u.mobile == user.mobile,
+                        u.username == user.username
                     )
                 )
             ).first()
@@ -101,8 +101,8 @@ class UsersCrud:
             results = db.execute(
                 select().where(
                     and_(
-                        Users.password == user.password,
-                        Users.username == user.username
+                        u.password == user.password,
+                        u.username == user.username
                     )
                 )
             )

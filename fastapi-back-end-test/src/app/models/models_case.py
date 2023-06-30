@@ -26,12 +26,12 @@ from src.app.excpetions.custom_json import (
 
 
 __all__ = [
-    "Users"
+    "Case"
 ]
 
 
-class Cases(Base):
-    __tablename__ = "cases"
+class Case(Base):
+    __tablename__ = "case"
 
     id = Column(Integer, primary_key=True, index=True)
     method = Column(String(10), nullable=False)

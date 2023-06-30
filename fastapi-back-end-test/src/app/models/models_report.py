@@ -11,9 +11,7 @@ from sqlalchemy import (
     Column,
     Integer,
     String,
-    DateTime,
-    Float,
-    JSON
+    DateTime
 )
 from json import (
     dumps, loads
@@ -35,24 +33,24 @@ class Report(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String(10), nullable=False)
-    total_num = Column(Integer, nullable=False)
-    defeated_num = Column(Integer, nullable=False)
-    succeed_num = Column(Integer, nullable=False)
+    total = Column(Integer, default=0)
+    total_succeed = Column(Integer, default=0)
+    total_defeated = Column(Integer, default=0)
     created_time = Column(DateTime, default=datetime.now())
     updated_time = Column(DateTime, onupdate=datetime.now,
                           default=datetime.now())
 
-    def __init__(self, title, total_num, defeated_num, succeed_num):
+    def __init__(self, title, total, total_succeed, total_defeated):
         self.title = title
-        self.total_num = total_num
-        self.defeated_num = defeated_num
-        self.succeed_num = succeed_num
+        self.total = total
+        self.total_succeed = total_succeed
+        self.total_defeated = total_defeated
 
     def __repr__(self):
         return f"""
             <Report(
-                  id='{self.id}', title='{self.title}', total_num='{self.total_num}', 
-                  defeated_num='{self.defeated_num}',succeed_num='{self.succeed_num}'
+                  id='{self.id}', title='{self.title}', total_num='{self.total}', 
+                  total_succeed='{self.total_succeed}',total_defeated='{self.total_defeated}'
             )>
         """
 
@@ -61,24 +59,24 @@ class ReportRecord(Base):
     __tablename__ = "report_record"
 
     id = Column(Integer, primary_key=True, index=True)
-    defeated = Column(String(10), nullable=True)
-    succeed = Column(Integer, nullable=True)
-    error = Column(Integer, nullable=True)
+    succeed_results = Column(String(500), nullable=True)
+    defeated_results = Column(String(500), nullable=True)
+    error_results = Column(String(500), nullable=True)
     report_id = Column(Integer, nullable=True)
     created_time = Column(DateTime, default=datetime.now())
     updated_time = Column(DateTime, onupdate=datetime.now,
                           default=datetime.now())
 
-    def __init__(self, defeated_num=None, succeed_num=None, error=None, report_id=None):
-        self.defeated_num = defeated_num
-        self.succeed_num = succeed_num
-        self.error = error
+    def __init__(self, succeed_results=None, defeated_results=None, error_results=None, report_id=None):
+        self.succeed_results = succeed_results
+        self.defeated_results = defeated_results
+        self.error_results = error_results
         self.report_id = report_id
 
     def __repr__(self):
         return f"""
             <ReportRecord(
-                  id='{self.id}', defeated_num='{self.defeated_num}', succeed_num='{self.succeed_num}', 
-                  error='{self.error}',report_id='{self.report_id}'
+                  id='{self.id}', succeed_results='{self.succeed_results}', defeated_results='{self.defeated_results}', 
+                  error_results='{self.error_results}',report_id='{self.report_id}'
             )>
         """

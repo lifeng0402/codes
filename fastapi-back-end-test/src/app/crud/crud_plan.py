@@ -12,7 +12,7 @@ from sqlalchemy import (
     select, update, delete
 )
 from sqlalchemy.orm import Session
-from src.app.models.models_plan import Plan
+from src.app.models.models_plan import Plan as p
 from src.app.core.db.session import session_commit
 from src.app.schemas.plan import (
     PlanSchemas
@@ -32,7 +32,7 @@ class PlanCrud:
         """
         try:
             # 传递参数
-            plan_info = Plan(
+            plan_info = p(
                 title=data.title,
                 environment=data.environment,
                 description=data.description
@@ -45,14 +45,14 @@ class PlanCrud:
     def update_plan(self, plan_id, data: PlanSchemas):
         try:
             results = self.db.execute(
-                select(Plan.id).where(Plan.id == plan_id)
+                select(p.id).where(p.id == plan_id)
             ).scalars().first()
 
             if not results:
                 raise Exception("plan_id不存在...")
 
             self.db.execute(
-                update(Plan).where(Plan.id == plan_id).values(
+                update(p).where(p.id == plan_id).values(
                     title=data.title,
                     environment=data.environment,
                     description=data.description
@@ -71,7 +71,7 @@ class PlanCrud:
         """
         try:
             plan_list = self.db.execute(
-                select(Plan).offset(skip).limit(limit)
+                select(p).offset(skip).limit(limit)
             ).scalars().all()
 
             return {"list": plan_list}
@@ -81,15 +81,13 @@ class PlanCrud:
     def delete_plan(self, plan_id):
         try:
             results = self.db.execute(
-                select(Plan.id).where(Plan.id == plan_id)
+                select(p.id).where(p.id == plan_id)
             ).scalars().first()
 
             if not results:
                 raise Exception("数据不存在或被移除...")
 
-            self.db.execute(
-                delete(Plan).where(Plan.id == plan_id)
-            )
+            self.db.execute(delete(p).where(p.id == plan_id))
             self.db.commit()
             return
         except Exception as e:

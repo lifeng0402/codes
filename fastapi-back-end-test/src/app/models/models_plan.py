@@ -16,13 +16,8 @@ from sqlalchemy import (
 from json import (
     dumps, loads
 )
-from sqlalchemy.orm import (
-    relationship,
-    backref
-)
 from datetime import datetime
 from src.app.core.db.base import Base
-from src.app.models.models_case import Cases
 
 
 class Plan(Base):

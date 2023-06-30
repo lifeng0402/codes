@@ -1,6 +1,9 @@
 from src.app.models.models_plan import Plan
-from src.app.models.models_users import Users
-from src.app.models.cases_models import Cases
+from src.app.models.models_user import User
+from src.app.models.models_case import Case
+from src.app.models.models_report import (
+    Report, ReportRecord
+)
 from src.app.core.db.base import Base
 from logging.config import fileConfig
 

@@ -19,12 +19,12 @@ from src.app.core.db.base import Base
 
 
 __all__ = [
-    "Users"
+    "User"
 ]
 
 
-class Users(Base):
-    __tablename__ = "users"
+class User(Base):
+    __tablename__ = "user"
 
     id = Column(Integer, primary_key=True, index=True)
     mobile = Column(String(20), nullable=True)
