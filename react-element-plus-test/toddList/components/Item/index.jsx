@@ -23,7 +23,11 @@ export default class Item extends Component {
   }
 
   handleDelete = (id) => {
-    this.props.deleteTodo(id)
+    if (window.confirm('确定删除嘛？')) {
+      this.props.deleteTodo(id)
+    }
+    // this.props.deleteTodo(id)
+
   }
 
   render() {

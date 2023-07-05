@@ -38,13 +38,12 @@ class Execute:
             cookies=cookies, files=files, timeout=timeout
         )
 
+        if not response["status"]:
+            return response
 
+        if expected_result:
+            response["response"]["response"]
 
-        if response["status"]:
-            if expected_result:
-                response["response"]["response"] 
-            
-            
         return response
 
     @classmethod

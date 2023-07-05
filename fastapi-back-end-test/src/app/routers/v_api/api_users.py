@@ -9,7 +9,6 @@
 
 from fastapi import APIRouter
 from fastapi import Depends
-from fastapi import status
 from sqlalchemy.orm import Session
 from src.app.crud.crud_user import UsersCrud
 from src.app.core.db.session import session
@@ -36,10 +35,7 @@ async def user_register(users: UsersSchemas, db: Session = Depends(session)):
         response = UsersCrud(session=db).register_user(user=users)
         return CodeResponse.succeed(data=response)
     except Exception as exc:
-        return CodeResponse.defeated(
-            err_msg=str(exc.args[0]),
-            err_code=status.HTTP_503_SERVICE_UNAVAILABLE
-        )
+        return CodeResponse.defeated(err_msg=str(exc.args[0]))
 
 
 @router.post("/login")
@@ -61,7 +57,4 @@ async def user_login(users: UsersLogin, db: Session = Depends(session)):
             data=dict(response, **{"token": access_token})
         )
     except Exception as exc:
-        return CodeResponse.defeated(
-            err_msg=str(exc.args[0]),
-            err_code=status.HTTP_503_SERVICE_UNAVAILABLE
-        )
+        return CodeResponse.defeated(err_msg=str(exc.args[0]))
