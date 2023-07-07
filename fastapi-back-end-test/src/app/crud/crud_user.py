@@ -114,7 +114,8 @@ class UsersCrud:
                     redis_key,
                     DependenciesProject.jwt_encode(
                         # 创建一个只有用户ID的新字典, 用于生成token
-                        data={k: v for k, v in user_info.items() if k == "id"}
+                        data={k: v for k, v in user_info.items() if k == "id"},
+                        expires_delta=7
                     )
                 )
 
@@ -122,7 +123,7 @@ class UsersCrud:
             token = await redis_client.get(redis_key)
 
             # 判断token是否过期
-            if not DependenciesProject.jwt_decode(token=token):
+            if not DependenciesProject.token_expiration(token=token):
                 token = DependenciesProject.jwt_encode(
                     data={k: v for k, v in user_info.items() if k == "id"}
                 )

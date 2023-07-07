@@ -10,7 +10,7 @@
 
 from fastapi import APIRouter
 from fastapi import Depends
-from fastapi import status
+from fastapi import status, HTTPException
 from src.app.core.dependencies import DependenciesProject
 from src.app.core.code_response import CodeResponse
 
@@ -28,7 +28,4 @@ async def home_index():
         )
         return result
     except Exception as exc:
-        return CodeResponse.defeated(
-            err_msg=str(exc.args[0]),
-            err_code=status.HTTP_503_SERVICE_UNAVAILABLE
-        )
+        return CodeResponse.defeated(err_msg=str(exc.args))
