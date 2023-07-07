@@ -27,6 +27,7 @@ class Plan(Base):
     title = Column(String(50), nullable=False)
     environment = Column(Integer, nullable=False)
     description = Column(String(500), nullable=True)
+    is_delete = Column(Integer, default=0)
     created_time = Column(DateTime, default=datetime.now())
     updated_time = Column(DateTime, onupdate=datetime.now,
                           default=datetime.now())

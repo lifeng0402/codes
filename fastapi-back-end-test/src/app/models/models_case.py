@@ -46,6 +46,7 @@ class Case(Base):
     timeout = Column(Float, nullable=True)
     expected_result = Column(String(500), nullable=True)
     plan_id = Column(Integer, nullable=True)
+    is_delete = Column(Integer, default=0)
     created_time = Column(DateTime, default=datetime.now())
     updated_time = Column(DateTime, onupdate=datetime.now,
                           default=datetime.now())

@@ -27,11 +27,9 @@ class User(Base):
     __tablename__ = "user"
 
     id = Column(Integer, primary_key=True, index=True)
-    mobile = Column(String(20), nullable=True)
-    username = Column(String(20), nullable=True)
-    password = Column(String(50), nullable=True)
-    mailbox = Column(String(100), nullable=True)
-    is_delete = Column(Boolean, default=False)
+    username = Column(String(100), nullable=True)
+    password = Column(String(500), nullable=True)
+    is_delete = Column(Integer, default=0)
     created_time = Column(DateTime, default=datetime.now())
     updated_time = Column(DateTime, onupdate=datetime.now,
                           default=datetime.now())
@@ -39,7 +37,6 @@ class User(Base):
     def __repr__(self):
         return f"""
             <Users(
-                  id='{self.id}', mobile='{self.mobile}', username='{self.username}', 
-                  password='{self.password}', mailbox='{self.mailbox}', is_delete='{self.is_delete}'
+                  id='{self.id}', username='{self.username}', password='{self.password}', is_delete='{self.is_delete}'
             )>
         """

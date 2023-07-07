@@ -30,3 +30,10 @@ class Environment(Enum):
     test: int = 0
     pre: int = 1
     pro: int = 2
+
+
+@unique
+class LoginMethodEnum(Enum):
+    username: int = 0
+    mobile: int = 1
+    mailbox: int = 2

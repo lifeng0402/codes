@@ -10,18 +10,20 @@
 from pydantic import BaseModel, EmailStr
 
 
-class UsersSchemas(BaseModel):
-    mobile: str
+__all__ = [
+    "UseRregister",
+    "UsersLogin"
+]
+
+
+class User(BaseModel):
     username: str
     password: str
-    mailbox: EmailStr
 
 
-class UserToken(BaseModel):
-    username: str
-    token: str
+class UseRregister(User):
+    pass
 
 
-class UsersLogin(BaseModel):
-    username: str
-    password: str
+class UsersLogin(User):
+    pass

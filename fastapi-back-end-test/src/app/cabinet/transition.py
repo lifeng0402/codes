@@ -10,6 +10,7 @@
 import json
 import datetime
 import typing as ty
+from src.app.excpetions.custom_json import DateTimeEncoder
 
 
 class Transition:
@@ -49,4 +50,16 @@ class Transition:
             else:
                 return data
 
-
+    @staticmethod
+    def proof_timestamp(data: ty.Dict):
+        """
+        对返回值中含未格式化的日期进行格式化操作
+        @param  :
+        @return  :
+        """
+        result = json.loads(
+            json.dumps(
+                data, ensure_ascii=False, cls=DateTimeEncoder
+            )
+        )
+        return result

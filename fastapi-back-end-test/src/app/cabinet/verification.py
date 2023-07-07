@@ -44,10 +44,12 @@ class VerificationData:
             return False if result.strip() else True
 
     @staticmethod
-    def verification_lenth(*, var: AnyStr, max_len: int = 15, min_len: int = 5):
+    def verification_lenth(*, var: AnyStr, max_len: int = 25, min_len: int = 5):
         """
         验证账号和密码的长度是否符合
         @param  :
         @return  :
         """
         return False if (len(var.strip()) > max_len) or (len(var.strip()) < min_len) else True
+
+

@@ -9,14 +9,14 @@
 
 from fastapi import APIRouter
 from fastapi import Depends
-from src.app.core.access_token import AccessToken
+from src.app.core.dependencies import DependenciesProject
 from src.app.core.code_response import CodeResponse
 from src.app.core.http_request import safe_request
 from src.app.schemas.case import RequestSchemas
 
 
 router = APIRouter(
-    #     dependencies=[Depends(AccessToken.verify_token)]
+    #     dependencies=[Depends(DependenciesProject.verify_token)]
 )
 
 
