@@ -8,9 +8,17 @@
 """
 
 from sqlalchemy.orm import Session
-from sqlalchemy import select
+from sqlalchemy import (
+    select, 
+    delete,
+    update
+)
 from src.app.schemas.user import (
-    UseRregister, UsersLogin
+    UseRregister,
+    UsersLogin,
+    UserLogout,
+    UserChangePwd,
+    UserSignOut
 )
 from src.app.models.models_user import User
 from src.app.core.hash_pwd import HashPassword
@@ -114,8 +122,7 @@ class UsersCrud:
                     redis_key,
                     DependenciesProject.jwt_encode(
                         # 创建一个只有用户ID的新字典, 用于生成token
-                        data={k: v for k, v in user_info.items() if k == "id"},
-                        expires_delta=7
+                        data={k: v for k, v in user_info.items() if k == "id"}
                     )
                 )
 
@@ -134,6 +141,84 @@ class UsersCrud:
 
             # 返回结果
             return Transition.proof_timestamp(dict(result, token=token))
+
+        except Exception as exc:
+            raise exc
+
+    def change_password(self, user: UserChangePwd, password):
+        """
+        修改密码
+        根据用户ID把传参的新密码提交到数据库中
+        @param  :
+        @return  :
+        """
+        try:
+            # 对密码进行加密, 再赋值给password变量
+            password = self.hash.get_password_hash(password=user.password)
+            # 更新用户密码
+            self.db.execute(
+                update(self.u).where(self.u.id == user.user_id).values(self.u.password = f"{password}")
+            )
+            self.db.commit()
+
+            # 查询用户密码
+            changed_password = self.db.execute(
+                select(self.u.password).where(self.u.id == user.user_id)
+            ).scalars().first()
+
+            # 对比密码是否一致
+            if not self.hash.verify_password(password, changed_password):
+                raise Exception("密码修改失败...")
+            
+            return {"message": "密码修改成功.."}
+
+        except Exception as exc:
+            raise exc
+
+    async def logout(self, user: UserLogout):
+        """
+        登出接口
+        根据用户ID删Redis中的Token
+        @param  :
+        @return  :
+        """
+        try:
+            redis_key = f"access_token:{user.user_id}"
+            await redis_client.delete(redis_key)
+
+            if await redis_client.exists(redis_key):
+                raise Exception("登出失败...")
+
+            return {"message": "登出成功..."}
+        except Exception as exc:
+            raise exc
+
+    def sign_out(self, user: UserSignOut):
+        """
+        注销用户接口
+        根据用户ID删数据库中的指定用户信息
+        @param  :
+        @return  :
+        """
+        try:
+            # 执行删除数据动作
+            self.db.execute(
+                delete(self.u).where(self.u.id == user.user_id)
+            )
+            # 提交删除数据
+            self.db.commit()
+
+            # 根据用户ID查询数据
+            user_info = self.db.execute(
+                select(self.u).where(self.u.id == user.user_id)
+            ).scalars().first()
+
+            # 如果查询结果为真,就抛出异常
+            if user_info:
+                raise Exception("用户注销失败...")
+
+            # 返回删除用户成功的数据
+            return {"message": "用户注销成功..."}
 
         except Exception as exc:
             raise exc

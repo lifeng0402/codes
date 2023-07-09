@@ -12,7 +12,10 @@ from pydantic import BaseModel, EmailStr
 
 __all__ = [
     "UseRregister",
-    "UsersLogin"
+    "UsersLogin",
+    "UserLogout",
+    "UserSignOut",
+    "UserChangePwd"
 ]
 
 
@@ -27,3 +30,15 @@ class UseRregister(User):
 
 class UsersLogin(User):
     pass
+
+
+class UserLogout(BaseModel):
+    user_id: int
+
+
+class UserSignOut(UserLogout):
+    pass
+
+
+class UserChangePwd(UserLogout):
+    password:str

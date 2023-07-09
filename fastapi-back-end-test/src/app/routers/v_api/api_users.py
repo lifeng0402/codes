@@ -11,7 +11,7 @@ from fastapi import APIRouter
 from fastapi import Depends
 from sqlalchemy.orm import Session
 from src.app.schemas.user import (
-    UseRregister, UsersLogin
+    UseRregister, UsersLogin, UserLogout
 )
 from src.app.core.db.session import session
 from src.app.crud.crud_user import UsersCrud
@@ -46,6 +46,21 @@ async def user_login(users: UsersLogin, db: Session = Depends(session)):
     """
     try:
         response = await UsersCrud(session=db).login(user=users)
+        return CodeResponse.succeed(data=response)
+
+    except Exception as exc:
+        return CodeResponse.defeated(err_msg=str(exc.args))
+
+
+@router.delete("/logout/{user_id}")
+async def user_logout(user_id: UserLogout, db: Session = Depends(session)):
+    """
+    登出接口
+    @param  :
+    @return  :
+    """
+    try:
+        response = await UsersCrud(session=db).logout(user=user_id)
         return CodeResponse.succeed(data=response)
 
     except Exception as exc:
