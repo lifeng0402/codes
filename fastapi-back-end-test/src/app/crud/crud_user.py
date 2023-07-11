@@ -9,16 +9,14 @@
 
 from sqlalchemy.orm import Session
 from sqlalchemy import (
-    select, 
+    select,
     delete,
     update
 )
 from src.app.schemas.user import (
     UseRregister,
     UsersLogin,
-    UserLogout,
-    UserChangePwd,
-    UserSignOut
+    UserChangePwd
 )
 from src.app.models.models_user import User
 from src.app.core.hash_pwd import HashPassword
@@ -75,13 +73,13 @@ class UsersCrud:
             # 刷新提交的数据
             self.db.refresh(user_info)
 
-            result = self.db.execute(
-                select(
-                    self.u.id, self.u.username, self.u.created_time
-                ).where(self.u.username == user.username)
-            ).first()._asdict()
+            response = user_info.to_dict()
 
-            return Transition.proof_timestamp(result)
+            return dict(
+                user_id=response["id"],
+                username=response["username"],
+                create_time=response["create_time"]
+            )
         except Exception as exc:
             raise exc
 
@@ -99,8 +97,6 @@ class UsersCrud:
                     self.u.id,
                     self.u.is_delete,
                     self.u.username,
-                    self.u.created_time,
-                    self.u.updated_time,
                     self.u.password
                 ).where(
                     self.u.username == user.username
@@ -114,38 +110,23 @@ class UsersCrud:
                 raise Exception("账号或密码错误...")
 
             # 定义一个用于存储redis中的值并赋值给redis_key
-            redis_key = f"access_token:{user_info['id']}"
+            redis_key: str = f"{user_info['id']}"
 
-            # 判断redis中是否存在token,不存在就写入
-            if await redis_client.exists(redis_key):
-                await redis_client.set(
-                    redis_key,
-                    DependenciesProject.jwt_encode(
-                        # 创建一个只有用户ID的新字典, 用于生成token
-                        data={k: v for k, v in user_info.items() if k == "id"}
-                    )
-                )
-
-            # 从redis中读取token
-            token = await redis_client.get(redis_key)
-
-            # 判断token是否过期
-            if not DependenciesProject.token_expiration(token=token):
-                token = DependenciesProject.jwt_encode(
-                    data={k: v for k, v in user_info.items() if k == "id"}
-                )
-                await redis_client.set(redis_key, token)
+            access_token = await DependenciesProject.verify_token(
+                is_token=True, key_str=redis_key,
+                encry_param={k: v for k, v in user_info.items() if k == "id"}
+            )
 
             # 生成一个清除密码的新字典，用于作返回值
             result = {k: v for k, v in user_info.items() if k != "password"}
 
             # 返回结果
-            return Transition.proof_timestamp(dict(result, token=token))
+            return Transition.proof_timestamp(dict(user=result, token=access_token))
 
         except Exception as exc:
             raise exc
 
-    def change_password(self, user: UserChangePwd, password):
+    def change_password(self, user: UserChangePwd):
         """
         修改密码
         根据用户ID把传参的新密码提交到数据库中
@@ -153,11 +134,12 @@ class UsersCrud:
         @return  :
         """
         try:
-            # 对密码进行加密, 再赋值给password变量
-            password = self.hash.get_password_hash(password=user.password)
+            # 对密码进行加密, 再从新赋值给password变量
+            hash_password = self.hash.get_password_hash(password=user.password)
             # 更新用户密码
             self.db.execute(
-                update(self.u).where(self.u.id == user.user_id).values(self.u.password = f"{password}")
+                update(self.u).where(self.u.id == user.user_id).values(
+                    password=hash_password)
             )
             self.db.commit()
 
@@ -167,15 +149,15 @@ class UsersCrud:
             ).scalars().first()
 
             # 对比密码是否一致
-            if not self.hash.verify_password(password, changed_password):
+            if not self.hash.verify_password(user.password, changed_password):
                 raise Exception("密码修改失败...")
-            
-            return {"message": "密码修改成功.."}
+
+            return dict(message="密码修改成功..")
 
         except Exception as exc:
             raise exc
 
-    async def logout(self, user: UserLogout):
+    async def logout(self, user_id: int):
         """
         登出接口
         根据用户ID删Redis中的Token
@@ -183,17 +165,17 @@ class UsersCrud:
         @return  :
         """
         try:
-            redis_key = f"access_token:{user.user_id}"
+            redis_key = f"access_token:{user_id}"
             await redis_client.delete(redis_key)
 
             if await redis_client.exists(redis_key):
                 raise Exception("登出失败...")
 
-            return {"message": "登出成功..."}
+            return dict(message="退出登录..")
         except Exception as exc:
             raise exc
 
-    def sign_out(self, user: UserSignOut):
+    def sign_out(self, user_id: int):
         """
         注销用户接口
         根据用户ID删数据库中的指定用户信息
@@ -203,14 +185,14 @@ class UsersCrud:
         try:
             # 执行删除数据动作
             self.db.execute(
-                delete(self.u).where(self.u.id == user.user_id)
+                delete(self.u).where(self.u.id == user_id)
             )
             # 提交删除数据
             self.db.commit()
 
             # 根据用户ID查询数据
             user_info = self.db.execute(
-                select(self.u).where(self.u.id == user.user_id)
+                select(self.u).where(self.u.id == user_id)
             ).scalars().first()
 
             # 如果查询结果为真,就抛出异常
@@ -218,7 +200,7 @@ class UsersCrud:
                 raise Exception("用户注销失败...")
 
             # 返回删除用户成功的数据
-            return {"message": "用户注销成功..."}
+            return dict(message="用户注销..")
 
         except Exception as exc:
             raise exc

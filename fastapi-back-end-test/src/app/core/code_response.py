@@ -8,7 +8,6 @@
 """
 
 from fastapi.encoders import jsonable_encoder
-from fastapi.responses import ORJSONResponse
 
 
 __all__ = [

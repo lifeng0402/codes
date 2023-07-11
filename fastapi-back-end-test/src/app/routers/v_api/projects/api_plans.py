@@ -18,11 +18,12 @@ from src.app.core.db.session import session
 from src.app.crud.crud_plan import PlanCrud
 from src.app.core.code_response import CodeResponse
 from src.app.schemas.plan import PlanSchemas
+from src.app.core.dependencies import DependenciesProject
 
 
 router = APIRouter(
     prefix="/plan",
-    #     dependencies=[Depends(AccessToken.verify_token)]
+        dependencies=[Depends(DependenciesProject.dependence_token)]
 )
 
 

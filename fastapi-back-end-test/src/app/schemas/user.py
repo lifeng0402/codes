@@ -13,8 +13,6 @@ from pydantic import BaseModel, EmailStr
 __all__ = [
     "UseRregister",
     "UsersLogin",
-    "UserLogout",
-    "UserSignOut",
     "UserChangePwd"
 ]
 
@@ -32,13 +30,6 @@ class UsersLogin(User):
     pass
 
 
-class UserLogout(BaseModel):
+class UserChangePwd(BaseModel):
     user_id: int
-
-
-class UserSignOut(UserLogout):
-    pass
-
-
-class UserChangePwd(UserLogout):
-    password:str
+    password: str

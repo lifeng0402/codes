@@ -16,7 +16,7 @@ from src.app.core.code_response import CodeResponse
 
 
 router = APIRouter(
-    dependencies=[Depends(DependenciesProject.verify_token)]
+    dependencies=[Depends(DependenciesProject.dependence_token)]
 )
 
 

@@ -12,17 +12,13 @@ from sqlalchemy import (
     Integer,
     String,
     DateTime,
-    Float,
-    JSON
+    Float
 )
-from json import (
-    dumps, loads
-)
+from json import dumps
 from datetime import datetime
+from sqlalchemy_serializer import SerializerMixin
 from src.app.core.db.base import Base
-from src.app.excpetions.custom_json import (
-    DateTimeEncoder, CustomJSONEncoder
-)
+from src.app.excpetions.custom_json import CustomJSONEncoder
 
 
 __all__ = [
@@ -30,7 +26,7 @@ __all__ = [
 ]
 
 
-class Case(Base):
+class Case(Base, SerializerMixin):
     __tablename__ = "case"
 
     id = Column(Integer, primary_key=True, index=True)

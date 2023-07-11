@@ -14,9 +14,10 @@ from sqlalchemy import (
     select, update, delete, and_
 )
 from sqlalchemy.orm import Session
-from src.app.models.models_plan import Plan as p
-from src.app.models.models_case import Case as c
-from src.app.core.db.session import session_commit
+from fastapi.encoders import jsonable_encoder
+from src.app.models.models_plan import Plan
+from src.app.models.models_case import Case
+from src.app.cabinet.transition import Transition
 from src.app.schemas.case import (
     RequestSchemas, DeleteCases, BatchTestCaseRequest
 )
@@ -25,28 +26,20 @@ from src.app.excpetions.custom_json import CustomJSONEncoder
 
 class CasesCrud:
     def __init__(self, session: Session) -> None:
+        self.p = Plan
+        self.c = Case
         self.db = session
 
-    def save_cases(self, data: RequestSchemas):
+    def create_cases(self, data: RequestSchemas):
         """
         对data中的数据进行存储到数据库
         @param  :
         @return  :
         """
 
-        def select_plan(*, db: Session, plan_id: int or str):
-            # 查询计划ID是否存在,不存在就抛出异常
-            results = db.execute(
-                select(p).where(p.id == plan_id)
-            )
-            # 判断数据是否存在
-            if results.scalars().first():
-                return
-            raise Exception("plan_id不存在...")
-
         try:
             # 映射对应数据
-            case_info = c(
+            case_info = self.c(
                 method=data.method, url=data.url, body=data.body, files=data.files,
                 content=data.content, timeout=data.timeout, body_type=data.body_type,
                 expected_result=data.expected_result, plan_id=data.plan_id,
@@ -54,10 +47,23 @@ class CasesCrud:
             )
             # 如果计划ID为真值
             if data.plan_id:
-                return select_plan(db=self.db, plan_id=data.plan_id)
+                # 查询计划ID是否存在
+                results = self.db.execute(
+                    select(self.p).where(self.p.id == data.plan_id)
+                )
+                # 判断数据是否存在
+                if results.scalars().first():
+                    return
+                raise Exception("plan_id不存在...")
 
             # 往数据库提交数据
-            return session_commit(self.db, datas=case_info)
+            self.db.add(case_info)
+            self.db.commit()
+            self.db.refresh(case_info)
+            
+
+            return case_info.to_dict()
+
         except Exception as e:
             raise e
 
@@ -81,7 +87,7 @@ class CasesCrud:
 
         try:
             results = self.db.execute(
-                select(c.id).where(c.id == case_id)
+                select(self.c.id).where(self.c.id == case_id)
             ).scalars().first()
 
             if not results:
@@ -89,7 +95,7 @@ class CasesCrud:
 
             # 执行更新语句
             self.db.execute(
-                update(c).where(c.id == case_id).values(
+                update(self.c).where(self.c.id == case_id).values(
                     method=data.method, url=data.url,
                     body=transition(data.body),
                     files=transition(data.files),
@@ -115,7 +121,7 @@ class CasesCrud:
         """
         try:
             # 分页查询Cases表中的数据
-            results = self.db.execute(select(c).offset(
+            results = self.db.execute(select(self.c).offset(
                 skip).limit(limit)).scalars().all()
 
             return {"list": results}
@@ -131,7 +137,7 @@ class CasesCrud:
         try:
             # 查询数据是否存在
             case_id = self.db.execute(
-                select(c.id).where(c.id == case_id)
+                select(self.c.id).where(self.c.id == case_id)
             ).scalars().first()
 
             # 不存在就抛异常提示
@@ -139,7 +145,7 @@ class CasesCrud:
                 return Exception("数据不存在或被移除...")
 
             # 执行删除操作
-            self.db.execute(delete(c).where(c.id == case_id))
+            self.db.execute(delete(self.c).where(self.c.id == case_id))
             self.db.commit()
 
             return
@@ -157,7 +163,7 @@ class CasesCrud:
         try:
             # 根据case_id查询全部数据
             case_list = self.db.execute(
-                select(c.id).where(c.id.in_(case.case_id))
+                select(self.c.id).where(self.c.id.in_(case.case_id))
             ).scalars().all()
 
             # 判断数据是否存在
@@ -181,8 +187,8 @@ class CasesCrud:
         """
         def select_cases(condition: typing.Any):
             stmt = select(
-                c.method, c.url, c.body_type, c.body, c.params,
-                c.headers, c.cookies, c.content, c.files, c.expected_result
+                self.c.method, self.c.url, self.c.body_type, self.c.body, self.c.params,
+                self.c.headers, self.c.cookies, self.c.content, self.c.files, self.c.expected_result
             ).where(condition)
 
             return stmt
@@ -193,15 +199,15 @@ class CasesCrud:
                 case_list = self.db.execute(
                     select_cases(
                         condition=and_(
-                            c.id.in_(case_ids.case_ids),
-                            c.plan_id == case_ids.plan_id
+                            self.c.id.in_(case_ids.case_ids),
+                            self.c.plan_id == case_ids.plan_id
                         )
                     )
                 ).all()
             else:
                 # 根据case_id查询全部数据
                 case_list = self.db.execute(
-                    select_cases(condition=c.id.in_(case_ids.case_ids))
+                    select_cases(condition=self.c.id.in_(case_ids.case_ids))
                 ).all()
 
             # 判断数据是否存在

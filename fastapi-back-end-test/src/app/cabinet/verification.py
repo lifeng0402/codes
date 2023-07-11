@@ -26,8 +26,11 @@ class VerificationData:
         @param  :
         @return  :
         """
-        pattern = r'^1[3456789]\d{9}$'
-        return re.match(pattern, mobile.strip()) is not None
+        try:
+            pattern = r'^1[3456789]\d{9}$'
+            return re.match(pattern, mobile.strip()) is not None
+        except Exception as exc:
+            raise exc
 
     @staticmethod
     async def verification_email(*, email: AnyStr):
@@ -36,12 +39,15 @@ class VerificationData:
         @param  :
         @return  :
         """
-        # 用 asyncio.create_unverified_context() 函数创建一个未验证的上下文。
-        # 这个上下文是非阻塞的，因此我们可以在主线程中继续执行其他操作，而 verify_email() 函数会在后台线程中运行。
-        # 如果 verify_email() 函数验证邮件有效，则会在未验证的上下文中调用 print() 函数，否则会在主线程中抛出异常。
-        async with verify_email.create_unverified_context() as ctx:
-            result = await verify_email(email, ctx)
-            return False if result.strip() else True
+        try:
+            # 用 asyncio.create_unverified_context() 函数创建一个未验证的上下文。
+            # 这个上下文是非阻塞的，因此我们可以在主线程中继续执行其他操作，而 verify_email() 函数会在后台线程中运行。
+            # 如果 verify_email() 函数验证邮件有效，则会在未验证的上下文中调用 print() 函数，否则会在主线程中抛出异常。
+            async with verify_email.create_unverified_context() as ctx:
+                result = await verify_email(email, ctx)
+                return False if result.strip() else True
+        except Exception as exc:
+            raise exc
 
     @staticmethod
     def verification_lenth(*, var: AnyStr, max_len: int = 25, min_len: int = 5):
@@ -50,6 +56,7 @@ class VerificationData:
         @param  :
         @return  :
         """
-        return False if (len(var.strip()) > max_len) or (len(var.strip()) < min_len) else True
-
-
+        try:
+            return False if (len(var.strip()) > max_len) or (len(var.strip()) < min_len) else True
+        except Exception as exc:
+            raise exc

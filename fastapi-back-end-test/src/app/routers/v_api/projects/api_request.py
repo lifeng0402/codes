@@ -13,10 +13,12 @@ from src.app.core.dependencies import DependenciesProject
 from src.app.core.code_response import CodeResponse
 from src.app.core.http_request import safe_request
 from src.app.schemas.case import RequestSchemas
+from src.app.core.dependencies import DependenciesProject
+
 
 
 router = APIRouter(
-    #     dependencies=[Depends(DependenciesProject.verify_token)]
+        dependencies=[Depends(DependenciesProject.dependence_token)]
 )
 
 

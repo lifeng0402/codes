@@ -44,9 +44,9 @@ class Transition:
             if not data:
                 return data
             return json.dumps(data, indent=4)
-        except json.JSONDecodeError:
+        except json.JSONDecodeError as exc:
             if json_error:
-                raise json.JSONDecodeError("请求参数非json类型")
+                raise json.JSONDecodeError(f"请求参数非json类型: {exc}")
             else:
                 return data
 
@@ -58,8 +58,6 @@ class Transition:
         @return  :
         """
         result = json.loads(
-            json.dumps(
-                data, ensure_ascii=False, cls=DateTimeEncoder
-            )
+            json.dumps(data, ensure_ascii=False, cls=DateTimeEncoder)
         )
         return result

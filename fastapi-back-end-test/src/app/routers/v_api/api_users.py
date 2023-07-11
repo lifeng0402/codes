@@ -11,7 +11,9 @@ from fastapi import APIRouter
 from fastapi import Depends
 from sqlalchemy.orm import Session
 from src.app.schemas.user import (
-    UseRregister, UsersLogin, UserLogout
+    UseRregister, 
+    UsersLogin, 
+    UserChangePwd
 )
 from src.app.core.db.session import session
 from src.app.crud.crud_user import UsersCrud
@@ -34,7 +36,7 @@ async def user_register(users: UseRregister, db: Session = Depends(session)):
         response = UsersCrud(session=db).register(user=users)
         return CodeResponse.succeed(data=response)
     except Exception as exc:
-        return CodeResponse.defeated(err_msg=str(exc.args[0]))
+        return CodeResponse.defeated(err_msg=str(exc.args))
 
 
 @router.post("/login")
@@ -52,15 +54,45 @@ async def user_login(users: UsersLogin, db: Session = Depends(session)):
         return CodeResponse.defeated(err_msg=str(exc.args))
 
 
-@router.delete("/logout/{user_id}")
-async def user_logout(user_id: UserLogout, db: Session = Depends(session)):
+@router.put("/password")
+async def user_change_password(user: UserChangePwd, db: Session = Depends(session)):
     """
-    登出接口
+    修改密码接口
     @param  :
     @return  :
     """
     try:
-        response = await UsersCrud(session=db).logout(user=user_id)
+        response = UsersCrud(session=db).change_password(user=user)
+        return CodeResponse.succeed(data=response)
+
+    except Exception as exc:
+        return CodeResponse.defeated(err_msg=str(exc.args))
+
+
+@router.delete("/logout/{user_id}")
+async def user_logout(user_id: int, db: Session = Depends(session)):
+    """
+    登出用户接口
+    @param  :
+    @return  :
+    """
+    try:
+        response = await UsersCrud(session=db).logout(user_id=user_id)
+        return CodeResponse.succeed(data=response)
+
+    except Exception as exc:
+        return CodeResponse.defeated(err_msg=str(exc.args))
+
+
+@router.delete("/signout/{user_id}")
+async def user_sign_out(user_id: int, db: Session = Depends(session)):
+    """
+    注销用户接口
+    @param  :
+    @return  :
+    """
+    try:
+        response = await UsersCrud(session=db).sign_out(user_id=user_id)
         return CodeResponse.succeed(data=response)
 
     except Exception as exc:

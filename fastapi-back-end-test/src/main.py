@@ -8,10 +8,11 @@
 """
 
 import uvicorn
-from fastapi import Depends
-from fastapi import FastAPI
-from fastapi import Request
-from fastapi import Response
+from fastapi import (
+    FastAPI,
+    Request,
+    Response
+)
 from typing import Optional, Callable, Any
 from src.app.routers.api_router import api_router
 

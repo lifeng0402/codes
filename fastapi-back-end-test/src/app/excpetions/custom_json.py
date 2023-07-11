@@ -27,12 +27,7 @@ class DateTimeEncoder(json.JSONEncoder):
 # 自定义 json 编码器
 class CustomJSONEncoder(json.JSONEncoder):
     def default(self, obj):
-        if isinstance(obj, dict):
-            return json.dumps(obj, ensure_ascii=False)
-        return json.JSONEncoder.default(self, obj)
+        if isinstance(obj, datetime):
+            return obj.isoformat()
+        return super().default(obj)
 
-
-# 将数据序列化为 JSON 格式
-# data = {'timestamp': datetime.datetime.now(), 'message': 'hello, world'}
-# json.dumps(data, cls=DateTimeEncoder)
-# print(json.dumps(data, cls=DateTimeEncoder))

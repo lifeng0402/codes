@@ -19,27 +19,25 @@ from src.app.core.code_response import CodeResponse
 from src.app.schemas.case import (
     RequestSchemas, DeleteCases, BatchTestCaseRequest
 )
-from src.app.core.execute import Execute
+from src.app.core.execute_cases import Execute
+from src.app.core.dependencies import DependenciesProject
 
 
 router = APIRouter(
     prefix="/case",
-    #     dependencies=[Depends(AccessToken.verify_token)]
+        dependencies=[Depends(DependenciesProject.dependence_token)]
 )
 
 
-@router.post("/save")
-async def save_case(data: RequestSchemas, db: Session = Depends(session)):
+@router.post("/create")
+async def create_case(data: RequestSchemas, db: Session = Depends(session)):
     """
     测试用例保存接口
     @param  :
     @return  :
     """
     try:
-        response = CasesCrud(db).save_cases(data)
-
-        if not response:
-            return HTTPException(detail=response)
+        response = CasesCrud(db).create_cases(data)
 
         return CodeResponse.succeed(
             data=response, err_msg="添加成功..."

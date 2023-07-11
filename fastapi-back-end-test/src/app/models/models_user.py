@@ -15,6 +15,7 @@ from sqlalchemy import (
     DateTime
 )
 from datetime import datetime
+from sqlalchemy_serializer import SerializerMixin
 from src.app.core.db.base import Base
 
 
@@ -23,7 +24,7 @@ __all__ = [
 ]
 
 
-class User(Base):
+class User(Base, SerializerMixin):
     __tablename__ = "user"
 
     id = Column(Integer, primary_key=True, index=True)

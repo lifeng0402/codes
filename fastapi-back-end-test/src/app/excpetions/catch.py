@@ -10,4 +10,3 @@
 
 class CatchException(Exception):
     pass
-
