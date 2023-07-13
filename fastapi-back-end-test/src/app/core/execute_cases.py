@@ -13,31 +13,33 @@ import typing as ty
 import concurrent.futures
 from fastapi.encoders import jsonable_encoder
 from src.app.schemas.case import RequestBase
-from src.app.core.http_request import safe_request
+from src.app.core.http_request import RequestHttp
 from src.app.schemas.case import TestCaseRequest
 from src.app.cabinet.transition import Transition
 
 
-class Execute:
+async def execute(list_results: ty.List[dict]):
 
-    @classmethod
-    async def execute(cls, datas: dict):
-        method = datas.get("method")
-        url = datas.get("url")
-        body_type = datas.get("body_type")
-        files = datas.get("files")
-        timeout = datas.get("timeout")
-        body = Transition.proof_dict(datas.get("body"))
-        params = Transition.proof_dict(datas.get("params"))
-        headers = Transition.proof_dict(datas.get("headers"))
-        cookies = Transition.proof_dict(datas.get("cookies"))
-        expected_result = Transition.proof_dict(datas.get("expected_result"))
+    for rq in list_results["list"]:
+        method = rq.method
+        url = rq.url
+        body_type = rq.body_type
+        files = rq.files
+        timeout = rq.timeout
+        body = Transition.proof_dict(rq.body),
+        params = Transition.proof_dict(rq.params),
+        headers = Transition.proof_dict(rq.headers),
+        cookies = Transition.proof_dict(rq.cookies),
 
-        response = await safe_request(
-            method=method, url=url, body_type=body_type, body=body, params=params, headers=headers,
-            cookies=cookies, files=files, timeout=timeout
+        expected_result = Transition.proof_dict(rq.expected_result)
+
+        print(rq.url)
+
+        response = await RequestHttp.safe_request(
+            method=method, url=url, body_type=body_type, files=files, timeout=timeout,
+            body=body, params=params, headers=headers, cookies=cookies
         )
-
+    else:
         if not response["status"]:
             return response
 
@@ -45,20 +47,6 @@ class Execute:
             response["response"]["response"]
 
         return response
-
-    @classmethod
-    async def run(cls, test_cases: TestCaseRequest):
-        if not test_cases:
-            raise Exception("")
-
-        total: int = 0
-        for case in test_cases:
-            response = await cls.execute(case)
-
-            status = response.get("status")
-        # response = await asyncio.gather(results)
-        # return results
-        return results
 
 
 if __name__ == "__main__":
@@ -74,7 +62,3 @@ if __name__ == "__main__":
         'files': None,
         'expected_result': None
     }
-    loop = asyncio.get_event_loop()
-    response = loop.run_until_complete(Execute().execute(a))
-    print(response)
-    print()

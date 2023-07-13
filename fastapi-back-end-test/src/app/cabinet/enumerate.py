@@ -10,19 +10,19 @@
 from enum import Enum, unique
 
 __all__ = [
-    "RequestBody",
+    "BodyType",
     "Environment"
 ]
 
 
 @unique
-class RequestBody(Enum):
+class BodyType(Enum):
     none: int = 0
     raw: int = 1
     graphql: int = 2
     form_data: int = 3
     binary: int = 4
-    x_www_form_urlencoded: int = 5
+    x_form_url: int = 5
 
 
 @unique

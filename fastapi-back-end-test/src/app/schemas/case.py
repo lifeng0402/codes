@@ -15,7 +15,7 @@ from typing import (
 from pydantic import (
     BaseModel, HttpUrl, validator
 )
-from src.app.cabinet.enumerate import RequestBody
+from src.app.cabinet.enumerate import BodyType
 
 
 __all__ = [
@@ -29,7 +29,7 @@ __all__ = [
 class RequestBase(BaseModel):
     method: str
     url: HttpUrl
-    body_type: RequestBody = RequestBody.none.value
+    body_type: BodyType = BodyType.none.value
     content: Optional[Any] = None
     body: Optional[Any] = None
     files: Optional[Any] = None

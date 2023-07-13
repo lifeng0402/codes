@@ -11,7 +11,7 @@ from fastapi import APIRouter
 from fastapi import Depends
 from src.app.core.dependencies import DependenciesProject
 from src.app.core.code_response import CodeResponse
-from src.app.core.http_request import safe_request
+from src.app.core.http_request import RequestHttp
 from src.app.schemas.case import RequestSchemas
 from src.app.core.dependencies import DependenciesProject
 
@@ -25,12 +25,12 @@ router = APIRouter(
 @router.post("/request")
 async def cases_resuest(datas: RequestSchemas):
     try:
-        return await safe_request(
+        return await RequestHttp(
             method=datas.method, url=datas.url,
             body_type=datas.body_type, body=datas.body,
             params=datas.params, headers=datas.headers,
             cookies=datas.cookies, files=datas.files,
-            timeout=datas.timeout, is_response=True
+            timeout=datas.timeout
         )
     except Exception as exc:
         return await CodeResponse.defeated(

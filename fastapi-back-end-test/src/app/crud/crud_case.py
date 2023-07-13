@@ -52,15 +52,14 @@ class CasesCrud:
                     select(self.p).where(self.p.id == data.plan_id)
                 )
                 # 判断数据是否存在
-                if results.scalars().first():
-                    return
-                raise Exception("plan_id不存在...")
+                if not results.scalars().first():
+                    raise Exception("plan_id不存在...")
+                return
 
             # 往数据库提交数据
             self.db.add(case_info)
             self.db.commit()
             self.db.refresh(case_info)
-            
 
             return case_info.to_dict()
 
@@ -171,7 +170,7 @@ class CasesCrud:
                 raise Exception("数据不存在或被移除...")
 
             # 执行删除操作
-            self.db.execute(delete(c).where(c.id.in_(case.case_id)))
+            self.db.execute(delete(self.c).where(self.c.id.in_(case.case_id)))
             self.db.commit()
 
             return
@@ -179,42 +178,32 @@ class CasesCrud:
         except Exception as e:
             raise e
 
-    def cases_running(self, case_ids: BatchTestCaseRequest):
+    def cases_run(self, case_ids: BatchTestCaseRequest):
         """
         根据数组case_id查询到数据,再执行删除操作
         @param  :
         @return  :
         """
-        def select_cases(condition: typing.Any):
-            stmt = select(
-                self.c.method, self.c.url, self.c.body_type, self.c.body, self.c.params,
-                self.c.headers, self.c.cookies, self.c.content, self.c.files, self.c.expected_result
-            ).where(condition)
-
-            return stmt
-
         try:
             # 判断计划ID是否为真
             if case_ids.plan_id:
-                case_list = self.db.execute(
-                    select_cases(
-                        condition=and_(
-                            self.c.id.in_(case_ids.case_ids),
-                            self.c.plan_id == case_ids.plan_id
-                        )
+                stmt = select(self.c).where(
+                    and_(
+                        self.c.id.in_(case_ids.case_ids),
+                        self.c.plan_id == case_ids.plan_id
                     )
-                ).all()
+                )
             else:
                 # 根据case_id查询全部数据
-                case_list = self.db.execute(
-                    select_cases(condition=self.c.id.in_(case_ids.case_ids))
-                ).all()
+                stmt = select(self.c).where(self.c.id.in_(case_ids.case_ids))
+                
+            results_cases = self.db.execute(stmt).scalars().fetchall()
 
             # 判断数据是否存在
-            if not case_list:
+            if not results_cases:
                 raise Exception("数据不存在或被移除...")
 
-            return [row._asdict() for row in case_list]
+            return dict(list=results_cases)
 
         except Exception as e:
             raise e

@@ -19,13 +19,13 @@ from src.app.core.code_response import CodeResponse
 from src.app.schemas.case import (
     RequestSchemas, DeleteCases, BatchTestCaseRequest
 )
-from src.app.core.execute_cases import Execute
+from src.app.core.execute_cases import execute
 from src.app.core.dependencies import DependenciesProject
 
 
 router = APIRouter(
     prefix="/case",
-        dependencies=[Depends(DependenciesProject.dependence_token)]
+    dependencies=[Depends(DependenciesProject.dependence_token)]
 )
 
 
@@ -120,7 +120,7 @@ async def batch_delete_case(case: DeleteCases, db: Session = Depends(session)):
         )
 
 
-@router.post("/running")
+@router.post("/run")
 async def run_test_cases(case_ids: BatchTestCaseRequest, db: Session = Depends(session)):
     """
     批量运行用例接口
@@ -128,10 +128,10 @@ async def run_test_cases(case_ids: BatchTestCaseRequest, db: Session = Depends(s
     @return  :
     """
     try:
-        response = CasesCrud(db).cases_running(case_ids=case_ids)
-        results = await Execute.run(response)
+        response = CasesCrud(db).cases_run(case_ids=case_ids)
+        response = await execute(list_results=response)
         return CodeResponse.succeed(
-            data=results, err_msg="批量运行成功..."
+            data=response, err_msg="运行成功..."
         )
     except Exception as e:
         return CodeResponse.defeated(
