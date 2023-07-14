@@ -40,9 +40,9 @@ class CasesCrud:
         try:
             # 映射对应数据
             case_info = self.c(
-                method=data.method, url=data.url, body=data.body, files=data.files,
-                content=data.content, timeout=data.timeout, body_type=data.body_type,
-                expected_result=data.expected_result, plan_id=data.plan_id,
+                method=data.method, url=data.url, json_data=data.json_data,
+                form_data=data.form_data, files=data.files, content=data.content,
+                timeout=data.timeout, expected_result=data.expected_result, plan_id=data.plan_id,
                 cookies=data.cookies, headers=data.headers
             )
             # 如果计划ID为真值
@@ -96,10 +96,10 @@ class CasesCrud:
             self.db.execute(
                 update(self.c).where(self.c.id == case_id).values(
                     method=data.method, url=data.url,
-                    body=transition(data.body),
-                    files=transition(data.files),
-                    content=data.content, timeout=data.timeout,
-                    body_type=data.body_type, plan_id=data.plan_id,
+                    json_data=transition(data.json_data),
+                    form_data=transition(data.form_data),
+                    files=transition(data.files), content=data.content,
+                    timeout=data.timeout, plan_id=data.plan_id,
                     expected_result=transition(data.expected_result),
                     cookies=transition(data.cookies), headers=transition(data.headers)
                 )
@@ -196,14 +196,15 @@ class CasesCrud:
             else:
                 # 根据case_id查询全部数据
                 stmt = select(self.c).where(self.c.id.in_(case_ids.case_ids))
-                
-            results_cases = self.db.execute(stmt).scalars().fetchall()
+
+            results_cases = self.db.execute(stmt).scalars().all()
 
             # 判断数据是否存在
             if not results_cases:
                 raise Exception("数据不存在或被移除...")
 
-            return dict(list=results_cases)
+            # return [article._asdict() for article in results_cases]
+            return results_cases
 
         except Exception as e:
             raise e

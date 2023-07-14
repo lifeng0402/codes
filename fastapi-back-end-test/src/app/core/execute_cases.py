@@ -20,33 +20,33 @@ from src.app.cabinet.transition import Transition
 
 async def execute(list_results: ty.List[dict]):
 
-    for rq in list_results["list"]:
-        method = rq.method
-        url = rq.url
-        body_type = rq.body_type
-        files = rq.files
-        timeout = rq.timeout
-        body = Transition.proof_dict(rq.body),
-        params = Transition.proof_dict(rq.params),
-        headers = Transition.proof_dict(rq.headers),
-        cookies = Transition.proof_dict(rq.cookies),
+    total, succeed, defeated, error = (0, 0, 0, 0)
 
-        expected_result = Transition.proof_dict(rq.expected_result)
+    for req in list_results["list"]:
 
-        print(rq.url)
-
-        response = await RequestHttp.safe_request(
-            method=method, url=url, body_type=body_type, files=files, timeout=timeout,
-            body=body, params=params, headers=headers, cookies=cookies
+        req_params = dict(
+            url=req.get("url"),
+            method=req.get("method"),
+            json=req.get("json_data"),
+            data=req.get("form_data"),
+            params=req.get("params"),
+            files=req.get("files"),
+            content=req.get("content"),
+            headers=json.loads(req.get("headers")),
+            cookies=req.get("cookies"),
+            timeout=req.get("timeout"),
         )
-    else:
-        if not response["status"]:
-            return response
 
-        if expected_result:
-            response["response"]["response"]
+        expected_result = req.get("expected_result")
 
-        return response
+        response = await RequestHttp.safe_request(**req_params)
+
+        response_status = response["status"]
+
+        if not expected_result:
+            pass
+
+    print(total, succeed, defeated, error)
 
 
 if __name__ == "__main__":

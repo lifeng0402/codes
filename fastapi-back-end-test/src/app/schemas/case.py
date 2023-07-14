@@ -10,7 +10,9 @@
 from typing import (
     Optional,
     Any,
-    List
+    List,
+    Union,
+    Dict
 )
 from pydantic import (
     BaseModel, HttpUrl, validator
@@ -22,19 +24,20 @@ __all__ = [
     "RequestBase",
     "RequestSchemas",
     "DeleteCases",
-    "BatchTestCaseRequest"
+    "BatchTestCaseRequest",
+    "CasesRunRequest"
 ]
 
 
 class RequestBase(BaseModel):
     method: str
     url: HttpUrl
-    body_type: BodyType = BodyType.none.value
+    json_data: Union[Dict, None] = None
+    form_data:  Union[Dict, None] = None
+    headers: Union[Dict, None] = None
     content: Optional[Any] = None
-    body: Optional[Any] = None
     files: Optional[Any] = None
     params: Optional[Any] = None
-    headers: Optional[Any] = None
     cookies: Optional[Any] = None
     timeout: Optional[Any] = None
     expected_result: Optional[Any] = None
@@ -66,3 +69,14 @@ class TestCaseRequest(BaseModel):
 
 class BatchTestCaseRequest(DeleteCases):
     plan_id: int = None
+
+
+class CasesRunRequest(BaseModel):
+    case_ids: List[int]
+    plan_id: int = None
+
+    @validator('case_ids')
+    def name_not_empty(cls, v):
+        if isinstance(v, str) and len(v.strip()) == 0:
+            raise Exception(f"{v} 不能为空")
+        return v

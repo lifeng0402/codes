@@ -12,20 +12,23 @@ from fastapi import (
     Depends,
     HTTPException
 )
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 from src.app.core.db.session import session
 from src.app.crud.crud_case import CasesCrud
 from src.app.core.code_response import CodeResponse
 from src.app.schemas.case import (
-    RequestSchemas, DeleteCases, BatchTestCaseRequest
+    RequestSchemas, DeleteCases,
+    BatchTestCaseRequest, CasesRunRequest
 )
+from src.app.cabinet.transition import Transition
 from src.app.core.execute_cases import execute
 from src.app.core.dependencies import DependenciesProject
 
 
 router = APIRouter(
     prefix="/case",
-    dependencies=[Depends(DependenciesProject.dependence_token)]
+    # dependencies=[Depends(DependenciesProject.dependence_token)]
 )
 
 
@@ -121,7 +124,7 @@ async def batch_delete_case(case: DeleteCases, db: Session = Depends(session)):
 
 
 @router.post("/run")
-async def run_test_cases(case_ids: BatchTestCaseRequest, db: Session = Depends(session)):
+async def run_test_cases(case_ids: CasesRunRequest, db: Session = Depends(session)):
     """
     批量运行用例接口
     @param  :
@@ -129,7 +132,9 @@ async def run_test_cases(case_ids: BatchTestCaseRequest, db: Session = Depends(s
     """
     try:
         response = CasesCrud(db).cases_run(case_ids=case_ids)
+        response = dict(list=jsonable_encoder(response))
         response = await execute(list_results=response)
+        # response = Transition.convert_nested_json(response)
         return CodeResponse.succeed(
             data=response, err_msg="运行成功..."
         )

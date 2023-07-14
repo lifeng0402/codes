@@ -36,6 +36,7 @@ class Report(Base):
     total = Column(Integer, default=0)
     total_succeed = Column(Integer, default=0)
     total_defeated = Column(Integer, default=0)
+    total_error = Column(Integer, default=0)
     is_delete = Column(Integer, default=0)
     created_time = Column(DateTime, default=datetime.now())
     updated_time = Column(DateTime, onupdate=datetime.now,

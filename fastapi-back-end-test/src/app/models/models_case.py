@@ -32,8 +32,8 @@ class Case(Base, SerializerMixin):
     id = Column(Integer, primary_key=True, index=True)
     method = Column(String(10), nullable=False)
     url = Column(String(200), nullable=False)
-    body_type = Column(String(10), nullable=False)
-    body = Column(String(500), nullable=True)
+    json_data = Column(String(500), nullable=True)
+    form_data = Column(String(500), nullable=True)
     content = Column(String(500), nullable=True)
     files = Column(String(500), nullable=True)
     params = Column(String(500), nullable=True)
@@ -48,7 +48,7 @@ class Case(Base, SerializerMixin):
                           default=datetime.now())
 
     def __init__(
-        self, method, url, body_type, body=None, content=None, files=None,
+        self, method, url, json_data=None, form_data=None, content=None, files=None,
         params=None, headers=None, cookies=None, timeout=None, expected_result=None, plan_id=None
     ):
         self.url = url
@@ -56,8 +56,8 @@ class Case(Base, SerializerMixin):
         self.content = content
         self.plan_id = plan_id
         self.timeout = timeout
-        self.body_type = body_type
-        self.body = self.dumps_data(body)
+        self.json_data = self.dumps_data(json_data)
+        self.form_data = self.dumps_data(form_data)
         self.files = self.dumps_data(files)
         self.params = self.dumps_data(params)
         self.headers = self.dumps_data(headers)
@@ -68,7 +68,7 @@ class Case(Base, SerializerMixin):
         return f"""
             <Cases(
                   id='{self.id}', method='{self.method}', url='{self.url}', 
-                  body_type='{self.body_type}',body='{self.body}', content='{self.content}', 
+                  json_data='{self.json_data}',form_data='{self.form_data}', content='{self.content}', 
                   files='{self.files}', params='{self.params}', headers='{self.headers}', 
                   cookies='{self.cookies}', timeout='{self.timeout}', expected_result='{self.expected_result}'
             )>

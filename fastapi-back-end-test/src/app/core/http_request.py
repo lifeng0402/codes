@@ -11,13 +11,15 @@
 import asyncio
 from typing import (
     Dict,
-    Any
+    Any,
+    Union
 )
 import json as js
 from httpx import (
-    Response, AsyncClient
+    Response, AsyncClient, Cookies, Headers
 )
 from pydantic import HttpUrl
+from fastapi import HTTPException
 
 
 __all__ = [
@@ -28,7 +30,6 @@ __all__ = [
 class RequestHttp:
 
     is_verify: bool = False
-    is_response: bool = False
 
     @classmethod
     def handle_response(cls, status, response: Response, results):
@@ -68,35 +69,39 @@ class RequestHttp:
 
     @classmethod
     async def safe_request(
-        cls, method: str, url: HttpUrl, json=None, data=None, params=None,
-        content=None, files=None, headers=None, cookies=None, timeout=30, **kwargs
+            cls, method: str, url: HttpUrl, json: Dict = None, data: Dict = None, params: Dict = None,
+            files=None, headers: Headers = None, timeout: float = None, cookies: Cookies = None, **kwargs
     ) -> Dict[str, Any]:
         """
         请求接口返回返回值
         @param  :
         @return  :
         """
-        method = method.upper()
-        if not url.startswith("https://", "http://"):
-            raise Exception("请求地址必须要包含https或http...")
+        try:
 
-        # 发送请求
-        async with AsyncClient(verify=cls.is_verify) as client:
-            request = await client.request(
-                method, url, data=data, json=json, params=params, content=content,
-                files=files, headers=headers, cookies=cookies, timeout=timeout, **kwargs
-            )
+            # 发送请求
+            async with AsyncClient(verify=cls.is_verify) as client:
 
-            # 如果为真则直接返回结果, 否则就是返回收集后的返回结果
-            if cls.is_response:
-                return cls.return_response(response=request)
+                method = method.upper()
+                
+                req_params = dict(
+                    method=method, url=url, json=json, data=data,
+                    params=params, headers=headers, timeout=timeout,
+                    files=files, cookies=cookies, **kwargs
+                )
 
-            # 如果请求不成功后返回status为假的收集结果
-            if not request.is_success:
-                return cls.handle_response(False, request, request)
+                # 发送请求
+                request = await client.request(**req_params)
 
-            # 请求成功后返回status为真的收集结果
-            return cls.handle_response(True, request, request)
+                # 如果请求不成功后返回status为假的收集结果
+                if not request.is_success:
+                    return cls.handle_response(False, request, request)
+
+                # 请求成功后返回status为真的收集结果
+                return cls.handle_response(True, request, request)
+
+        except Exception as exc:
+            raise exc
 
 
 if __name__ == "__main__":

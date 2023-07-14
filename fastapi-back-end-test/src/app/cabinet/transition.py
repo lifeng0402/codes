@@ -16,6 +16,22 @@ from src.app.excpetions.custom_json import DateTimeEncoder
 class Transition:
 
     @staticmethod
+    def convert_nested_json(dictionary: dict):
+        """
+        递归转换为字典
+        @param  :
+        @return  :
+        """
+        for key, value in dictionary.items():
+            if isinstance(value, str):
+                try:
+                    dictionary[key] = json.loads(value)
+                except ValueError:
+                    pass
+            elif isinstance(value, dict):
+                Transition.convert_nested_json(value)
+
+    @staticmethod
     def proof_dict(data: ty.Any):
         """
         把json字符串转换成字典
