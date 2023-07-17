@@ -17,7 +17,8 @@ from src.app.core.db.session import session_commit
 from src.app.schemas.plan import (
     PlanSchemas
 )
-from src.app.excpetions.custom_json import CustomJSONEncoder
+from src.app.cabinet.transition import Transition
+from src.app.excpetions.debug_test import CustomJSONEncoder
 
 
 class PlanCrud:
@@ -32,13 +33,16 @@ class PlanCrud:
         """
         try:
             # 传递参数
-            plan_info = p(
+            plan_results = p(
                 title=data.title,
                 environment=data.environment,
                 description=data.description
             )
             # 添加数据并提交, 最后刷新数据
-            return session_commit(self.db, datas=plan_info)
+            self.db.add(plan_results)
+            self.db.commit()
+            self.db.refresh(plan_results)
+            return Transition.proof_dict(plan_results)
         except Exception as e:
             raise e
 
@@ -60,8 +64,8 @@ class PlanCrud:
             )
             self.db.commit()
             return
-        except Exception as e:
-            raise e
+        except Exception as exc:
+            raise Exception(f"错误信息：{exc}")
 
     def list_plan(self, *, skip, limit):
         """
@@ -70,11 +74,12 @@ class PlanCrud:
         @return  :
         """
         try:
-            plan_list = self.db.execute(
-                select(p).offset(skip).limit(limit)
-            ).scalars().all()
+            stmt = select(p).offset(skip).limit(limit)
+            plan_results = self.db.execute(stmt).scalars().all()
 
-            return {"list": plan_list}
+            return dict(
+                list=Transition.proof_dict(plan_results.to_dict())
+            )
         except Exception as e:
             raise e
 

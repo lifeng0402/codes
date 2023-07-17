@@ -10,7 +10,6 @@
 from fastapi import (
     APIRouter,
     Depends,
-    status,
     HTTPException
 )
 from sqlalchemy.orm import Session
@@ -19,6 +18,7 @@ from src.app.crud.crud_plan import PlanCrud
 from src.app.core.code_response import CodeResponse
 from src.app.schemas.plan import PlanSchemas
 from src.app.core.dependencies import DependenciesProject
+from src.app.excpetions.debug_test import DebugTestException
 
 
 router = APIRouter(
@@ -38,10 +38,8 @@ async def plan_create(data: PlanSchemas, db: Session = Depends(session)):
         return CodeResponse.succeed(
             data=response, err_msg="添加成功"
         )
-    except Exception as e:
-        return CodeResponse.defeated(
-            err_msg=str(e.args),
-        )
+    except DebugTestException as e:
+        return CodeResponse.defeated(err_msg=e.message)
 
 
 @router.put("/{plan_id}")
@@ -52,11 +50,8 @@ async def plan_update(plan_id: int, data: PlanSchemas, db: Session = Depends(ses
         return CodeResponse.succeed(
             data=response, err_msg="修改成功"
         )
-    except Exception as e:
-        return CodeResponse.defeated(
-            err_msg=str(e.args)
-        )
-
+    except DebugTestException as e:
+        return CodeResponse.defeated(err_msg=e.message)
 
 @router.get("/list")
 async def plan_list(skip: int = 0, limit: int = 10, db: Session = Depends(session)):
@@ -66,11 +61,8 @@ async def plan_list(skip: int = 0, limit: int = 10, db: Session = Depends(sessio
         return CodeResponse.succeed(
             data=response, err_msg="查询成功"
         )
-    except Exception as e:
-        return CodeResponse.defeated(
-            err_msg=str(e.args),
-        )
-
+    except DebugTestException as e:
+        return CodeResponse.defeated(err_msg=e.message)
 
 @router.delete("/{plan_id}")
 async def plan_list(plan_id: int, db: Session = Depends(session)):
@@ -80,7 +72,5 @@ async def plan_list(plan_id: int, db: Session = Depends(session)):
         return CodeResponse.succeed(
             data=response, err_msg="删除成功"
         )
-    except Exception as e:
-        return CodeResponse.defeated(
-            err_msg=str(e.args),
-        )
+    except DebugTestException as e:
+        return CodeResponse.defeated(err_msg=e.message)

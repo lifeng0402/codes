@@ -14,6 +14,7 @@ from httpx import AsyncClient
 from src.app.schemas.case import RequestBase
 from src.app.core.code_response import CodeResponse
 from src.app.core.dependencies import DependenciesProject
+from src.app.excpetions.debug_test import DebugTestException
 
 
 router = APIRouter(
@@ -47,7 +48,5 @@ async def cases_resuest(datas: RequestBase):
             except json.JSONDecodeError:
                 return request.text
 
-    except Exception as exc:
-        return await CodeResponse.defeated(
-            err_msg=str(exc.args)
-        )
+    except DebugTestException as e:
+        return CodeResponse.defeated(err_msg=e.message)

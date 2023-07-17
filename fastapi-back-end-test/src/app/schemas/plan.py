@@ -8,7 +8,6 @@
 """
 
 from typing import (
-    List,
     Any,
     Optional
 )

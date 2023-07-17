@@ -12,13 +12,14 @@ from sqlalchemy import (
     Integer,
     String,
     DateTime,
-    Float
+    Float,
+    JSON
 )
 from json import dumps
 from datetime import datetime
 from sqlalchemy_serializer import SerializerMixin
 from src.app.core.db.base import Base
-from src.app.excpetions.custom_json import CustomJSONEncoder
+from src.app.excpetions.debug_test import CustomJSONEncoder
 
 
 __all__ = [
@@ -30,17 +31,17 @@ class Case(Base, SerializerMixin):
     __tablename__ = "case"
 
     id = Column(Integer, primary_key=True, index=True)
-    method = Column(String(10), nullable=False)
-    url = Column(String(200), nullable=False)
-    json_data = Column(String(500), nullable=True)
-    form_data = Column(String(500), nullable=True)
+    method = Column(String(20), nullable=False)
+    url = Column(String(500), nullable=False)
+    json = Column(JSON, nullable=True)
+    data = Column(JSON, nullable=True)
     content = Column(String(500), nullable=True)
-    files = Column(String(500), nullable=True)
-    params = Column(String(500), nullable=True)
-    headers = Column(String(500), nullable=True)
-    cookies = Column(String(500), nullable=True)
+    files = Column(JSON, nullable=True)
+    params = Column(JSON, nullable=True)
+    headers = Column(JSON, nullable=True)
+    cookies = Column(JSON, nullable=True)
     timeout = Column(Float, nullable=True)
-    expected_result = Column(String(500), nullable=True)
+    expected_result = Column(JSON, nullable=True)
     plan_id = Column(Integer, nullable=True)
     is_delete = Column(Integer, default=0)
     created_time = Column(DateTime, default=datetime.now())
@@ -48,7 +49,7 @@ class Case(Base, SerializerMixin):
                           default=datetime.now())
 
     def __init__(
-        self, method, url, json_data=None, form_data=None, content=None, files=None,
+        self, method, url, json=None, data=None, content=None, files=None,
         params=None, headers=None, cookies=None, timeout=None, expected_result=None, plan_id=None
     ):
         self.url = url
@@ -56,13 +57,13 @@ class Case(Base, SerializerMixin):
         self.content = content
         self.plan_id = plan_id
         self.timeout = timeout
-        self.json_data = self.dumps_data(json_data)
-        self.form_data = self.dumps_data(form_data)
-        self.files = self.dumps_data(files)
-        self.params = self.dumps_data(params)
-        self.headers = self.dumps_data(headers)
-        self.cookies = self.dumps_data(cookies)
-        self.expected_result = self.dumps_data(expected_result)
+        self.json = json
+        self.data = data
+        self.files = files
+        self.params = params
+        self.headers = headers
+        self.cookies = cookies
+        self.expected_result = expected_result
 
     def __repr__(self):
         return f"""
@@ -73,12 +74,3 @@ class Case(Base, SerializerMixin):
                   cookies='{self.cookies}', timeout='{self.timeout}', expected_result='{self.expected_result}'
             )>
         """
-
-    @classmethod
-    def dumps_data(cls, data: dict):
-        """
-        如果为真则转换成json数据并返回,否则直接返空
-        @param  :
-        @return  :
-        """
-        return dumps(data, ensure_ascii=False, cls=CustomJSONEncoder) if data else data

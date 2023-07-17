@@ -11,13 +11,14 @@ from fastapi import APIRouter
 from fastapi import Depends
 from sqlalchemy.orm import Session
 from src.app.schemas.user import (
-    UseRregister, 
-    UsersLogin, 
+    UseRregister,
+    UsersLogin,
     UserChangePwd
 )
 from src.app.core.db.session import session
 from src.app.crud.crud_user import UsersCrud
 from src.app.core.code_response import CodeResponse
+from src.app.excpetions.debug_test import DebugTestException
 
 
 router = APIRouter(
@@ -35,8 +36,8 @@ async def user_register(users: UseRregister, db: Session = Depends(session)):
     try:
         response = UsersCrud(session=db).register(user=users)
         return CodeResponse.succeed(data=response)
-    except Exception as exc:
-        return CodeResponse.defeated(err_msg=str(exc.args))
+    except DebugTestException as e:
+        return CodeResponse.defeated(err_msg=e.message)
 
 
 @router.post("/login")
@@ -50,8 +51,8 @@ async def user_login(users: UsersLogin, db: Session = Depends(session)):
         response = await UsersCrud(session=db).login(user=users)
         return CodeResponse.succeed(data=response)
 
-    except Exception as exc:
-        return CodeResponse.defeated(err_msg=str(exc.args))
+    except DebugTestException as e:
+        return CodeResponse.defeated(err_msg=e.message)
 
 
 @router.put("/password")
@@ -65,8 +66,8 @@ async def user_change_password(user: UserChangePwd, db: Session = Depends(sessio
         response = UsersCrud(session=db).change_password(user=user)
         return CodeResponse.succeed(data=response)
 
-    except Exception as exc:
-        return CodeResponse.defeated(err_msg=str(exc.args))
+    except DebugTestException as e:
+        return CodeResponse.defeated(err_msg=e.message)
 
 
 @router.delete("/logout/{user_id}")
@@ -80,8 +81,8 @@ async def user_logout(user_id: int, db: Session = Depends(session)):
         response = await UsersCrud(session=db).logout(user_id=user_id)
         return CodeResponse.succeed(data=response)
 
-    except Exception as exc:
-        return CodeResponse.defeated(err_msg=str(exc.args))
+    except DebugTestException as e:
+        return CodeResponse.defeated(err_msg=e.message)
 
 
 @router.delete("/signout/{user_id}")
@@ -95,5 +96,5 @@ async def user_sign_out(user_id: int, db: Session = Depends(session)):
         response = await UsersCrud(session=db).sign_out(user_id=user_id)
         return CodeResponse.succeed(data=response)
 
-    except Exception as exc:
-        return CodeResponse.defeated(err_msg=str(exc.args))
+    except DebugTestException as e:
+        return CodeResponse.defeated(err_msg=e.message)

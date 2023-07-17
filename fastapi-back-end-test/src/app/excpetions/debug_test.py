@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 """
 @作者: debugfeng
-@文件: datetime_excpetions.py
-@时间: 2023/06/20 08:13:28
+@文件: catch_exception.py
+@时间: 2023/06/25 10:14:56
 @说明: 
 """
 
@@ -11,10 +11,11 @@ import json
 import datetime
 
 
-__all__ = [
-    "DateTimeEncoder",
-    "CustomJSONEncoder"
-]
+class DebugTestException(Exception):
+    def __init__(self, message):
+        self.message = message
+        super().__init__(self.message)
+
 
 # 继承 json.JSONEncoder 类，并添加对 datetime 类型的支持
 class DateTimeEncoder(json.JSONEncoder):
@@ -30,4 +31,3 @@ class CustomJSONEncoder(json.JSONEncoder):
         if isinstance(obj, datetime):
             return obj.isoformat()
         return super().default(obj)
-

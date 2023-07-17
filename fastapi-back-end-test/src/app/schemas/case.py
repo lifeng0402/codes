@@ -17,7 +17,6 @@ from typing import (
 from pydantic import (
     BaseModel, HttpUrl, validator
 )
-from src.app.cabinet.enumerate import BodyType
 
 
 __all__ = [

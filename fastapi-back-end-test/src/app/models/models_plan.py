@@ -17,10 +17,11 @@ from json import (
     dumps, loads
 )
 from datetime import datetime
+from sqlalchemy_serializer import SerializerMixin
 from src.app.core.db.base import Base
 
 
-class Plan(Base):
+class Plan(Base, SerializerMixin):
     __tablename__ = "plan"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -40,9 +41,6 @@ class Plan(Base):
     def __repr__(self):
         return f"""
             <Plan(
-                  id='{self.id}', 
-                  name='{self.title}', 
-                  environment='{self.environment}', 
-                  description='{self.description}'
+                  id='{self.id}', name='{self.title}', environment='{self.environment}', description='{self.description}'
             )>
         """

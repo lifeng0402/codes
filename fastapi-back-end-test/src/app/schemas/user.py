@@ -7,7 +7,7 @@
 @说明: 
 """
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 
 
 __all__ = [

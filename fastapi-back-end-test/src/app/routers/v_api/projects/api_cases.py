@@ -24,6 +24,7 @@ from src.app.schemas.case import (
 from src.app.cabinet.transition import Transition
 from src.app.core.execute_cases import execute
 from src.app.core.dependencies import DependenciesProject
+from src.app.excpetions.debug_test import DebugTestException
 
 
 router = APIRouter(
@@ -45,10 +46,8 @@ async def create_case(data: RequestSchemas, db: Session = Depends(session)):
         return CodeResponse.succeed(
             data=response, err_msg="添加成功..."
         )
-    except Exception as e:
-        return CodeResponse.defeated(
-            err_msg=str(e.args)
-        )
+    except DebugTestException as e:
+        return CodeResponse.defeated(err_msg=e.message)
 
 
 @router.put("/{case_id}")
@@ -63,10 +62,8 @@ async def update_case(case_id: int, data: RequestSchemas, db: Session = Depends(
         return CodeResponse.succeed(
             data=response, err_msg="修改成功..."
         )
-    except Exception as e:
-        return CodeResponse.defeated(
-            err_msg=str(e.args)
-        )
+    except DebugTestException as e:
+        return CodeResponse.defeated(err_msg=e.message)
 
 
 @router.get("/list")
@@ -81,10 +78,8 @@ async def list_case(skip: int = 0, limit: int = 10, db: Session = Depends(sessio
         return CodeResponse.succeed(
             data=response, err_msg="查询成功..."
         )
-    except Exception as e:
-        return CodeResponse.defeated(
-            err_msg=str(e.args)
-        )
+    except DebugTestException as e:
+        return CodeResponse.defeated(err_msg=e.message)
 
 
 @router.delete("/{case_id}")
@@ -99,10 +94,8 @@ async def delete_case(case_id: int, db: Session = Depends(session)):
         return CodeResponse.succeed(
             data=response, err_msg="删除成功..."
         )
-    except Exception as e:
-        return CodeResponse.defeated(
-            err_msg=str(e.args)
-        )
+    except DebugTestException as e:
+        return CodeResponse.defeated(err_msg=e.message)
 
 
 @router.post("/batch")
@@ -117,10 +110,8 @@ async def batch_delete_case(case: DeleteCases, db: Session = Depends(session)):
         return CodeResponse.succeed(
             data=response, err_msg="批量删除成功..."
         )
-    except Exception as e:
-        return CodeResponse.defeated(
-            err_msg=str(e.args)
-        )
+    except DebugTestException as e:
+        return CodeResponse.defeated(err_msg=e.message)
 
 
 @router.post("/run")
@@ -132,13 +123,11 @@ async def run_test_cases(case_ids: CasesRunRequest, db: Session = Depends(sessio
     """
     try:
         response = CasesCrud(db).cases_run(case_ids=case_ids)
-        response = dict(list=jsonable_encoder(response))
-        response = await execute(list_results=response)
+        # response = dict(list=jsonable_encoder(response))
+        # response = await execute(list_results=response)
         # response = Transition.convert_nested_json(response)
         return CodeResponse.succeed(
             data=response, err_msg="运行成功..."
         )
-    except Exception as e:
-        return CodeResponse.defeated(
-            err_msg=str(e.args)
-        )
+    except DebugTestException as e:
+        return CodeResponse.defeated(err_msg=e.message)

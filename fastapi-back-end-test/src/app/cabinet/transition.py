@@ -10,61 +10,30 @@
 import json
 import datetime
 import typing as ty
-from src.app.excpetions.custom_json import DateTimeEncoder
+from src.app.excpetions.debug_test import DateTimeEncoder
 
 
 class Transition:
 
     @staticmethod
-    def convert_nested_json(dictionary: dict):
+    def proof_dict(data: ty.Dict, condition: str = None):
         """
-        递归转换为字典
+        遍历字典,如果value值为真就赋值为空字符串,否则就保留原value
+        condition条件为真则删除指定key
+        最后直接返回处理好的字典
         @param  :
         @return  :
         """
-        for key, value in dictionary.items():
-            if isinstance(value, str):
-                try:
-                    dictionary[key] = json.loads(value)
-                except ValueError:
-                    pass
-            elif isinstance(value, dict):
-                Transition.convert_nested_json(value)
+        handled_dict = dict()
 
-    @staticmethod
-    def proof_dict(data: ty.Any):
-        """
-        把json字符串转换成字典
-        如非json字符串直接返回数据
-        @param  :
-        @return  :
-        """
-        try:
-            # 判断值是否为真
-            if not data:
-                return data
-            return json.loads(data)
-        except json.decoder.JSONDecodeError:
-            return data
+        for key, value in data.items():
 
-    @staticmethod
-    def proof_json(data: str, json_error: bool = False):
-        """
-        把字符串转成json数据
-        如转换不成功则直接返回或者抛出错误提示
-        @param  :
-        @return  :
-        """
-        try:
-            # 判断值是否为真
-            if not data:
-                return data
-            return json.dumps(data, indent=4)
-        except json.JSONDecodeError as exc:
-            if json_error:
-                raise json.JSONDecodeError(f"请求参数非json类型: {exc}")
-            else:
-                return data
+            handled_dict[key] = "" if value is None else value
+
+        if condition:
+            del handled_dict[condition]
+
+        return handled_dict
 
     @staticmethod
     def proof_timestamp(data: ty.Dict):

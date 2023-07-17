@@ -73,13 +73,8 @@ class UsersCrud:
             # 刷新提交的数据
             self.db.refresh(user_info)
 
-            response = user_info.to_dict()
+            return Transition.proof_dict(user_info.to_dict(), condition="password")
 
-            return dict(
-                user_id=response["id"],
-                username=response["username"],
-                create_time=response["create_time"]
-            )
         except Exception as exc:
             raise exc
 
@@ -117,11 +112,11 @@ class UsersCrud:
                 encry_param={k: v for k, v in user_info.items() if k == "id"}
             )
 
-            # 生成一个清除密码的新字典，用于作返回值
-            result = {k: v for k, v in user_info.items() if k != "password"}
-
             # 返回结果
-            return Transition.proof_timestamp(dict(user=result, token=access_token))
+            return dict(
+                user=Transition.proof_dict(user_info, condition="password"),
+                token=access_token
+            )
 
         except Exception as exc:
             raise exc
@@ -171,7 +166,7 @@ class UsersCrud:
             if await redis_client.exists(redis_key):
                 raise Exception("登出失败...")
 
-            return dict(message="退出登录..")
+            return dict(message="退出成功..")
         except Exception as exc:
             raise exc
 
@@ -200,7 +195,7 @@ class UsersCrud:
                 raise Exception("用户注销失败...")
 
             # 返回删除用户成功的数据
-            return dict(message="用户注销..")
+            return dict(message="注销成功..")
 
         except Exception as exc:
             raise exc
