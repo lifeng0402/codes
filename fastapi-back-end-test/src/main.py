@@ -13,6 +13,7 @@ from fastapi import (
     Request,
     Response
 )
+from loguru import logger
 from typing import Optional, Callable, Any
 from src.app.routers.api_router import api_router
 
@@ -26,6 +27,18 @@ async def add_header(request: Request, response: Response, next: Optional[Callab
     response.headers.update(headers)
     return await next(response)
 
+
+# @app.middleware("http")
+# async def log_requests(request, call_next):
+#     response = await call_next(request)
+
+#     # 记录请求日志
+#     print(response)
+#     logger.info(
+#         f"{request.method} {request.url.path} - {response.status_code}"
+#     )
+
+#     return response
 
 app.include_router(router=api_router)
 

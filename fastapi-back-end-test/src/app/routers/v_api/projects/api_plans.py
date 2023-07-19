@@ -13,17 +13,21 @@ from fastapi import (
     HTTPException
 )
 from sqlalchemy.orm import Session
+from src.app.schemas.plan import (
+    PlanSchemas, PlanExcute
+)
 from src.app.core.db.session import session
 from src.app.crud.crud_plan import PlanCrud
+from src.app.crud.crud_report import ReportCrud
+from src.app.core.execute_cases import ExecuteCase
 from src.app.core.code_response import CodeResponse
-from src.app.schemas.plan import PlanSchemas
 from src.app.core.dependencies import DependenciesProject
 from src.app.excpetions.debug_test import DebugTestException
 
 
 router = APIRouter(
     prefix="/plan",
-        dependencies=[Depends(DependenciesProject.dependence_token)]
+    # dependencies=[Depends(DependenciesProject.dependence_token)]
 )
 
 
@@ -53,6 +57,7 @@ async def plan_update(plan_id: int, data: PlanSchemas, db: Session = Depends(ses
     except DebugTestException as e:
         return CodeResponse.defeated(err_msg=e.message)
 
+
 @router.get("/list")
 async def plan_list(skip: int = 0, limit: int = 10, db: Session = Depends(session)):
     try:
@@ -64,6 +69,7 @@ async def plan_list(skip: int = 0, limit: int = 10, db: Session = Depends(sessio
     except DebugTestException as e:
         return CodeResponse.defeated(err_msg=e.message)
 
+
 @router.delete("/{plan_id}")
 async def plan_list(plan_id: int, db: Session = Depends(session)):
     try:
@@ -71,6 +77,19 @@ async def plan_list(plan_id: int, db: Session = Depends(session)):
 
         return CodeResponse.succeed(
             data=response, err_msg="删除成功"
+        )
+    except DebugTestException as e:
+        return CodeResponse.defeated(err_msg=e.message)
+
+
+@router.post("/execute")
+async def plan_execute(data: PlanExcute, db: Session = Depends(session)):
+    try:
+        response = PlanCrud(db).execute_plan(data)
+        response = await ExecuteCase.execute(response, db)
+
+        return CodeResponse.succeed(
+            data=response, err_msg=""
         )
     except DebugTestException as e:
         return CodeResponse.defeated(err_msg=e.message)

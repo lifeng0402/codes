@@ -11,22 +11,34 @@ from typing import (
     Any,
     Optional
 )
-from pydantic import (
-    BaseModel, validator
-)
+from pydantic import validator
+from dataclasses import dataclass
 from src.app.cabinet.enumerate import Environment
 
 __all__ = [
-    "PlanSchemas"
+    "PlanSchemas",
+    "PlanExcute"
 ]
 
 
-class PlanSchemas(BaseModel):
+@dataclass
+class PlanSchemas:
     title: str
     environment: Environment = Environment.test.value
     description: Optional[Any] = None
 
     @validator('title')
+    def name_not_empty(cls, v):
+        if isinstance(v, str) and len(v.strip()) == 0:
+            raise Exception(f"{v} 不能为空")
+        return v
+
+
+@dataclass
+class PlanExcute:
+    plan_id: int
+
+    @validator('plan_id')
     def name_not_empty(cls, v):
         if isinstance(v, str) and len(v.strip()) == 0:
             raise Exception(f"{v} 不能为空")

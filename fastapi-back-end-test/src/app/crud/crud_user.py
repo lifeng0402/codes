@@ -24,6 +24,7 @@ from src.app.core.base_redis import redis_client
 from src.app.cabinet.transition import Transition
 from src.app.cabinet.verification import VerificationData
 from src.app.core.dependencies import DependenciesProject
+from src.app.excpetions.debug_test import DebugTestException
 
 
 __all__ = [
@@ -47,11 +48,11 @@ class UsersCrud:
 
             # 验证账号长度
             if not VerificationData.verification_lenth(var=user.username):
-                raise Exception("账号长度为5-25个字符...")
+                raise DebugTestException(message="账号长度为5-25个字符...")
 
             # 验证密码长度
             if not VerificationData.verification_lenth(var=user.password, max_len=25):
-                raise Exception("密码长度为5-25个字符...")
+                raise DebugTestException(message="密码长度为5-25个字符...")
 
             # 首先查询账号是否重复
             user_info = self.db.execute(
@@ -59,7 +60,7 @@ class UsersCrud:
             )
 
             if user_info.scalars().first():
-                raise Exception("账号已存在...")
+                raise DebugTestException(message="账号已存在...")
 
             # 对密码进行加密, 再赋值给password变量
             password = self.hash.get_password_hash(password=user.password)
@@ -102,7 +103,7 @@ class UsersCrud:
 
             # 密码进行解密校验, 条件不满足则抛出异常
             if not self.hash.verify_password(user.password, hashed_password):
-                raise Exception("账号或密码错误...")
+                raise DebugTestException(message="账号或密码错误...")
 
             # 定义一个用于存储redis中的值并赋值给redis_key
             redis_key: str = f"{user_info['id']}"
@@ -145,7 +146,7 @@ class UsersCrud:
 
             # 对比密码是否一致
             if not self.hash.verify_password(user.password, changed_password):
-                raise Exception("密码修改失败...")
+                raise DebugTestException(message="密码修改失败...")
 
             return dict(message="密码修改成功..")
 
@@ -164,7 +165,7 @@ class UsersCrud:
             await redis_client.delete(redis_key)
 
             if await redis_client.exists(redis_key):
-                raise Exception("登出失败...")
+                raise DebugTestException(message="登出失败...")
 
             return dict(message="退出成功..")
         except Exception as exc:
@@ -192,7 +193,7 @@ class UsersCrud:
 
             # 如果查询结果为真,就抛出异常
             if user_info:
-                raise Exception("用户注销失败...")
+                raise DebugTestException(message="用户注销失败...")
 
             # 返回删除用户成功的数据
             return dict(message="注销成功..")

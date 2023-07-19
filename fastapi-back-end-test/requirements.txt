@@ -8,5 +8,6 @@ passlib[bcrypt]
 redis
 httpx
 pytest
+loguru
 sqlalchemy-serializer
 sqlalchemy-utils

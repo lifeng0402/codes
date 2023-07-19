@@ -19,7 +19,6 @@ from json import dumps
 from datetime import datetime
 from sqlalchemy_serializer import SerializerMixin
 from src.app.core.db.base import Base
-from src.app.excpetions.debug_test import CustomJSONEncoder
 
 
 __all__ = [
@@ -41,7 +40,6 @@ class Case(Base, SerializerMixin):
     headers = Column(JSON, nullable=True)
     cookies = Column(JSON, nullable=True)
     timeout = Column(Float, nullable=True)
-    expected_result = Column(JSON, nullable=True)
     plan_id = Column(Integer, nullable=True)
     is_delete = Column(Integer, default=0)
     created_time = Column(DateTime, default=datetime.now())
@@ -50,7 +48,7 @@ class Case(Base, SerializerMixin):
 
     def __init__(
         self, method, url, json=None, data=None, content=None, files=None,
-        params=None, headers=None, cookies=None, timeout=None, expected_result=None, plan_id=None
+        params=None, headers=None, cookies=None, timeout=None, plan_id=None
     ):
         self.url = url
         self.method = method
@@ -63,14 +61,13 @@ class Case(Base, SerializerMixin):
         self.params = params
         self.headers = headers
         self.cookies = cookies
-        self.expected_result = expected_result
 
     def __repr__(self):
         return f"""
             <Cases(
                   id='{self.id}', method='{self.method}', url='{self.url}', 
-                  json_data='{self.json_data}',form_data='{self.form_data}', content='{self.content}', 
+                  json_data='{self.json}',form_data='{self.data}', content='{self.content}', 
                   files='{self.files}', params='{self.params}', headers='{self.headers}', 
-                  cookies='{self.cookies}', timeout='{self.timeout}', expected_result='{self.expected_result}'
+                  cookies='{self.cookies}', timeout='{self.timeout}'
             )>
         """

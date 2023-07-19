@@ -32,28 +32,28 @@ class RequestHttp:
     is_verify: bool = False
 
     @classmethod
-    def handle_response(cls, status, response: Response, results):
+    def handle_response(cls, status, response: Response, results: Response):
         """
         收集返回值信息
         @param  :
         @return  :
         """
-        return {
-            "status": status,
-            "request": {
-                "method": response.request.method,
-                "url": response.request.url,
-                "headers": response.request.headers,
-                "request": response.request.content
-            },
-            "response": {
-                "method": response.request.method,
-                "url": response.url,
-                "headers": response.headers,
-                "cookies": response.cookies,
-                "response": results
-            }
-        }
+        return dict(
+            status=status,
+            request=dict(
+                method=response.request.method,
+                url=response.request.url,
+                headers=response.request.headers,
+                request=response.request.content.decode("utf-8")
+            ),
+            response=dict(
+                method=response.request.method,
+                url=response.url,
+                headers=response.headers,
+                cookies=response.cookies,
+                response=cls.return_response(results)
+            )
+        )
 
     @classmethod
     def return_response(cls, response: Response):
@@ -83,7 +83,7 @@ class RequestHttp:
             async with AsyncClient(verify=cls.is_verify) as client:
 
                 method = method.upper()
-                
+
                 req_params = dict(
                     method=method, url=url, json=json, data=data,
                     params=params, headers=headers, timeout=timeout,

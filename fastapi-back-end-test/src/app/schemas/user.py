@@ -7,7 +7,7 @@
 @说明: 
 """
 
-from pydantic import BaseModel
+from dataclasses import dataclass
 
 
 __all__ = [
@@ -17,19 +17,23 @@ __all__ = [
 ]
 
 
-class User(BaseModel):
+@dataclass
+class User:
     username: str
     password: str
 
 
+@dataclass
 class UseRregister(User):
     pass
 
 
+@dataclass
 class UsersLogin(User):
     pass
 
 
-class UserChangePwd(BaseModel):
+@dataclass
+class UserChangePwd:
     user_id: int
     password: str

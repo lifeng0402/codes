@@ -15,8 +15,9 @@ from typing import (
     Dict
 )
 from pydantic import (
-    BaseModel, HttpUrl, validator
+    HttpUrl, validator
 )
+from dataclasses import dataclass
 
 
 __all__ = [
@@ -28,7 +29,8 @@ __all__ = [
 ]
 
 
-class RequestBase(BaseModel):
+@dataclass
+class RequestBase:
     method: str
     url: HttpUrl
     json_data: Union[Dict, None] = None
@@ -48,11 +50,13 @@ class RequestBase(BaseModel):
         return v
 
 
+@dataclass
 class RequestSchemas(RequestBase):
     plan_id: Optional[int] = None
 
 
-class DeleteCases(BaseModel):
+@dataclass
+class DeleteCases:
     case_ids: List[int]
 
     @validator('case_ids')
@@ -62,15 +66,18 @@ class DeleteCases(BaseModel):
         return v
 
 
-class TestCaseRequest(BaseModel):
+@dataclass
+class TestCaseRequest:
     case_ids: List[RequestBase]
 
 
-class BatchTestCaseRequest(DeleteCases):
+@dataclass
+class BatchTestCaseRequest:
     plan_id: int = None
 
 
-class CasesRunRequest(BaseModel):
+@dataclass
+class CasesRunRequest:
     case_ids: List[int]
     plan_id: int = None
 

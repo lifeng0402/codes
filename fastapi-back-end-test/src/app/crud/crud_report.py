@@ -7,50 +7,80 @@
 @说明:
 """
 
-import json
-import typing
 from sqlalchemy import (
-    select, update, delete, and_
+    select, update, delete, insert,
+    and_
 )
 from sqlalchemy.orm import Session
 from src.app.models.models_report import (
-    Report as r, ReportRecord as rr
+    Report, ReportRecord
 )
-from src.app.core.db.session import session_commit
-from src.app.schemas.case import (
-    RequestSchemas, DeleteCases, BatchTestCaseRequest
-)
-from src.app.excpetions.custom_json import CustomJSONEncoder
+from src.app.cabinet.transition import Transition
+from src.app.excpetions.debug_test import DebugTestException
+
+
+__all__ = [
+    "ReportCrud"
+]
 
 
 class ReportCrud:
     def __init__(self, session: Session) -> None:
+        self.r = Report
         self.db = session
+        self.rd = ReportRecord
 
-    def create_number(self, *, title: str, total: int = 0, total_succeed: int = 0, total_defeated: int = 0):
+    def create_report(self, total: int, total_succeed: int, total_defeated: int, total_error: int, success_rate: float):
+        """
+        创建测试报告概括数据
+        @param  :
+        @return  :
+        """
         try:
-            data_info = self.db.execute(
-                r(
-                    title=title, total=total,
-                    total_succeed=total_succeed, total_defeated=total_defeated
-                )
+            title: str = "测试报告"
+
+            results = self.r(
+                title=title, total=total, total_succeed=total_succeed,
+                total_defeated=total_defeated, total_error=total_error, success_rate=success_rate
             )
-            self.db.add(data_info)
+            self.db.add(results)
             self.db.commit()
-            self.db.refresh(data_info)
+            self.db.refresh(results)
+            results = Transition.proof_dict(results.to_dict())
+            return dict(report_id=results["id"])
+        except Exception as e:
+            raise DebugTestException(message=e)
+
+    def update_number(self, *, report_id: int, total: int, total_succeed: int, total_defeated: int, total_error: int):
+        try:
+            update(self.r).where(self.r.id == report_id).values(
+                total=total, total_succeed=total_succeed,
+                total_defeated=total_defeated, total_error=total_error
+            )
+
+            self.db.commit()
             return
         except Exception as e:
             raise e
 
-    def update_number(self, *, report_id: int, total: int, total_succeed: int, total_defeated: int):
+    def report_details(self, report_id: int):
+        """
+        根据报告ID,查询测试报告概括详情
+        @param  :
+        @return  :
+        """
         try:
-            update(r).where(r.id == report_id).values(
-                total=r.total + total,
-                total_succeed=r.total_succeed + total_succeed,
-                total_defeated=r.total_defeated + total_defeated
-            )
+            results = self.db.execute(
+                select(
+                    self.r.id, self.r.title,
+                    self.r.total, self.r.total_succeed,
+                    self.r.total_defeated, self.r.total_error, self.r.success_rate
+                ).where(self.r.id == report_id)
+            ).first()
 
-            self.db.commit()
-            return
+            if not results:
+                raise DebugTestException(message="数据不存在或被删除...")
+
+            return Transition.proof_dict(results._asdict())
         except Exception as e:
-            raise e
+            raise DebugTestException(message=e)

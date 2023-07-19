@@ -12,15 +12,13 @@ import json
 from sqlalchemy import (
     select, update, delete, and_
 )
-from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from src.app.models.models_plan import Plan
 from src.app.models.models_case import Case
 from src.app.cabinet.transition import Transition
 from src.app.schemas.case import (
-    RequestSchemas, DeleteCases, BatchTestCaseRequest
+    RequestSchemas, DeleteCases
 )
-from src.app.excpetions.debug_test import CustomJSONEncoder
 from src.app.excpetions.debug_test import DebugTestException
 
 
@@ -41,15 +39,15 @@ class CasesCrud:
 
             if datas.form_data and datas.json_data:
                 raise DebugTestException(
-                    message="form_data 和 json_data字段不能同时存在.."
+                    message="form_data 和 json_data 字段不能同时存在.."
                 )
 
             # 映射对应数据
             case_info = self.c(
                 method=datas.method, url=datas.url, json=datas.json_data,
                 data=datas.form_data, files=datas.files, content=datas.content,
-                timeout=datas.timeout, expected_result=datas.expected_result, plan_id=datas.plan_id,
-                cookies=datas.cookies, headers=datas.headers
+                timeout=datas.timeout, expected_result=datas.expected_result,
+                plan_id=datas.plan_id, cookies=datas.cookies, headers=datas.headers
             )
             # 如果计划ID为真值
             if datas.plan_id:
@@ -59,7 +57,7 @@ class CasesCrud:
                 )
                 # 判断数据是否存在
                 if not results.scalars().first():
-                    raise Exception("plan_id不存在...")
+                    raise DebugTestException(message="plan_id不存在...")
                 return
 
             # 往数据库提交数据
@@ -80,34 +78,24 @@ class CasesCrud:
         @param  :
         @return  :
         """
-
-        def transition(datas: dict):
-            """
-            如果是字典则转成json
-            否则就返回原值
-            @param  :
-            @return  :
-            """
-            return json.dumps(datas, ensure_ascii=False, cls=CustomJSONEncoder) if datas else datas
-
         try:
             results = self.db.execute(
                 select(self.c.id).where(self.c.id == case_id)
             ).scalars().first()
 
             if not results:
-                raise Exception("case_id不存在...")
+                raise DebugTestException(message="case_id不存在...")
 
             # 执行更新语句
             self.db.execute(
                 update(self.c).where(self.c.id == case_id).values(
                     method=data.method, url=data.url,
-                    json_data=transition(data.json_data),
-                    form_data=transition(data.form_data),
-                    files=transition(data.files), content=data.content,
+                    json_data=data.json_data,
+                    form_data=data.form_data,
+                    files=data.files, content=data.content,
                     timeout=data.timeout, plan_id=data.plan_id,
-                    expected_result=transition(data.expected_result),
-                    cookies=transition(data.cookies), headers=transition(data.headers)
+                    expected_result=data.expected_result,
+                    cookies=data.cookies, headers=data.headers
                 )
             )
 
@@ -127,10 +115,10 @@ class CasesCrud:
         try:
             # 分页查询Cases表中的数据
             results = self.db.execute(select(self.c).offset(
-                skip).limit(limit)).scalars().all()
+                skip).limit(limit)).fetchall()
 
             return dict(
-                list=[Transition.proof_dict(i.to_dict()) for i in results]
+                list=[Transition.proof_dict(i._asdict()) for i in results]
             )
         except Exception as e:
             raise e
@@ -149,7 +137,7 @@ class CasesCrud:
 
             # 不存在就抛异常提示
             if not case_id:
-                return Exception("数据不存在或被移除...")
+                return DebugTestException(message="数据不存在或被移除...")
 
             # 执行删除操作
             self.db.execute(delete(self.c).where(self.c.id == case_id))
@@ -175,42 +163,13 @@ class CasesCrud:
 
             # 判断数据是否存在
             if not case_list:
-                raise Exception("数据不存在或被移除...")
+                raise DebugTestException(message="数据不存在或被移除...")
 
             # 执行删除操作
             self.db.execute(delete(self.c).where(self.c.id.in_(case.case_id)))
             self.db.commit()
 
             return
-
-        except Exception as e:
-            raise e
-
-    def cases_run(self, case_ids: BatchTestCaseRequest):
-        """
-        根据数组case_id查询到数据,再执行删除操作
-        @param  :
-        @return  :
-        """
-        try:
-            # 判断计划ID是否为真
-            if case_ids.plan_id:
-                stmt = select(self.c).where(
-                    and_(
-                        self.c.id.in_(case_ids.case_ids),
-                        self.c.plan_id == case_ids.plan_id
-                    )
-                )
-            else:
-                # 根据case_id查询全部数据
-                stmt = select(self.c).where(self.c.id.in_(case_ids.case_ids))
-
-            results_cases = self.db.execute(stmt).scalars().fetchall()
-            # 判断数据是否存在
-            if not results_cases:
-                raise Exception("数据不存在或被移除...")
-
-            return [Transition.proof_dict(i.to_dict()) for i in results_cases]
 
         except Exception as e:
             raise e
