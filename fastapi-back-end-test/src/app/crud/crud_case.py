@@ -46,8 +46,7 @@ class CasesCrud:
             case_info = self.c(
                 method=datas.method, url=datas.url, json=datas.json_data,
                 data=datas.form_data, files=datas.files, content=datas.content,
-                timeout=datas.timeout, expected_result=datas.expected_result,
-                plan_id=datas.plan_id, cookies=datas.cookies, headers=datas.headers
+                timeout=datas.timeout, plan_id=datas.plan_id, cookies=datas.cookies, headers=datas.headers
             )
             # 如果计划ID为真值
             if datas.plan_id:
@@ -94,7 +93,6 @@ class CasesCrud:
                     form_data=data.form_data,
                     files=data.files, content=data.content,
                     timeout=data.timeout, plan_id=data.plan_id,
-                    expected_result=data.expected_result,
                     cookies=data.cookies, headers=data.headers
                 )
             )

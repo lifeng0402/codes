@@ -30,7 +30,7 @@ class ReportCrud:
         self.db = session
         self.rd = ReportRecord
 
-    def create_report(self, total: int, total_succeed: int, total_defeated: int, total_error: int, success_rate: float):
+    def create_report(self, total: int = 0, total_succeed: int = 0, total_defeated: int = 0, total_error: int = 0):
         """
         创建测试报告概括数据
         @param  :
@@ -39,9 +39,14 @@ class ReportCrud:
         try:
             title: str = "测试报告"
 
+            # 计算成功率,四舍五入保留2位小数
+            # success_rate = round((total_succeed / total) * 100, 2)
+
             results = self.r(
-                title=title, total=total, total_succeed=total_succeed,
-                total_defeated=total_defeated, total_error=total_error, success_rate=success_rate
+                title=title, total=total,
+                total_succeed=total_succeed,
+                total_defeated=total_defeated,
+                total_error=total_error, success_rate=float(0)
             )
             self.db.add(results)
             self.db.commit()
@@ -51,15 +56,26 @@ class ReportCrud:
         except Exception as e:
             raise DebugTestException(message=e)
 
-    def update_number(self, *, report_id: int, total: int, total_succeed: int, total_defeated: int, total_error: int):
+    def update_report(self, *, report_id: int, total: int, total_succeed: int, total_defeated: int, total_error: int):
+        """
+        更新测试报告表中的指定的测试报告的概况数据
+        @param  :
+        @return  :
+        """
         try:
-            update(self.r).where(self.r.id == report_id).values(
-                total=total, total_succeed=total_succeed,
-                total_defeated=total_defeated, total_error=total_error
+            # 计算成功率,四舍五入保留2位小数
+            success_rate = round((total_succeed / total) * 100, 2)
+
+            # 执行更新操作
+            self.db.execute(
+                update(self.r).where(self.r.id == report_id).values(
+                    total=total, total_succeed=total_succeed,
+                    total_defeated=total_defeated, total_error=total_error, success_rate=success_rate
+                )
             )
 
             self.db.commit()
-            return
+            return dict(report_id=report_id)
         except Exception as e:
             raise e
 

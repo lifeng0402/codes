@@ -110,6 +110,7 @@ class UsersCrud:
 
             access_token = await DependenciesProject.verify_token(
                 is_token=True, key_str=redis_key,
+                # 用户ID加密到Token中
                 encry_param={k: v for k, v in user_info.items() if k == "id"}
             )
 

@@ -23,7 +23,7 @@ from src.app.excpetions.debug_test import CustomJSONEncoder
 
 
 __all__ = [
-    "Case"
+    "Expected"
 ]
 
 

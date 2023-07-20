@@ -13,25 +13,90 @@ from fastapi.encoders import jsonable_encoder
 from src.app.core.http_request import RequestHttp
 from src.app.cabinet.transition import Transition
 from src.app.crud.crud_report import ReportCrud
-from src.app.crud.crud_report_record import ReportRecord
+from src.app.crud.crud_report_record import CrudReportRecord
 from src.app.excpetions.debug_test import DebugTestException
 
 
 class ExecuteCase:
 
     @staticmethod
-    def generate_report(
-        db: Session, *, total: int, total_succeed: int, total_defeated: int, total_error: int, success_rate: float
+    def result_assertion():
+        """
+        对请求接口的实际结果和预期结果进行断言
+        @param  :
+        @return  :
+        """
+        pass
+
+    @staticmethod
+    def get_report_record_data(db: Session, *, report_id: int):
+        """
+        根据report_id获取运行用例的具体情况
+        @param  :
+        @return  :
+        """
+        try:
+            # 获取详情数据并返回
+            return CrudReportRecord(db).report_record_detalis(report_id=report_id)
+        except DebugTestException as exc:
+            raise exc
+
+    @staticmethod
+    def insert_report_record_data(
+        db: Session, *, report_id: int, case_id: int, response: ty.Union[dict, str, None]
     ):
+        """
+        往测试报告记录表中插入数据
+        根据report_id去查询测试报告记录表,然后返回数据
+
+        @param  :
+        @return  :
+        """
+        try:
+            # 生成数据
+            CrudReportRecord(db).insert_record(
+                response=response, report_id=report_id, case_id=case_id
+            )
+            return True
+        except DebugTestException as exc:
+            raise exc
+
+    @staticmethod
+    def update_report_data(
+        db: Session, *, report_id: int, total: int, total_succeed: int, total_defeated: int, total_error: int
+    ):
+        """
+        往测试报告表中更新指定report_id的数据
+        根据report_id去查询测试报告概况详情数据,然后返回数据
+        @param  :
+        @return  :
+        """
         try:
             report = ReportCrud(db)
-            result = report.create_report(
-                total=total, total_succeed=total_succeed,
-                total_defeated=total_defeated, total_error=total_error, success_rate=success_rate
+            # 更新指定测试报告的概况数据
+            result = report.update_report(
+                total=total, report_id=report_id,
+                total_succeed=total_succeed, total_defeated=total_defeated, total_error=total_error
             )
+            # 提取report_id
             report_id = result["report_id"]
 
+            # 获取详情数据并返回
             return report.report_details(report_id=report_id)
+        except DebugTestException as exc:
+            raise exc
+
+    @staticmethod
+    def generate_report(db: Session):
+        """
+        往测试报告表中创建一条数据
+        @param  :
+        @return  :
+        """
+        try:
+            # 生成数据操作
+            results = ReportCrud(db).create_report()
+            return int(results["report_id"])
         except DebugTestException as exc:
             raise exc
 
@@ -44,6 +109,8 @@ class ExecuteCase:
         """
 
         try:
+            # 生成一条报告数据
+            report_id = ExecuteCase.generate_report(db)
 
             # 定义收集变量
             total, succeed, defeated, error = 0, 0, 0, 0
@@ -51,7 +118,7 @@ class ExecuteCase:
             # 循环列表获取请求参数
             for request_params in results["list"]:
 
-                case_id = request_params["id"]
+                case_id = int(request_params["id"])
                 copy_request_params = request_params.copy()
 
                 del copy_request_params["id"]
@@ -67,23 +134,36 @@ class ExecuteCase:
                     else:
                         defeated += 1
 
+                    ExecuteCase.insert_report_record_data(
+                        db, case_id=case_id,
+                        report_id=report_id,
+                        response=jsonable_encoder(response)
+                    )
                 except Exception as error_info:
                     total += 1
                     error += 1
-                    print(error_info)
+                    ExecuteCase.insert_report_record_data(
+                        db, case_id=case_id,
+                        report_id=report_id,
+                        response=f"{error_info}"
+                    )
                     continue
 
                 total += 1
             else:
-                # 计算成功率,四舍五入保留2位小数
-                success_rate = round((succeed / total) * 100, 2)
-                # 写入数据库指定表中
-                return ExecuteCase.generate_report(
-                    db, total=total, total_succeed=succeed,
-                    total_defeated=defeated, total_error=error, success_rate=success_rate
+                # 更新数据到指定测试报告
+                summarize = ExecuteCase.update_report_data(
+                    db, report_id=report_id, total=total,
+                    total_succeed=succeed, total_defeated=defeated, total_error=error
                 )
+                # 获取测试报告记录表中的记录详情
+                running_results = ExecuteCase.get_report_record_data(
+                    db, report_id=report_id
+                )
+                # 返回数据
+                return dict(summarize, details=running_results)
+
         except DebugTestException as exc:
-            print(exc)
             raise exc
 
 

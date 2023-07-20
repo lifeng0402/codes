@@ -10,16 +10,13 @@
 
 import asyncio
 from typing import (
-    Dict,
-    Any,
-    Union
+    Dict, Any, Union
 )
 import json as js
 from httpx import (
     Response, AsyncClient, Cookies, Headers
 )
 from pydantic import HttpUrl
-from fastapi import HTTPException
 
 
 __all__ = [
@@ -32,28 +29,41 @@ class RequestHttp:
     is_verify: bool = False
 
     @classmethod
+    def handle_request_content(cls, params: Union[bytes, None]):
+        """
+        处理字节转成字典,报错就返回原值
+        @param  :
+        @return  :
+        """
+        try:
+            return js.loads(params.decode("utf-8"))
+        except js.JSONDecodeError:
+            return params
+
+    @classmethod
     def handle_response(cls, status, response: Response, results: Response):
         """
         收集返回值信息
         @param  :
         @return  :
         """
-        return dict(
+        response = dict(
             status=status,
-            request=dict(
+            Request=dict(
                 method=response.request.method,
-                url=response.request.url,
+                url=str(response.request.url),
                 headers=response.request.headers,
-                request=response.request.content.decode("utf-8")
+                parameters=cls.handle_request_content(response.request.content)
             ),
-            response=dict(
+            Response=dict(
                 method=response.request.method,
-                url=response.url,
+                url=str(response.url),
                 headers=response.headers,
                 cookies=response.cookies,
-                response=cls.return_response(results)
+                results=cls.return_response(results)
             )
         )
+        return response
 
     @classmethod
     def return_response(cls, response: Response):

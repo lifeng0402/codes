@@ -1,8 +1,8 @@
-"""first commit
+"""重新同步数据表
 
-Revision ID: be51dcb03572
+Revision ID: 4b2a6cd3ad14
 Revises: 
-Create Date: 2023-07-17 20:02:33.200521
+Create Date: 2023-07-20 14:24:33.005334
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'be51dcb03572'
+revision = '4b2a6cd3ad14'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -30,7 +30,6 @@ def upgrade() -> None:
     sa.Column('headers', sa.JSON(), nullable=True),
     sa.Column('cookies', sa.JSON(), nullable=True),
     sa.Column('timeout', sa.Float(), nullable=True),
-    sa.Column('expected_result', sa.JSON(), nullable=True),
     sa.Column('plan_id', sa.Integer(), nullable=True),
     sa.Column('is_delete', sa.Integer(), nullable=True),
     sa.Column('created_time', sa.DateTime(), nullable=True),
@@ -38,6 +37,17 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_case_id'), 'case', ['id'], unique=False)
+    op.create_table('expected',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('symbol', sa.String(length=20), nullable=True),
+    sa.Column('expected_result', sa.JSON(), nullable=True),
+    sa.Column('case_id', sa.Integer(), nullable=True),
+    sa.Column('is_delete', sa.Integer(), nullable=True),
+    sa.Column('created_time', sa.DateTime(), nullable=True),
+    sa.Column('updated_time', sa.DateTime(), nullable=True),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index(op.f('ix_expected_id'), 'expected', ['id'], unique=False)
     op.create_table('plan',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('title', sa.String(length=50), nullable=False),
@@ -51,11 +61,12 @@ def upgrade() -> None:
     op.create_index(op.f('ix_plan_id'), 'plan', ['id'], unique=False)
     op.create_table('report',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('title', sa.String(length=10), nullable=False),
+    sa.Column('title', sa.String(length=50), nullable=False),
     sa.Column('total', sa.Integer(), nullable=True),
     sa.Column('total_succeed', sa.Integer(), nullable=True),
     sa.Column('total_defeated', sa.Integer(), nullable=True),
     sa.Column('total_error', sa.Integer(), nullable=True),
+    sa.Column('success_rate', sa.Float(), nullable=True),
     sa.Column('is_delete', sa.Integer(), nullable=True),
     sa.Column('created_time', sa.DateTime(), nullable=True),
     sa.Column('updated_time', sa.DateTime(), nullable=True),
@@ -64,9 +75,10 @@ def upgrade() -> None:
     op.create_index(op.f('ix_report_id'), 'report', ['id'], unique=False)
     op.create_table('report_record',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('succeed_results', sa.String(length=500), nullable=True),
-    sa.Column('defeated_results', sa.String(length=500), nullable=True),
-    sa.Column('error_results', sa.String(length=500), nullable=True),
+    sa.Column('succeed_results', sa.JSON(), nullable=True),
+    sa.Column('defeated_results', sa.JSON(), nullable=True),
+    sa.Column('error_results', sa.Text(), nullable=True),
+    sa.Column('case_id', sa.Integer(), nullable=True),
     sa.Column('report_id', sa.Integer(), nullable=True),
     sa.Column('created_time', sa.DateTime(), nullable=True),
     sa.Column('updated_time', sa.DateTime(), nullable=True),
@@ -96,6 +108,8 @@ def downgrade() -> None:
     op.drop_table('report')
     op.drop_index(op.f('ix_plan_id'), table_name='plan')
     op.drop_table('plan')
+    op.drop_index(op.f('ix_expected_id'), table_name='expected')
+    op.drop_table('expected')
     op.drop_index(op.f('ix_case_id'), table_name='case')
     op.drop_table('case')
     # ### end Alembic commands ###

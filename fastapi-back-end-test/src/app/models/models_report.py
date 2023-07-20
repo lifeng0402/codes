@@ -14,7 +14,7 @@ from sqlalchemy import (
     DateTime,
     Float,
     JSON,
-    TEXT
+    Text
 )
 from datetime import datetime
 from src.app.core.db.base import Base
@@ -58,28 +58,25 @@ class Report(Base, SerializerMixin):
         """
 
 
-class ReportRecord(Base):
+class ReportRecord(Base, SerializerMixin):
     __tablename__ = "report_record"
 
     id = Column(Integer, primary_key=True, index=True)
-    succeed_results = Column(JSON, nullable=True)
-    defeated_results = Column(JSON, nullable=True)
-    error_results = Column(TEXT, nullable=True)
+    response = Column(JSON, nullable=True)
+    case_id = Column(Integer, nullable=True)
     report_id = Column(Integer, nullable=True)
     created_time = Column(DateTime, default=datetime.now())
     updated_time = Column(DateTime, onupdate=datetime.now,
                           default=datetime.now())
 
-    def __init__(self, succeed_results=None, defeated_results=None, error_results=None, report_id=None):
-        self.succeed_results = succeed_results
-        self.defeated_results = defeated_results
-        self.error_results = error_results
+    def __init__(self, response=None, case_id=None, report_id=None):
+        self.response = response
+        self.case_id = case_id
         self.report_id = report_id
 
     def __repr__(self):
         return f"""
             <ReportRecord(
-                  id='{self.id}', succeed_results='{self.succeed_results}', defeated_results='{self.defeated_results}', 
-                  error_results='{self.error_results}',report_id='{self.report_id}'
+                  id='{self.id}', response='{self.response}', report_id='{self.report_id}',case_id='{self.case_id}'
             )>
         """

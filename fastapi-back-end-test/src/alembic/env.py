@@ -4,6 +4,7 @@ from src.app.models.models_case import Case
 from src.app.models.models_report import (
     Report, ReportRecord
 )
+from src.app.models.models_expected import Expected
 from src.app.core.db.base import Base
 from logging.config import fileConfig
 

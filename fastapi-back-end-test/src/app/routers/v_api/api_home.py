@@ -10,7 +10,6 @@
 
 from fastapi import APIRouter
 from fastapi import Depends
-from fastapi import status, HTTPException
 from src.app.core.dependencies import DependenciesProject
 from src.app.core.code_response import CodeResponse
 from src.app.excpetions.debug_test import DebugTestException
