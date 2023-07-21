@@ -9,5 +9,6 @@ redis
 httpx
 pytest
 loguru
+jinja2
 sqlalchemy-serializer
 sqlalchemy-utils

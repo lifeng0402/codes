@@ -30,11 +30,16 @@ class CasesCrud:
 
     def create_cases(self, datas: RequestSchemas):
         """
-        对data中的数据进行存储到数据库
-        @param  :
-        @return  :
-        """
+        创建测试用例并存储到数据库中
 
+        :param datas: 请求参数
+        :type datas: RequestSchemas
+        :raises DebugTestException: 抛出异常
+        :raises DebugTestException: 抛出异常
+        :raises exc.message: 捕获异常错误
+        :return: 
+        :rtype: dict
+        """
         try:
 
             if datas.form_data and datas.json_data:
@@ -66,16 +71,20 @@ class CasesCrud:
 
             return Transition.proof_dict(case_info.to_dict())
 
-        except Exception as e:
-            raise e
+        except DebugTestException as exc:
+            raise exc.message
 
     def update_cases(self, case_id: int, data: RequestSchemas):
         """
-        根据case_id进行查询数据是否存在
-        如存在则执行更新测试用例
-        否则就抛出异常错误
-        @param  :
-        @return  :
+        根据测试用例ID查询数据是否存在,不存在就抛出异常
+        如果存在就根据测试用例ID执行数据更新操作
+
+        :param case_id: 用例ID
+        :type case_id: int
+        :param data: 请求参数
+        :type data: RequestSchemas
+        :raises DebugTestException: 抛出异常
+        :raises exc.message: 捕获异常错误
         """
         try:
             results = self.db.execute(
@@ -101,14 +110,20 @@ class CasesCrud:
             self.db.commit()
 
             return
-        except Exception as e:
-            raise e
+        except DebugTestException as exc:
+            raise exc.message
 
     def case_list(self, *, skip: int, limit: int):
         """
-        测试用例列表查询
-        @param  :
-        @return  :
+        查询测试用例表中的数据进行分页展示
+
+        :param skip: 页码
+        :type skip: int
+        :param limit: 条数
+        :type limit: int
+        :raises exc: 捕获异常错误
+        :return: 
+        :rtype: dict
         """
         try:
             # 分页查询Cases表中的数据
@@ -118,14 +133,18 @@ class CasesCrud:
             return dict(
                 list=[Transition.proof_dict(i._asdict()) for i in results]
             )
-        except Exception as e:
-            raise e
+        except DebugTestException as exc:
+            raise exc
 
     def case_delete(self, *, case_id: int):
         """
-        根据case_id查询到数据,再执行删除操作
-        @param  :
-        @return  :
+        根据测试用例ID从数据库删除指定数据
+
+        :param case_id: 用例ID
+        :type case_id: int
+        :raises exc.message: 捕获异常错误
+        :return: 
+        :rtype: None
         """
         try:
             # 查询数据是否存在
@@ -143,16 +162,18 @@ class CasesCrud:
 
             return
 
-        except Exception as e:
-            raise e
+        except DebugTestException as exc:
+            raise exc.message
 
     def case_batch_delete(self, case: DeleteCases):
         """
-        根据数组case_id查询到数据,再执行删除操作
-        @param  :
-        @return  :
-        """
+        根据测试用例ID,从数据库批量删除测试用例
 
+        :param case: 请求参数
+        :type case: DeleteCases
+        :raises DebugTestException: 抛出异常
+        :raises exc.message: 捕获异常错误
+        """
         try:
             # 根据case_id查询全部数据
             case_list = self.db.execute(
@@ -169,5 +190,5 @@ class CasesCrud:
 
             return
 
-        except Exception as e:
-            raise e
+        except DebugTestException as exc:
+            raise exc.message

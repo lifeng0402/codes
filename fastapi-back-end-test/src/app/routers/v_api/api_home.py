@@ -22,6 +22,12 @@ router = APIRouter(
 
 @router.get("/index")
 async def home_index():
+    """
+    首页接口
+
+    :return: 
+    :rtype: json
+    """
     try:
         result = CodeResponse.succeed(
             data=dict(info="Welcome to the home page")

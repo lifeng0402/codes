@@ -32,6 +32,20 @@ class CrudReportRecord:
         self.rd = ReportRecord
 
     def create_record(self, response: ty.Union[dict, str, None], case_id: int, report_id: int):
+        """
+        新建测试报告记录数据
+
+        :param response: 接口的返回值
+        :type response: ty.Union[dict, str, None]
+        :param case_id: 测试用例ID
+        :type case_id: int
+        :param report_id: 测试报告ID
+        :type report_id: int
+        :raises DebugTestException: 抛出异常
+        :raises exc.message: 捕获异常错误
+        :return: 
+        :rtype: dict
+        """
         try:
             if not self.db.execute(
                 select(self.r).where(self.r.id == report_id)
@@ -45,14 +59,20 @@ class CrudReportRecord:
             self.db.commit()
             self.db.refresh(results)
             return results.to_dict()
-        except Exception as exc:
-            raise exc
+        except DebugTestException as exc:
+            raise exc.message
 
     def insert_record(self, response: ty.Union[dict, str, None], case_id: int, report_id: int):
         """
-        往测试报告记录表中插入数据
-        @param  :
-        @return  :
+        往测试记录表插入数据
+
+        :param response: 返回值
+        :type response: ty.Union[dict, str, None]
+        :param case_id: 用例ID
+        :type case_id: int
+        :param report_id: 测试报告ID
+        :type report_id: int
+        :raises exc.message: 捕获异常错误
         """
         try:
             self.db.execute(
@@ -62,14 +82,18 @@ class CrudReportRecord:
             )
             self.db.commit()
             return
-        except Exception as exc:
-            raise exc
+        except DebugTestException as exc:
+            raise exc.message
 
     def report_record_detalis(self, report_id: int):
         """
-        根据report_id查询具体运行结果
-        @param  :
-        @return  :
+        根据测试报告ID从测试报告记录表中获取数据
+
+        :param report_id: 测试报告ID
+        :type report_id: int
+        :raises exc.message: 捕获异常错误
+        :return: 
+        :rtype: dict
         """
         try:
             results = self.db.execute(
@@ -83,5 +107,5 @@ class CrudReportRecord:
             return dict(
                 list=[Transition.proof_dict(i._asdict()) for i in results]
             )
-        except Exception as exc:
-            raise exc
+        except DebugTestException as exc:
+            raise exc.message

@@ -26,9 +26,12 @@ router = APIRouter(
 @router.post("/send")
 async def cases_resuest(datas: RequestBase):
     """
-    单个请求接口
-    @param  :
-    @return  :
+    发送请求接口
+
+    :param datas: 请求参数
+    :type datas: RequestBase
+    :return: 
+    :rtype: json 或 text
     """
     try:
         async with AsyncClient(verify=False) as asynclent:

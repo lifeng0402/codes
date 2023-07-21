@@ -139,13 +139,13 @@ class ExecuteCase:
                         report_id=report_id,
                         response=jsonable_encoder(response)
                     )
-                except Exception as error_info:
+                except DebugTestException as error_info:
                     total += 1
                     error += 1
                     ExecuteCase.insert_report_record_data(
                         db, case_id=case_id,
                         report_id=report_id,
-                        response=f"{error_info}"
+                        response=f"{error_info.message}"
                     )
                     continue
 

@@ -32,9 +32,19 @@ class ReportCrud:
 
     def create_report(self, total: int = 0, total_succeed: int = 0, total_defeated: int = 0, total_error: int = 0):
         """
-        创建测试报告概括数据
-        @param  :
-        @return  :
+        创建测试报告存入数据库
+
+        :param total: 用例总数, defaults to 0
+        :type total: int
+        :param total_succeed: 成功总数, defaults to 0
+        :type total_succeed: int
+        :param total_defeated: 失败总数, defaults to 0
+        :type total_defeated: int
+        :param total_error: 错误总数, defaults to 0
+        :type total_error: int
+        :raises exc.message: 捕获异常错误
+        :return: 
+        :rtype: dict
         """
         try:
             title: str = "测试报告"
@@ -53,14 +63,26 @@ class ReportCrud:
             self.db.refresh(results)
             results = Transition.proof_dict(results.to_dict())
             return dict(report_id=results["id"])
-        except Exception as e:
-            raise DebugTestException(message=e)
+        except DebugTestException as exc:
+            raise exc.message
 
     def update_report(self, *, report_id: int, total: int, total_succeed: int, total_defeated: int, total_error: int):
         """
-        更新测试报告表中的指定的测试报告的概况数据
-        @param  :
-        @return  :
+        根据测试报告ID往数据库指定数据更新数据
+
+        :param report_id: 测试报告ID
+        :type report_id: int
+        :param total: 用例总数
+        :type total: int
+        :param total_succeed: 成功总数
+        :type total_succeed: int
+        :param total_defeated: 失败总数
+        :type total_defeated: int
+        :param total_error: 错误总数
+        :type total_error: int
+        :raises exc.message: 捕获异常错误
+        :return: 
+        :rtype: dict
         """
         try:
             # 计算成功率,四舍五入保留2位小数
@@ -76,14 +98,19 @@ class ReportCrud:
 
             self.db.commit()
             return dict(report_id=report_id)
-        except Exception as e:
-            raise e
+        except DebugTestException as exc:
+            raise exc.message
 
     def report_details(self, report_id: int):
         """
-        根据报告ID,查询测试报告概括详情
-        @param  :
-        @return  :
+        根据测试报告ID查询数据
+
+        :param report_id: 测试报告ID
+        :type report_id: int
+        :raises DebugTestException: 抛出异常
+        :raises exc.message: 捕获异常错误
+        :return: 
+        :rtype: dict
         """
         try:
             results = self.db.execute(
@@ -98,5 +125,5 @@ class ReportCrud:
                 raise DebugTestException(message="数据不存在或被删除...")
 
             return Transition.proof_dict(results._asdict())
-        except Exception as e:
-            raise DebugTestException(message=e)
+        except DebugTestException as exc:
+            raise exc.message

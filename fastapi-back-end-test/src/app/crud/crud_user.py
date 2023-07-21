@@ -40,9 +40,16 @@ class UsersCrud:
 
     def register(self, user: UseRregister):
         """
-        注册接口数据和数据库交互
-        @param  :
-        @return  :
+        新建账号存入到数据库
+
+        :param user: 请求参数
+        :type user: UseRregister
+        :raises DebugTestException: 抛出异常
+        :raises DebugTestException: 抛出异常
+        :raises DebugTestException: 抛出异常
+        :raises exc.message: 捕获异常错误
+        :return: 
+        :rtype: dict
         """
         try:
 
@@ -76,16 +83,21 @@ class UsersCrud:
 
             return Transition.proof_dict(user_info.to_dict(), condition="password")
 
-        except Exception as exc:
-            raise exc
+        except DebugTestException as exc:
+            raise exc.message
 
     async def login(self, user: UsersLogin):
         """
-        登录接口查询数据并返回
-        @param  :
-        @return  :
-        """
+        根据用户名称查询数据库数据
+        数据库取出用户的密码和传入的密码进行比对
 
+        :param user: 请求参数
+        :type user: UsersLogin
+        :raises DebugTestException: 抛出异常
+        :raises exc.message: 捕获异常错误
+        :return: 
+        :rtype: dict
+        """
         try:
             # 查询数据库的数据并转成字典格式
             user_info = self.db.execute(
@@ -120,15 +132,19 @@ class UsersCrud:
                 token=access_token
             )
 
-        except Exception as exc:
-            raise exc
+        except DebugTestException as exc:
+            raise exc.message
 
     def change_password(self, user: UserChangePwd):
         """
-        修改密码
-        根据用户ID把传参的新密码提交到数据库中
-        @param  :
-        @return  :
+        根据所传参数加密后存入数据库中
+
+        :param user: 请求参数
+        :type user: UserChangePwd
+        :raises DebugTestException: 抛出异常
+        :raises exc.message: 捕获异常错误
+        :return: 
+        :rtype: dict
         """
         try:
             # 对密码进行加密, 再从新赋值给password变量
@@ -151,15 +167,19 @@ class UsersCrud:
 
             return dict(message="密码修改成功..")
 
-        except Exception as exc:
-            raise exc
+        except DebugTestException as exc:
+            raise exc.message
 
     async def logout(self, user_id: int):
         """
-        登出接口
-        根据用户ID删Redis中的Token
-        @param  :
-        @return  :
+        根据用户ID删除Redis存储的Token
+
+        :param user_id: 用户ID
+        :type user_id: int
+        :raises DebugTestException: 抛出异常
+        :raises exc.message: 捕获异常错误
+        :return: 
+        :rtype: dict
         """
         try:
             redis_key = f"access_token:{user_id}"
@@ -169,15 +189,20 @@ class UsersCrud:
                 raise DebugTestException(message="登出失败...")
 
             return dict(message="退出成功..")
-        except Exception as exc:
-            raise exc
+        except DebugTestException as exc:
+            raise exc.message
 
     def sign_out(self, user_id: int):
         """
-        注销用户接口
-        根据用户ID删数据库中的指定用户信息
-        @param  :
-        @return  :
+        根据用户ID从数据库中删除该用户
+        再次查询是否删除成功
+
+        :param user_id: 用户ID
+        :type user_id: int
+        :raises DebugTestException: 抛出异常
+        :raises exc.message: 捕获异常错误
+        :return: 
+        :rtype: dict
         """
         try:
             # 执行删除数据动作
@@ -199,5 +224,5 @@ class UsersCrud:
             # 返回删除用户成功的数据
             return dict(message="注销成功..")
 
-        except Exception as exc:
-            raise exc
+        except DebugTestException as exc:
+            raise exc.message

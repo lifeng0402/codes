@@ -30,8 +30,13 @@ router = APIRouter(
 async def user_register(users: UseRregister, db: Session = Depends(session)):
     """
     注册接口
-    @param  :
-    @return  :
+
+    :param users: 请求参数
+    :type users: UseRregister
+    :param db: 依赖注入, defaults to Depends(session)
+    :type db: Session, optional
+    :return: 
+    :rtype: json
     """
     try:
         response = UsersCrud(session=db).register(user=users)
@@ -44,8 +49,13 @@ async def user_register(users: UseRregister, db: Session = Depends(session)):
 async def user_login(users: UsersLogin, db: Session = Depends(session)):
     """
     登录接口
-    @param  :
-    @return  :
+
+    :param users: 请求参数
+    :type users: UsersLogin
+    :param db: 依赖注入, defaults to Depends(session)
+    :type db: Session, optional
+    :return: 
+    :rtype: json
     """
     try:
         response = await UsersCrud(session=db).login(user=users)
@@ -59,8 +69,13 @@ async def user_login(users: UsersLogin, db: Session = Depends(session)):
 async def user_change_password(user: UserChangePwd, db: Session = Depends(session)):
     """
     修改密码接口
-    @param  :
-    @return  :
+
+    :param user: 请求参数
+    :type user: UserChangePwd
+    :param db: 依赖注入, defaults to Depends(session)
+    :type db: Session, optional
+    :return: 
+    :rtype: json
     """
     try:
         response = UsersCrud(session=db).change_password(user=user)
@@ -73,9 +88,14 @@ async def user_change_password(user: UserChangePwd, db: Session = Depends(sessio
 @router.delete("/logout/{user_id}")
 async def user_logout(user_id: int, db: Session = Depends(session)):
     """
-    登出用户接口
-    @param  :
-    @return  :
+    登出接口
+
+    :param user_id: 用户ID
+    :type user_id: int
+    :param db: 依赖注入, defaults to Depends(session)
+    :type db: Session, optional
+    :return: 
+    :rtype: json
     """
     try:
         response = await UsersCrud(session=db).logout(user_id=user_id)
@@ -88,9 +108,14 @@ async def user_logout(user_id: int, db: Session = Depends(session)):
 @router.delete("/signout/{user_id}")
 async def user_sign_out(user_id: int, db: Session = Depends(session)):
     """
-    注销用户接口
-    @param  :
-    @return  :
+    注销登录接口
+
+    :param user_id: 用户ID
+    :type user_id: int
+    :param db: 依赖注入, defaults to Depends(session)
+    :type db: Session, optional
+    :return: 
+    :rtype: json
     """
     try:
         response = await UsersCrud(session=db).sign_out(user_id=user_id)
