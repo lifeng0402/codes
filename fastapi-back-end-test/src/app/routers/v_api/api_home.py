@@ -12,7 +12,7 @@ from fastapi import APIRouter
 from fastapi import Depends
 from src.app.core.dependencies import DependenciesProject
 from src.app.core.code_response import CodeResponse
-from src.app.excpetions.debug_test import DebugTestException
+from src.app.core.excpetions import DebugTestException
 
 
 router = APIRouter(

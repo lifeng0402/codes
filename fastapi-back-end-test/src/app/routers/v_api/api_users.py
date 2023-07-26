@@ -15,10 +15,10 @@ from src.app.schemas.user import (
     UsersLogin,
     UserChangePwd
 )
-from src.app.core.db.session import session
+from src.app.core.database.session import session
 from src.app.crud.crud_user import UsersCrud
 from src.app.core.code_response import CodeResponse
-from src.app.excpetions.debug_test import DebugTestException
+from src.app.core.excpetions import DebugTestException
 
 
 router = APIRouter(

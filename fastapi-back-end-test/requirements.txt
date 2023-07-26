@@ -10,5 +10,6 @@ httpx
 pytest
 loguru
 jinja2
+jmespath
 sqlalchemy-serializer
 sqlalchemy-utils

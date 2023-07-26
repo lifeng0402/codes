@@ -17,7 +17,7 @@ from src.app.schemas.plan import (
     PlanSchemas, PlanExcute
 )
 from src.app.cabinet.transition import Transition
-from src.app.excpetions.debug_test import DebugTestException
+from src.app.core.excpetions import DebugTestException
 
 
 class PlanCrud:

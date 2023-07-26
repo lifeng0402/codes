@@ -41,6 +41,8 @@ class RequestBase:
     params: Optional[Any] = None
     cookies: Optional[Any] = None
     timeout: Optional[Any] = None
+    extract: Optional[List[Dict, Any]] = None
+    validate: Optional[List[List[Dict, Any]]] = None
     expected_result: Optional[Any] = None
 
     @validator('method', 'url')

@@ -9,7 +9,7 @@
 
 
 from sqlalchemy.orm import Session
-from src.app.core.db.session_context import SessionContextManager
+from src.app.core.database.session_context import SessionContextManager
 
 __all__ = [
     "session",

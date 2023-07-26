@@ -18,7 +18,7 @@ from sqlalchemy import (
 from json import dumps
 from datetime import datetime
 from sqlalchemy_serializer import SerializerMixin
-from src.app.core.db.base import Base
+from src.app.core.database.base import Base
 
 
 __all__ = [
@@ -40,6 +40,8 @@ class Case(Base, SerializerMixin):
     headers = Column(JSON, nullable=True)
     cookies = Column(JSON, nullable=True)
     timeout = Column(Float, nullable=True)
+    extract = Column(JSON, nullable=True)
+    validate = Column(JSON, nullable=True)
     plan_id = Column(Integer, nullable=True)
     is_delete = Column(Integer, default=0)
     created_time = Column(DateTime, default=datetime.now())

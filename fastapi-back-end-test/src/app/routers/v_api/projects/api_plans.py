@@ -16,12 +16,12 @@ from sqlalchemy.orm import Session
 from src.app.schemas.plan import (
     PlanSchemas, PlanExcute
 )
-from src.app.core.db.session import session
+from src.app.core.database.session import session
 from src.app.crud.crud_plan import PlanCrud
 from src.app.core.execute_cases import ExecuteCase
 from src.app.core.code_response import CodeResponse
 from src.app.core.dependencies import DependenciesProject
-from src.app.excpetions.debug_test import DebugTestException
+from src.app.core.excpetions import DebugTestException
 
 
 router = APIRouter(

@@ -15,7 +15,7 @@ from sqlalchemy import (
 )
 from datetime import datetime
 from sqlalchemy_serializer import SerializerMixin
-from src.app.core.db.base import Base
+from src.app.core.database.base import Base
 
 
 __all__ = [

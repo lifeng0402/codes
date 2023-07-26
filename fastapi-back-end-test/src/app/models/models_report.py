@@ -17,7 +17,7 @@ from sqlalchemy import (
     Text
 )
 from datetime import datetime
-from src.app.core.db.base import Base
+from src.app.core.database.base import Base
 from sqlalchemy_serializer import SerializerMixin
 
 

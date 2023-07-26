@@ -7,12 +7,19 @@
 @说明: 
 """
 
+from typing import (
+    List, Dict, Text
+)
 from enum import Enum, unique
 
 __all__ = [
     "BodyType",
     "Environment"
 ]
+
+
+Validators = List[Dict]
+Extractors = Dict[Text, Text]
 
 
 @unique

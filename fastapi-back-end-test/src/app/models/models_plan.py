@@ -18,7 +18,7 @@ from json import (
 )
 from datetime import datetime
 from sqlalchemy_serializer import SerializerMixin
-from src.app.core.db.base import Base
+from src.app.core.database.base import Base
 
 
 class Plan(Base, SerializerMixin):

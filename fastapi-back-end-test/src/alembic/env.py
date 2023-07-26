@@ -5,7 +5,7 @@ from src.app.models.models_report import (
     Report, ReportRecord
 )
 from src.app.models.models_expected import Expected
-from src.app.core.db.base import Base
+from src.app.core.database.base import Base
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
