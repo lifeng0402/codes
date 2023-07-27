@@ -19,7 +19,7 @@ from json import dumps
 from datetime import datetime
 from sqlalchemy_serializer import SerializerMixin
 from src.app.core.database.base import Base
-from src.app.excpetions.debug_test import CustomJSONEncoder
+from src.app.core.excpetions import CustomJSONEncoder
 
 
 __all__ = [

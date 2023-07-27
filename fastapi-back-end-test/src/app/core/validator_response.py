@@ -15,8 +15,9 @@ from loguru import logger
 from jmespath.exceptions import JMESPathError
 from src.app.core.excpetions import ParamsError
 from src.app.cabinet.enumerate import (
-    Validators, Extractors
+    Checkout, Extractors
 )
+from src.app.core.parser import Parser
 
 
 def get_uniform_comparator(comparator: ty.Text):
@@ -75,8 +76,9 @@ class ResponseBase:
 
     def __init__(self, response: ty.Union[ty.Any, ty.Dict]) -> None:
         self.resp = response
+        self.validation_results: ty.Dict = {}
 
-    def validator(self, validators: Validators):
+    def validator(self, validators: Checkout):
         """
 
 
@@ -96,15 +98,29 @@ class ResponseBase:
             else:
                 check_value = check_item
 
-            assert_item = u_validator["assert"]
-            except_item = u_validator["expect"]
+            assert_method = u_validator["assert"]
+            expect_item = u_validator["expect"]
+
+            assert_func = Parser.get_function_mapping(assert_method)
+
+            validate_msg = f"assert {check_item} {assert_method} {expect_item}"
+
+            validator_dict = {
+                "comparator": assert_method,
+                "check": check_item,
+                "expect": expect_item,
+            }
 
             try:
-                pass
+                assert_func(check_value, expect_item)
+                validator_dict["check_result"] = True
             except AssertionError as ex:
+                validator_dict["check_result"] = False
                 raise ex
 
-            print(check_value)
+            self.validation_results.update(validator_dict)
+
+        return self.validation_results
 
     def extract(self, extractors: Extractors):
         """

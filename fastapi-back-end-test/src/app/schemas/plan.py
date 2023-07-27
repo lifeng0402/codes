@@ -7,10 +7,7 @@
 @说明: 
 """
 
-from typing import (
-    Any,
-    Optional
-)
+from typing import Any
 from pydantic import validator
 from dataclasses import dataclass
 from src.app.cabinet.enumerate import Environment
@@ -25,7 +22,7 @@ __all__ = [
 class PlanSchemas:
     title: str
     environment: Environment = Environment.test.value
-    description: Optional[Any] = None
+    description: Any = None
 
     @validator('title')
     def name_not_empty(cls, v):

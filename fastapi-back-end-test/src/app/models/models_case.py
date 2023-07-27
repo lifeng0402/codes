@@ -41,7 +41,7 @@ class Case(Base, SerializerMixin):
     cookies = Column(JSON, nullable=True)
     timeout = Column(Float, nullable=True)
     extract = Column(JSON, nullable=True)
-    validate = Column(JSON, nullable=True)
+    checkout = Column(JSON, nullable=True)
     plan_id = Column(Integer, nullable=True)
     is_delete = Column(Integer, default=0)
     created_time = Column(DateTime, default=datetime.now())
@@ -50,7 +50,7 @@ class Case(Base, SerializerMixin):
 
     def __init__(
         self, method, url, json=None, data=None, content=None, files=None,
-        params=None, headers=None, cookies=None, timeout=None, plan_id=None
+        params=None, headers=None, cookies=None, timeout=None, extract=None, checkout=None, plan_id=None
     ):
         self.url = url
         self.method = method
@@ -59,6 +59,8 @@ class Case(Base, SerializerMixin):
         self.timeout = timeout
         self.json = json
         self.data = data
+        self.extract = extract
+        self.checkout = checkout
         self.files = files
         self.params = params
         self.headers = headers
@@ -70,6 +72,7 @@ class Case(Base, SerializerMixin):
                   id='{self.id}', method='{self.method}', url='{self.url}', 
                   json_data='{self.json}',form_data='{self.data}', content='{self.content}', 
                   files='{self.files}', params='{self.params}', headers='{self.headers}', 
-                  cookies='{self.cookies}', timeout='{self.timeout}'
+                  cookies='{self.cookies}', timeout='{self.timeout}, extract='{self.extract}',
+                  checkout='{self.checkout}',plan_id='{self.plan_id}''
             )>
         """

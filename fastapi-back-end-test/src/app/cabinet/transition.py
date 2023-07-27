@@ -10,7 +10,7 @@
 import json
 import datetime
 import typing as ty
-from src.app.excpetions.debug_test import DateTimeEncoder
+from src.app.core.excpetions import DateTimeEncoder
 
 
 class Transition:

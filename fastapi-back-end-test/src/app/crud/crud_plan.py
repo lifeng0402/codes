@@ -148,8 +148,8 @@ class PlanCrud:
             results = self.db.execute(
                 select(
                     self.c.id, self.c.method, self.c.url,
-                    self.c.json, self.c.data, self.c.params, self.c.headers,
-                    self.c.cookies, self.c.files, self.c.content, self.c.timeout
+                    self.c.json, self.c.data, self.c.params, self.c.headers, self.c.cookies,
+                    self.c.files, self.c.content, self.c.timeout, self.c.extract, self.c.checkout
                 ).where(data.plan_id == self.c.plan_id)
             ).fetchall()
 

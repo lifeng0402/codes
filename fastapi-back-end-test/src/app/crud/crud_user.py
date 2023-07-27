@@ -24,7 +24,7 @@ from src.app.core.base_redis import redis_client
 from src.app.cabinet.transition import Transition
 from src.app.cabinet.verification import VerificationData
 from src.app.core.dependencies import DependenciesProject
-from src.app.excpetions.debug_test import DebugTestException
+from src.app.core.excpetions import DebugTestException
 
 
 __all__ = [

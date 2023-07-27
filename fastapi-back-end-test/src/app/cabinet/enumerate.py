@@ -8,18 +8,30 @@
 """
 
 from typing import (
-    List, Dict, Text
+    List, Dict, Text, Any
 )
 from enum import Enum, unique
 
 __all__ = [
     "BodyType",
-    "Environment"
+    "Environment",
+    "Headers",
+    "Cookies",
+    "Validators",
+    "Extractors",
+    "ExpectedResult",
+    "JsonData",
+    "FormData"
 ]
 
 
-Validators = List[Dict]
-Extractors = Dict[Text, Text]
+JsonData = Dict[Text, Text]
+FormData = Dict[Text, Text]
+Headers = Dict[Text, Text]
+Cookies = Dict[Text, Text]
+Checkout = List[Dict[Text, Text]]
+Extractors = List[Dict[Text, Text]]
+ExpectedResult = Dict[Text, Text]
 
 
 @unique

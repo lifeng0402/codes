@@ -56,6 +56,7 @@ class RequestHttp:
                 parameters=cls.handle_request_content(response.request.content)
             ),
             Response=dict(
+                status_code=response.status_code,
                 method=response.request.method,
                 url=str(response.url),
                 headers=response.headers,

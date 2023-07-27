@@ -14,7 +14,8 @@ from src.app.core.http_request import RequestHttp
 from src.app.cabinet.transition import Transition
 from src.app.crud.crud_report import ReportCrud
 from src.app.crud.crud_report_record import CrudReportRecord
-from src.app.excpetions.debug_test import DebugTestException
+from src.app.core.excpetions import DebugTestException
+from src.app.core.validator_response import ResponseBase
 
 
 class ExecuteCase:
@@ -119,14 +120,35 @@ class ExecuteCase:
             for request_params in results["list"]:
 
                 case_id = int(request_params["id"])
-                copy_request_params = request_params.copy()
+                extract = request_params["extract"]
+                checkout = request_params["checkout"]
 
-                del copy_request_params["id"]
+                # 复制一个字典用于发送请求
+                copy_request_params = request_params.copy()
+                # 提取出要删除的key
+                keys_to_delete = ["id", "extract", "checkout"]
+
+                copy_request_params_handled = {
+                    key: value for key, value in copy_request_params.items() if key not in keys_to_delete
+                }
 
                 try:
                     # 发送请求
-                    response = await RequestHttp.safe_request(**copy_request_params)
+                    response = await RequestHttp.safe_request(**copy_request_params_handled)
                     response_status = response["status"]
+
+                    if extract or checkout:
+                        handel_response = ResponseBase(response=response)
+                        assert_results = handel_response.validator(checkout)
+                        
+                        # 获取断言后的状态
+                        assert_status = assert_results["check_result"]
+                        
+                        # 判断断言结果
+                        if assert_status and assert_status == response:
+                            succeed += 1
+                        else:
+                            defeated += 1
 
                     # 判断运行状态
                     if response_status:

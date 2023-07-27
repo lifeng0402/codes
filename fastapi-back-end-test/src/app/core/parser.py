@@ -10,13 +10,15 @@
 import typing as ty
 from src.app.cabinet.comparators import comparators
 
+__all__ = [
+    "Parser"
+]
+
 
 class Parser:
 
-    def __init__(self):
-        self._comparators = comparators
-
-    def get_function_mapping(self, function_name: ty.Text) -> callable:
+    @staticmethod
+    def get_function_mapping(function_name: ty.Text) -> callable:
         """
         根据传入的函数名称,判断类中是否存在
         存在则执行, 不存在则抛异常。
@@ -26,7 +28,7 @@ class Parser:
         :return: _description_
         :rtype: callable
         """
-        if not hasattr(self._comparators, function_name):
+        if not hasattr(comparators, function_name):
             raise
 
-        return getattr(self._comparators, function_name)
+        return getattr(comparators, function_name)
