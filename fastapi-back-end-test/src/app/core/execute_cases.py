@@ -21,15 +21,6 @@ from src.app.core.validator_response import ResponseBase
 class ExecuteCase:
 
     @staticmethod
-    def result_assertion():
-        """
-        对请求接口的实际结果和预期结果进行断言
-        @param  :
-        @return  :
-        """
-        pass
-
-    @staticmethod
     def get_report_record_data(db: Session, *, report_id: int):
         """
         根据report_id获取运行用例的具体情况
@@ -127,7 +118,7 @@ class ExecuteCase:
                 copy_request_params = request_params.copy()
                 # 提取出要删除的key
                 keys_to_delete = ["id", "extract", "checkout"]
-
+                # 去除要删除的key, 生成一个新的字典用于发送请求
                 copy_request_params_handled = {
                     key: value for key, value in copy_request_params.items() if key not in keys_to_delete
                 }
@@ -137,39 +128,32 @@ class ExecuteCase:
                     response = await RequestHttp.safe_request(**copy_request_params_handled)
                     response_status = response["status"]
 
-                    if extract or checkout:
+                    if checkout:
                         handel_response = ResponseBase(response=response)
                         assert_results = handel_response.validator(checkout)
-                        
+
                         # 获取断言后的状态
-                        assert_status = assert_results["check_result"]
-                        
-                        # 判断断言结果
-                        if assert_status and assert_status == response:
-                            succeed += 1
-                        else:
-                            defeated += 1
+                        assert_status = assert_results["check_status"]
 
                     # 判断运行状态
-                    if response_status:
+                    if response_status or assert_status:
                         succeed += 1
                     else:
                         defeated += 1
 
+                    # 数据写入数据库
                     ExecuteCase.insert_report_record_data(
                         db, case_id=case_id,
                         report_id=report_id,
                         response=jsonable_encoder(response)
                     )
                 except DebugTestException as error_info:
-                    total += 1
                     error += 1
                     ExecuteCase.insert_report_record_data(
                         db, case_id=case_id,
                         report_id=report_id,
                         response=f"{error_info.message}"
                     )
-                    continue
 
                 total += 1
             else:

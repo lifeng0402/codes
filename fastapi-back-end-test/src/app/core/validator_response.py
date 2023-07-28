@@ -8,86 +8,37 @@
 """
 
 
-import json
 import jmespath
 import typing as ty
 from loguru import logger
 from jmespath.exceptions import JMESPathError
-from src.app.core.excpetions import ParamsError
 from src.app.cabinet.enumerate import (
-    Checkout, Extractors
+    Checkout, Extractors, Resp
 )
 from src.app.core.parser import Parser
 
 
-def get_uniform_comparator(comparator: ty.Text):
-    """
-
-
-    :param comparator: _description_
-    :type comparator: ty.Text
-    :return: _description_
-    :rtype: _type_
-    """
-    if comparator in ["eq", "equals", "equal"]:
-        return "equal"
-    elif comparator in ["lt", "less_than"]:
-        return "less_than"
-    else:
-        return comparator
-
-
-def uniform_validator(validator):
-    """
-
-    判断字典中是否存在参数
-
-    :param validator: 传参
-    :type validator: ty.Dict
-    :raises ParamsError: 抛出异常
-    :raises ParamsError: 抛出异常
-    :return: 返回一个字典
-    :rtype: dict
-    """
-    if not isinstance(validator, dict):
-        raise ParamsError(f"无效的验证 {validator}")
-
-    if "check" in validator and "expect" in validator:
-        check_item = validator["check"]
-        expect_value = validator["expect"]
-
-        if "assert" in validator:
-            comparator = validator.get("assert")
-        else:
-            comparator = validator.get("comparator", "eq")
-    else:
-        raise ParamsError(f"无效的验证 {validator}")
-
-    assert_method = get_uniform_comparator(comparator)
-
-    return {
-        "check": check_item,
-        "expect": expect_value,
-        "assert": assert_method
-    }
+__all__ = [
+    "ResponseBase"
+]
 
 
 class ResponseBase:
 
-    def __init__(self, response: ty.Union[ty.Any, ty.Dict]) -> None:
-        self.resp = response
-        self.validation_results: ty.Dict = {}
+    def __init__(self, resp: Resp) -> None:
+        self.resp = resp
+        self.validation_results: dict = {}
 
     def validator(self, validators: Checkout):
         """
-
+        提取返回值值执行断言操作
 
         :param validators: _description_
         :type validators: Validators
         :raises ex: _description_
         """
         for items in validators:
-            u_validator = uniform_validator(items)
+            u_validator = Parser.uniform_validator(items)
 
             check_item = u_validator["check"]
 
@@ -99,24 +50,32 @@ class ResponseBase:
                 check_value = check_item
 
             assert_method = u_validator["assert"]
-            expect_item = u_validator["expect"]
+            expect_value = u_validator["expect"]
 
             assert_func = Parser.get_function_mapping(assert_method)
 
-            validate_msg = f"assert {check_item} {assert_method} {expect_item}"
+            validate_msg = f"assert {check_value} {assert_method} {expect_value}"
 
             validator_dict = {
                 "comparator": assert_method,
-                "check": check_item,
-                "expect": expect_item,
+                "check_item": check_item,
+                "check_value": check_value,
+                "expect": expect_value,
             }
 
+            # 判断参数如果是整型就转成字符串
+            check_value = str(check_value) if isinstance(
+                check_value, int) else check_value
+
             try:
-                assert_func(check_value, expect_item)
-                validator_dict["check_result"] = True
+                # 执行断言
+                assert_func(check_value, expect_value)
+                validator_dict["check_status"] = True
+                validator_dict["message"] = "断言成功..."
             except AssertionError as ex:
-                validator_dict["check_result"] = False
-                raise ex
+                validator_dict["check_status"] = False
+                validator_dict["message"] = f"断言失败..."
+                logger.error(f"{validate_msg}/n{ex.args}")
 
             self.validation_results.update(validator_dict)
 
@@ -160,45 +119,38 @@ class ResponseBase:
         return check_value
 
 
-def call_test(a: int, b: int):
-    return a+b
-
-
 if __name__ == "__main__":
-    assert_func = getattr(object, "call_test")
-    print(assert_func(1, 2))
+    response = {
+        "id": 85856,
+        "status_code": 200,
+        "username": "user10",
+        "list": [
+            {
+                "cc": 111,
+                "gg": 222
+            },
+            {
+                "dd": 333,
+                "hh": 444
+            }
+        ]
+    }
 
-    # response = {
-    #     "id": 85856,
-    #     "status_code": 200,
-    #     "username": "user10",
-    #     "list": [
-    #         {
-    #             "cc": 111,
-    #             "gg": 222
-    #         },
-    #         {
-    #             "dd": 333,
-    #             "hh": 444
-    #         }
-    #     ]
-    # }
+    results = [
+        {
+            "check": "status_code",
+            "assert": "equal",
+            "expect": 200
+        },
+        {
+            "check": 201,
+            "assert": "equal",
+            "expect": 5552222
+        }
+    ]
 
-    # results = [
-    #     {
-    #         "check": "status_code",
-    #         "assert": "equal",
-    #         "expect": 200
-    #     },
-    #     {
-    #         "check": 201,
-    #         "assert": "equal",
-    #         "expect": 5552222
-    #     }
-    # ]
+    resp = ResponseBase(response)
 
-    # resp = ResponseBase(response)
+    results = resp.validator(results)
 
-    # results = resp.validator(results)
-
-    # print(results)
+    print(results)

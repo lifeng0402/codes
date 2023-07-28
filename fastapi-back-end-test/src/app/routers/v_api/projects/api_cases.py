@@ -24,7 +24,7 @@ from src.app.core.excpetions import DebugTestException
 
 router = APIRouter(
     prefix="/case",
-    dependencies=[Depends(DependenciesProject.dependence_token)]
+    # dependencies=[Depends(DependenciesProject.dependence_token)]
 )
 
 

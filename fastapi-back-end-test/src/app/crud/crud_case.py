@@ -49,9 +49,9 @@ class CasesCrud:
 
             # 映射对应数据
             case_info = self.c(
-                method=datas.method, url=datas.url, json=datas.json_data,
-                data=datas.form_data, files=datas.files, content=datas.content,
-                timeout=datas.timeout, plan_id=datas.plan_id, cookies=datas.cookies, headers=datas.headers
+                method=datas.method, url=datas.url, json=datas.json_data,data=datas.form_data, 
+                files=datas.files, content=datas.content,timeout=datas.timeout, plan_id=datas.plan_id, 
+                cookies=datas.cookies, headers=datas.headers, extract=datas.extract, checkout=datas.checkout
             )
             # 如果计划ID为真值
             if datas.plan_id:

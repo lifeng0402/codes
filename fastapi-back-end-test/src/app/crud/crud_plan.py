@@ -17,7 +17,7 @@ from src.app.schemas.plan import (
     PlanSchemas, PlanExcute
 )
 from src.app.cabinet.transition import Transition
-from src.app.core.excpetions import DebugTestException
+from src.app.core.excpetions import DebugTestException, MyBaseError
 
 
 class PlanCrud:
@@ -154,5 +154,5 @@ class PlanCrud:
             ).fetchall()
 
             return dict(list=[i._asdict() for i in results])
-        except DebugTestException as exc:
-            raise exc.message
+        except MyBaseError as exc:
+            raise exc

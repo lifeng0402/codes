@@ -85,6 +85,7 @@ class ReportCrud:
         :rtype: dict
         """
         try:
+
             # 计算成功率,四舍五入保留2位小数
             success_rate = round((total_succeed / total) * 100, 2)
 

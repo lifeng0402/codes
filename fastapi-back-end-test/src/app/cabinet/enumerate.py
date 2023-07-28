@@ -8,7 +8,7 @@
 """
 
 from typing import (
-    List, Dict, Text, Any
+    List, Dict, Text, Any, Union
 )
 from enum import Enum, unique
 
@@ -21,10 +21,12 @@ __all__ = [
     "Extractors",
     "ExpectedResult",
     "JsonData",
-    "FormData"
+    "FormData",
+    "Resp"
 ]
 
 
+Resp = Union[Any, Dict]
 JsonData = Dict[Text, Text]
 FormData = Dict[Text, Text]
 Headers = Dict[Text, Text]

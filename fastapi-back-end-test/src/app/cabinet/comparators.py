@@ -28,10 +28,4 @@ class Comparators:
         assert str(check_value) == str(expect_value), message
 
 
-if __name__ == "__main__":
-
-    comparators = Comparators
-
-    assert_result = getattr(comparators, "not_equal")
-
-    print(assert_result(1, 2))
+comparators = Comparators
