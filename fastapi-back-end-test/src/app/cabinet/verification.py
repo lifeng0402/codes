@@ -9,7 +9,8 @@
 
 
 import re
-from typing import AnyStr
+import json
+from typing import AnyStr, Any
 from verify_email import verify_email
 
 __all__ = [
@@ -60,3 +61,19 @@ class VerificationData:
             return False if (len(var.strip()) > max_len) or (len(var.strip()) < min_len) else True
         except Exception as exc:
             raise exc
+
+    @staticmethod
+    def verification_json(var: Any):
+        """
+        验证是不是json数据
+
+        :param var: 参数
+        :type var: Any
+        :return: 布尔型
+        :rtype: bool
+        """
+        try:
+            json.loads(var)
+            return True
+        except ValueError:
+            return False

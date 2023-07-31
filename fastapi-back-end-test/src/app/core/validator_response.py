@@ -90,10 +90,10 @@ class ResponseBase:
         :return: 返回一个字典
         :rtype: dict
         """
-        if not extractors:
-            return {}
-
         extract_mapping = {}
+
+        if not extractors:
+            return extract_mapping
 
         for key, field in extractors.items():
             field_value = self._search_jmespath(field)
@@ -136,21 +136,36 @@ if __name__ == "__main__":
         ]
     }
 
-    results = [
-        {
-            "check": "status_code",
-            "assert": "equal",
-            "expect": 200
+    results = {
+        "method": "GET",
+        "url": "{{lms3}}/manager/index/index/list",
+        "headers": {
+            "token": "2fa575e61ccf5fd7e47d233083d9a6ea",
+            "content_type": "application/json"
         },
-        {
-            "check": 201,
-            "assert": "equal",
-            "expect": 5552222
-        }
-    ]
+        "json_data": {
+            "a": 1,
+            "b": 2
+        },
+        "extract": {
+            "token": "username"
+        },
+        "checkout": [
+            {
+                "check": "Response.status_code",
+                "assert": "equal",
+                "expect": 200
+            },
+            {
+                "check": "Response.status_code",
+                "assert": "equal",
+                "expect": 200
+            }
+        ]
+    }
 
     resp = ResponseBase(response)
 
-    results = resp.validator(results)
+    results = resp.extract(results["extract"])
 
     print(results)

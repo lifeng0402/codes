@@ -8,7 +8,7 @@
 """
 
 from typing import (
-    List, Dict, Text, Any, Union
+    List, Dict, Text, Any, Union, Tuple
 )
 from enum import Enum, unique
 
@@ -32,8 +32,9 @@ FormData = Dict[Text, Text]
 Headers = Dict[Text, Text]
 Cookies = Dict[Text, Text]
 Checkout = List[Dict[Text, Text]]
-Extractors = List[Dict[Text, Text]]
+Extractors = Dict[Text, Text]
 ExpectedResult = Dict[Text, Text]
+TemplateData = Union[Any, Dict, Text, Tuple, List]
 
 
 @unique

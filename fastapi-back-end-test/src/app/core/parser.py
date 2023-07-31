@@ -7,9 +7,12 @@
 @说明: 
 """
 
+import json
 import typing as ty
+from jinja2 import Template
 from src.app.cabinet.comparators import comparators
 from src.app.core.excpetions import ParamsError
+from src.app.cabinet.verification import VerificationData
 
 __all__ = [
     "Parser"
@@ -89,3 +92,18 @@ class Parser:
             raise
 
         return getattr(comparators, function_name)
+
+    @staticmethod
+    def render(template: str, datas):
+        if not VerificationData.verification_json(template) or not isinstance(template, str):
+            raise
+
+        return Template(template).render(datas)
+
+
+if __name__ == "__main__":
+    c = Parser.render(
+        template="Hello world {{name}}",
+        datas={"name": "Jobs"}
+    )
+    print(c)
