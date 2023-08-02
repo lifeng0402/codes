@@ -20,80 +20,12 @@ from src.app.core.validator_response import ResponseBase
 
 class ExecuteCase:
 
-    @staticmethod
-    def get_report_record_data(db: Session, *, report_id: int):
-        """
-        根据report_id获取运行用例的具体情况
-        @param  :
-        @return  :
-        """
-        try:
-            # 获取详情数据并返回
-            return CrudReportRecord(db).report_record_detalis(report_id=report_id)
-        except DebugTestException as exc:
-            raise exc
+    def __init__(self, session: Session) -> None:
+        self._session = session
+        self._report = ReportCrud(self._session)
+        self._report_rd = CrudReportRecord(self._session)
 
-    @staticmethod
-    def insert_report_record_data(
-        db: Session, *, report_id: int, case_id: int, response: ty.Union[dict, str, None]
-    ):
-        """
-        往测试报告记录表中插入数据
-        根据report_id去查询测试报告记录表,然后返回数据
-
-        @param  :
-        @return  :
-        """
-        try:
-            # 生成数据
-            CrudReportRecord(db).insert_record(
-                response=response, report_id=report_id, case_id=case_id
-            )
-            return True
-        except DebugTestException as exc:
-            raise exc
-
-    @staticmethod
-    def update_report_data(
-        db: Session, *, report_id: int, total: int, total_succeed: int, total_defeated: int, total_error: int
-    ):
-        """
-        往测试报告表中更新指定report_id的数据
-        根据report_id去查询测试报告概况详情数据,然后返回数据
-        @param  :
-        @return  :
-        """
-        try:
-            report = ReportCrud(db)
-            # 更新指定测试报告的概况数据
-            result = report.update_report(
-                total=total, report_id=report_id,
-                total_succeed=total_succeed, total_defeated=total_defeated, total_error=total_error
-            )
-            # 提取report_id
-            report_id = result["report_id"]
-
-            # 获取详情数据并返回
-            return report.report_details(report_id=report_id)
-        except DebugTestException as exc:
-            raise exc
-
-    @staticmethod
-    def generate_report(db: Session):
-        """
-        往测试报告表中创建一条数据
-        @param  :
-        @return  :
-        """
-        try:
-            # 生成数据操作
-            results = ReportCrud(db).create_report()
-            return int(results["report_id"])
-        except DebugTestException as exc:
-            raise exc
-
-    @staticmethod
-    async def execute(results: ty.List[dict], db: Session):
+    async def execute(self, results: ty.List[dict]):
         """
         批量执行读取用例并发送请求
         @param  :
@@ -102,7 +34,8 @@ class ExecuteCase:
 
         try:
             # 生成一条报告数据
-            report_id = ExecuteCase.generate_report(db)
+            generate_report = self._report.create_report()
+            report_id = int(generate_report["report_id"])
 
             # 定义收集变量
             total, succeed, defeated, error = 0, 0, 0, 0
@@ -116,11 +49,12 @@ class ExecuteCase:
 
                 # 复制一个字典用于发送请求
                 copy_request_params = request_params.copy()
-                # 提取出要删除的key
-                keys_to_delete = ["id", "extract", "checkout"]
+
                 # 去除要删除的key, 生成一个新的字典用于发送请求
                 copy_request_params_handled = {
-                    key: value for key, value in copy_request_params.items() if key not in keys_to_delete
+                    key: value for key, value in copy_request_params.items() if key not in [
+                        "id", "extract", "checkout"
+                    ]
                 }
 
                 try:
@@ -141,31 +75,32 @@ class ExecuteCase:
                     else:
                         defeated += 1
 
-                    # 数据写入数据库
-                    ExecuteCase.insert_report_record_data(
-                        db, case_id=case_id,
-                        report_id=report_id,
-                        response=jsonable_encoder(response)
+                    # 数据插入数据库
+                    self._report_rd.insert_record(
+                        response=jsonable_encoder(response), report_id=report_id, case_id=case_id
                     )
                 except DebugTestException as error_info:
                     error += 1
-                    ExecuteCase.insert_report_record_data(
-                        db, case_id=case_id,
-                        report_id=report_id,
-                        response=f"{error_info.message}"
+                    self._report_rd.insert_record(
+                        response=f"{error_info.message}", report_id=report_id, case_id=case_id
                     )
 
                 total += 1
             else:
                 # 更新数据到指定测试报告
-                summarize = ExecuteCase.update_report_data(
-                    db, report_id=report_id, total=total,
+                self._report.update_report(
+                    total=total, report_id=report_id,
                     total_succeed=succeed, total_defeated=defeated, total_error=error
                 )
+
+                # 获取报告的概况信息
+                summarize = self._report.report_details(report_id=report_id)
+
                 # 获取测试报告记录表中的记录详情
-                running_results = ExecuteCase.get_report_record_data(
-                    db, report_id=report_id
+                running_results = CrudReportRecord(self._session).report_record_detalis(
+                    report_id=report_id
                 )
+
                 # 返回数据
                 return dict(summarize, details=running_results)
 
