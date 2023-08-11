@@ -1,17 +1,5 @@
-html,
-body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      background-image: url("../../images/lighthouse.jpg");
-      background-size: cover;
-      background-position: center;
-      background-repeat: repeat-x;
-}
-
-.login-form {
+.card {
       position: fixed;
-      bottom: 0;
-      right: 0;
-      transform: translate(-200%, -250%);
+      bottom: 500px;
+      right: 600px;
 }
