@@ -9,7 +9,8 @@
 
 from jose import (
     jwt,
-    JWTError
+    JWTError,
+    ExpiredSignatureError
 )
 from datetime import (
     timedelta,
@@ -75,6 +76,9 @@ class DependenciesProject:
 
             # 判断是否过期, 条件为真返回False,否则返回True
             return False if expiration_datetime < current_datetime else True
+        except ExpiredSignatureError:
+            # Redis读取的token是否过期
+            return False
         except Exception as exc:
             raise exc
 
@@ -91,7 +95,7 @@ class DependenciesProject:
             redis_key = f"access_token:{key_str}"
             # 从redis中读取token用于判断
             result_token = await redis_client.get(redis_key)
-
+            print(222, DependenciesProject.token_expiration(token=result_token))
             # 判断redis中是否存在token,token是否过期, token是不是None,如条件满足就写入
             if not await redis_client.exists(redis_key) or not result_token or not DependenciesProject.token_expiration(token=result_token):
                 if is_token:
@@ -143,4 +147,6 @@ class DependenciesProject:
 
 if __name__ == "__main__":
 
-    print(jwt.encode({"user_id": 222}, st.SECRET, algorithm=st.ALGORITHM))
+    print(DependenciesProject.token_expiration(
+        token="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZXhwIjoxNjkwNzA4ODU4fQ.8nsSsE6gwjC1J9XGF_zv2zbqsj6oMXkwE6dlozXiiWE"
+    ))
