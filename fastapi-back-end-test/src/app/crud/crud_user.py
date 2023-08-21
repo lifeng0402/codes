@@ -38,7 +38,25 @@ class UsersCrud:
         self.db = session
         self.hash = HashPassword()
 
-    def register(self, user: UseRregister):
+    @staticmethod
+    async def access_token(*, user_info: dict):
+        try:
+            # 定义一个用于存储redis中的值并赋值给redis_key
+            redis_key: str = f"{user_info['id']}"
+            # 加密token
+            token = await DependenciesProject.verify_token(
+                is_token=True, key_str=redis_key,
+                encry_param={k: v for k, v in user_info.items() if k == "id"}
+            )
+
+            # 返回结果
+            return dict(
+                user=Transition.proof_dict(user_info, condition="password"), token=token
+            )
+        except Exception as exc:
+            raise DebugTestException(message=exc)
+
+    async def register(self, user: UseRregister):
         """
         新建账号存入到数据库
 
@@ -52,39 +70,39 @@ class UsersCrud:
         :rtype: dict
         """
         try:
-
             # 验证账号长度
             if not VerificationData.verification_lenth(var=user.username):
-                raise DebugTestException(message="账号长度为5-25个字符...")
-
+                raise DebugTestException(message="账号长度为5-25个字符!")
             # 验证密码长度
             if not VerificationData.verification_lenth(var=user.password, max_len=25):
-                raise DebugTestException(message="密码长度为5-25个字符...")
+                raise DebugTestException(message="密码长度为5-25个字符!")
 
-            # 首先查询账号是否重复
-            user_info = self.db.execute(
-                select(self.u).where(self.u.username == user.username)
-            )
+            # 查询账号是否重复SQL
+            stmt = select(self.u.id, self.u.username, self.u.password).where(
+                self.u.username == user.username)
 
-            if user_info.scalars().first():
-                raise DebugTestException(message="账号已存在...")
+            # 判断账号是否存在
+            if self.db.execute(stmt).first():
+                raise DebugTestException("账号已注册!")
 
             # 对密码进行加密, 再赋值给password变量
             password = self.hash.get_password_hash(password=user.password)
-
             # 获取到数据并赋值给users_info变量
-            user_info = self.u(username=user.username, password=password)
+            user_data = self.u(username=user.username, password=password)
             # 往数据库添加数据
-            self.db.add(user_info)
+            self.db.add(user_data)
             # 往数据库提交数据
             self.db.commit()
             # 刷新提交的数据
-            self.db.refresh(user_info)
+            self.db.refresh(user_data)
 
-            return Transition.proof_dict(user_info.to_dict(), condition="password")
+            # 再次执行SQL并转成字典类型
+            user_info = self.db.execute(stmt).first()._asdict()
 
-        except DebugTestException as exc:
-            raise exc.message
+            return await UsersCrud.access_token(user_info=user_info)
+
+        except Exception as exc:
+            raise exc
 
     async def login(self, user: UsersLogin):
         """
@@ -99,43 +117,30 @@ class UsersCrud:
         :rtype: dict
         """
         try:
-            # 查询数据库的数据并转成字典格式
-            user_info = self.db.execute(
-                select(
-                    self.u.id,
-                    self.u.is_delete,
-                    self.u.username,
-                    self.u.password
-                ).where(
-                    self.u.username == user.username
-                )).first()._asdict()
+            # 查询数据SQL
+            stmt = select(self.u.id, self.u.username, self.u.password).where(
+                self.u.username == user.username)
+
+            # 执行SQL判断是否为真
+            if not self.db.execute(stmt).first():
+                raise DebugTestException(message="数据不存在或被删除!")
+
+            # # 执行SQL并查询的数据转成字典
+            user_info = self.db.execute(stmt).first()._asdict()
 
             # 字典中取出密码
             hashed_password = user_info["password"]
 
             # 密码进行解密校验, 条件不满足则抛出异常
             if not self.hash.verify_password(user.password, hashed_password):
-                raise DebugTestException(message="账号或密码错误...")
+                raise DebugTestException(message="账号或密码错误!")
 
-            # 定义一个用于存储redis中的值并赋值给redis_key
-            redis_key: str = f"{user_info['id']}"
+            return await UsersCrud.access_token(user_info=user_info)
 
-            access_token = await DependenciesProject.verify_token(
-                is_token=True, key_str=redis_key,
-                # 用户ID加密到Token中
-                encry_param={k: v for k, v in user_info.items() if k == "id"}
-            )
+        except Exception as exc:
+            raise exc
 
-            # 返回结果
-            return dict(
-                user=Transition.proof_dict(user_info, condition="password"),
-                token=access_token
-            )
-
-        except DebugTestException as exc:
-            raise exc.message
-
-    def change_password(self, user: UserChangePwd):
+    async def change_password(self, user: UserChangePwd):
         """
         根据所传参数加密后存入数据库中
 
@@ -163,7 +168,7 @@ class UsersCrud:
 
             # 对比密码是否一致
             if not self.hash.verify_password(user.password, changed_password):
-                raise DebugTestException(message="密码修改失败...")
+                raise DebugTestException(message="密码修改失败!")
 
             return dict(message="密码修改成功..")
 
@@ -186,13 +191,13 @@ class UsersCrud:
             await redis_client.delete(redis_key)
 
             if await redis_client.exists(redis_key):
-                raise DebugTestException(message="登出失败...")
+                raise DebugTestException(message="登出失败!")
 
-            return dict(message="退出成功..")
+            return dict(message="登出成功..")
         except DebugTestException as exc:
             raise exc.message
 
-    def sign_out(self, user_id: int):
+    async def sign_out(self, user_id: int):
         """
         根据用户ID从数据库中删除该用户
         再次查询是否删除成功
@@ -219,10 +224,10 @@ class UsersCrud:
 
             # 如果查询结果为真,就抛出异常
             if user_info:
-                raise DebugTestException(message="用户注销失败...")
+                raise DebugTestException(message="注销失败!")
 
             # 返回删除用户成功的数据
-            return dict(message="注销成功..")
+            return dict(message="注销成功!")
 
         except DebugTestException as exc:
             raise exc.message

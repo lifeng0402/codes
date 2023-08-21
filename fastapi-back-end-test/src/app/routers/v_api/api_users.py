@@ -39,7 +39,7 @@ async def user_register(users: UseRregister, db: Session = Depends(session)):
     :rtype: json
     """
     try:
-        response = UsersCrud(session=db).register(user=users)
+        response = await UsersCrud(session=db).register(user=users)
         return CodeResponse.succeed(data=response)
     except DebugTestException as e:
         return CodeResponse.defeated(err_msg=e.message)
@@ -58,6 +58,7 @@ async def user_login(users: UsersLogin, db: Session = Depends(session)):
     :rtype: json
     """
     try:
+        print(users,3333)
         response = await UsersCrud(session=db).login(user=users)
         return CodeResponse.succeed(data=response)
 
@@ -78,7 +79,7 @@ async def user_change_password(user: UserChangePwd, db: Session = Depends(sessio
     :rtype: json
     """
     try:
-        response = UsersCrud(session=db).change_password(user=user)
+        response = await UsersCrud(session=db).change_password(user=user)
         return CodeResponse.succeed(data=response)
 
     except DebugTestException as e:

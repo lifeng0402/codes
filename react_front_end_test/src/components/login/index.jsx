@@ -1,12 +1,14 @@
 import axios from 'axios';
 import React, { Component } from 'react';
 import { Button, Form, Input, Radio } from 'antd';
+import { useHistory } from 'react-router-dom';
 import "./index.css"
 
 
 export default class Login extends Component {
 
   from = React.createRef();
+
 
   state = {
     requiredMark: 'optional',
@@ -18,11 +20,11 @@ export default class Login extends Component {
 
   usernameChande = (e) => {
     this.setState({ "uesrname": e.target.value })
-  }
+  };
 
   passwordChande = (e) => {
     this.setState({ "password": e.target.value })
-  }
+  };
 
   onRequiredTypeChange = ({ requiredMarkValue }) => {
     this.setState({ "requiredMark": requiredMarkValue })
@@ -33,22 +35,29 @@ export default class Login extends Component {
   };
 
   handleSubmit = async () => {
-    const { username, password } = this.state;
+    const history = useHistory();
+    const { isLogin, uesrname, password } = this.state;
+
+    // 根据 isLogin 状态选择不同的接口路径
+    const url = isLogin ? 'http://127.0.0.1:8000/user/login' : 'http://127.0.0.1:8000/user/register';
+    // 请求参数
+    const data = { username: uesrname, password: password };
 
     try {
-      const response = await axios.post(
-        "http://127.0.0.1:8000/api/uesr/login", { username, password }
-      );
-      console.log(response)
+      const response = await axios.post(url, data);
+      console.log("成功：", response.data);
+      localStorage.setItem("token", response.data.data.token)
+      history.pusg('/home')
     } catch (error) {
-      this.setState({ "errorMessage": "账号或密码错误!" })
+      console.error("错误：", error.response.data);
+      this.setState({ errorMessage: error.response.data.message });
     }
   };
 
   render() {
 
     const { requiredMark, isLogin } = this.state;
-
+    console.log(this.state.uesrname)
     return (
       <div className='login'>
         <div className='card'>
@@ -57,8 +66,7 @@ export default class Login extends Component {
             <span>一套敏捷的测试用例管理平台</span>
           </div>
           <Form
-            form={this.form}
-            layout="vertical"
+            form={this.form} layout="vertical"
             initialValues={{ requiredMarkValue: requiredMark }}
             onValuesChange={this.onRequiredTypeChange} onFinish={this.handleSubmit}
           >

@@ -95,7 +95,6 @@ class DependenciesProject:
             redis_key = f"access_token:{key_str}"
             # 从redis中读取token用于判断
             result_token = await redis_client.get(redis_key)
-            print(222, DependenciesProject.token_expiration(token=result_token))
             # 判断redis中是否存在token,token是否过期, token是不是None,如条件满足就写入
             if not await redis_client.exists(redis_key) or not result_token or not DependenciesProject.token_expiration(token=result_token):
                 if is_token:
