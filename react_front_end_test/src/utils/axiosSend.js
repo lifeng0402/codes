@@ -1,5 +1,6 @@
 
 import axios from 'axios';
+import { JsonFunction } from 'react-router-dom';
 
 // 状态码错误信息
 const codeMessage = {
@@ -21,7 +22,34 @@ const codeMessage = {
 }
 
 
-export default function request(url, options) {
-      const opts = {}
-      opts.method = options !== undefined ? options.method : 'get'
+export default function request(url, opt) {
+      const options = {}
+      options.method = opt !== undefined ? opt.method : 'get'
+      axios.request()
+
+      if (opt) {
+            if (opt.body) {
+                  options.data = typeof opt.body === 'string' ? JSON.parse(opt.body) : opt.body
+            }
+            if (opt.params !== undefined) {
+                  url += '?'
+                  for (let key in opt.params) {
+                        if (opt.params[key] !== undefined && opt.params[key] !== '') {
+                              url = url + key + '=' + opt.params[key] + '&'
+                        }
+                  }
+                  url = url.substring(0, url.length - 1)
+            }
+      }
+      return axios({
+            url, ...options,
+      }).then(
+            response => {
+                  return { ...response.data }
+            }
+      ).catch(
+            error => {
+                  return { ...error.data }
+            }
+      )
 }

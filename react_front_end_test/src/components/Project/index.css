@@ -1,0 +1,33 @@
+.header-info {
+      display: flex;
+      align-items: center
+}
+
+.menu-info {
+      height: 100%;
+      border-right: 0;
+}
+
+.layout {
+      padding: 0 24px 24px;
+}
+
+.breadcrumb {
+      margin: 16px 0;
+}
+
+.content {
+      padding: 0 50px;
+}
+
+.container {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+}
+
+.footer-info {
+      text-align: center;
+      flex-shrink: 0;
+      margin-top: auto;
+}
