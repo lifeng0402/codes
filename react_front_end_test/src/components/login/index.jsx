@@ -1,14 +1,12 @@
 import axios from 'axios';
 import React, { Component } from 'react';
-import { Button, Form, Input, Radio } from 'antd';
-import { useHistory } from 'react-router-dom';
+import { Button, Form, Input, Radio, message } from 'antd';
 import "./index.css"
 
 
 export default class Login extends Component {
 
   from = React.createRef();
-
 
   state = {
     requiredMark: 'optional',
@@ -19,14 +17,14 @@ export default class Login extends Component {
   };
 
   usernameChande = (e) => {
-    this.setState({ "uesrname": e.target.value })
+    this.setState({ "username": e.target.value })
   };
 
   passwordChande = (e) => {
     this.setState({ "password": e.target.value })
   };
 
-  onRequiredTypeChange = ({ requiredMarkValue }) => {
+  onRequiredTypeChange = (requiredMarkValue) => {
     this.setState({ "requiredMark": requiredMarkValue })
   };
 
@@ -34,30 +32,41 @@ export default class Login extends Component {
     this.setState(preState => ({ isLogin: !preState.isLogin }));
   };
 
+  messageInfo = (msg) => {
+    message.info(msg);
+  };
+
   handleSubmit = async () => {
-    const history = useHistory();
-    const { isLogin, uesrname, password } = this.state;
+    const { isLogin, username, password } = this.state;
 
     // 根据 isLogin 状态选择不同的接口路径
     const url = isLogin ? 'http://127.0.0.1:8000/user/login' : 'http://127.0.0.1:8000/user/register';
     // 请求参数
-    const data = { username: uesrname, password: password };
+    const data = { username: username, password: password };
 
     try {
       const response = await axios.post(url, data);
-      console.log("成功：", response.data);
-      localStorage.setItem("token", response.data.data.token)
-      history.pusg('/home')
+
+      if (response && response.status === 200) {
+
+        if (response.data.status === 1) {
+          // 存储Token到本地
+          localStorage.setItem("token", response.data.data.token);
+        } else {
+          this.setState({ "errorMessage": response.data.err_msg });
+        };
+      };
+
     } catch (error) {
-      console.error("错误：", error.response.data);
-      this.setState({ errorMessage: error.response.data.message });
-    }
+      console.error("错误信息：", error.message);
+      this.setState({ "errorMessage": error.message });
+    };
   };
 
   render() {
+    const { requiredMark, isLogin, errorMessage } = this.state;
+    console.log(errorMessage)
 
-    const { requiredMark, isLogin } = this.state;
-    console.log(this.state.uesrname)
     return (
       <div className='login'>
         <div className='card'>
@@ -68,7 +77,7 @@ export default class Login extends Component {
           <Form
             form={this.form} layout="vertical"
             initialValues={{ requiredMarkValue: requiredMark }}
-            onValuesChange={this.onRequiredTypeChange} onFinish={this.handleSubmit}
+            onValuesChange={this.onRequiredTypeChange}
           >
             <Form.Item name="requiredMarkValue" requiredMark={requiredMark}
               onFinish={this.onFinish}>
@@ -88,7 +97,8 @@ export default class Login extends Component {
               <Input.Password onChange={this.passwordChande} placeholder="密码:" />
             </Form.Item>
             <Form.Item>
-              <Button className='loginButton' type="primary" htmlType="submit">
+              <Button className='loginButton' type="primary" htmlType="submit"
+                onClick={() => { this.handleSubmit(); this.messageInfo(errorMessage) }}>
                 {isLogin ? "登录" : "注册并登录"}
               </Button>
             </Form.Item>
