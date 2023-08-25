@@ -1,3 +1,7 @@
+html {
+      background-image: url("./images/lighthouse.jpg");
+}
+
 .card {
       position: absolute;
       top: 190px;

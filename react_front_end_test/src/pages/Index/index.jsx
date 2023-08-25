@@ -4,7 +4,7 @@ export default class Index extends Component {
       render() {
             return (
                   <div>
-                        Welcome to the home page
+                        Welcome to the home page.
                   </div>
             )
       }
