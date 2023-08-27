@@ -1,13 +1,13 @@
 import React from 'react';
 import { Breadcrumb, Layout, Menu, Button } from 'antd';
-import { NavLink, Route, Routes, Router } from 'react-router-dom';
-import Index from '../Index'
-import Cases from '../Cases'
-import Integration from '../Integration'
-import Report from '../Report'
-import Settings from '../Settings'
-import Interface from '../Interface'
-import Project from '../Project'
+import { NavLink, Route, Routes } from 'react-router-dom';
+import Index from '../Index';
+import Cases from '../Cases';
+import Integration from '../Integration';
+import Report from '../Report';
+import Settings from '../Settings';
+import Interface from '../Interface';
+import Project from '../Project';
 import HeaderTitle from '../../components/HeaderTitle';
 import './index.css'
 

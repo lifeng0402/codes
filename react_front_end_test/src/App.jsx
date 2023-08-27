@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Route, Routes } from 'react-router-dom';
 import Login from "./pages/Login";
 import Manage from './pages/Manage';
 import './App.css'
@@ -18,14 +19,18 @@ export default class App extends Component {
     ]
 
   }
+  isAuthenticated = true;
 
 
   render() {
     const { moduleNames } = this.state;
     return (
       <div>
-        <Manage moduleNames={moduleNames} />
-        {/* <Login /> */}
+        <Routes>
+          <Route path='/login'>
+            {this.isAuthenticated ? <Manage moduleNames={moduleNames} /> : <Login />}
+          </Route>
+        </Routes>
       </div>
     )
   }

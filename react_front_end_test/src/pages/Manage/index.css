@@ -9,7 +9,8 @@
 }
 
 .logout-btn {
-      justify-content: space-between;
+      position: absolute;
+      right: 68px;
 }
 
 .demo-sider {
