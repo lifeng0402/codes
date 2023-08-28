@@ -1,4 +1,4 @@
-import axios from 'axios';
+// import axios from 'axios';
 import React, { Component } from 'react';
 import { Button, Form, Input, Radio, message } from 'antd';
 import "./index.css"
@@ -37,31 +37,33 @@ export default class Login extends Component {
   };
 
   handleSubmit = async () => {
-    const { isLogin, username, password } = this.state;
+    // const { isLogin, username, password } = this.state;
 
     // 根据 isLogin 状态选择不同的接口路径
-    const url = isLogin ? 'http://127.0.0.1:8000/user/login' : 'http://127.0.0.1:8000/user/register';
+    // const url = isLogin ? 'http://127.0.0.1:8000/user/login' : 'http://127.0.0.1:8000/user/register';
     // 请求参数
-    const data = { username: username, password: password };
+    //   const data = { username: username, password: password };
 
-    try {
-      const response = await axios.post(url, data);
+    //   try {
+    //     const response = await axios.post(url, data);
 
-      if (response && response.status === 200) {
+    //     if (response && response.status === 200) {
 
-        if (response.data.status === 1) {
-          // 存储Token到本地
-          localStorage.setItem("token", response.data.data.token);
-        } else {
-          this.setState({ "errorMessage": response.data.err_msg });
-        };
-      };
+    //       if (response.data.status === 1) {
+    //         // 存储Token到本地
+    //         localStorage.setItem("token", response.data.data.token);
+    //       } else {
+    //         this.setState({ "errorMessage": response.data.err_msg });
+    //       };
+    //     };
 
-    } catch (error) {
-      console.error("错误信息：", error.message);
-      this.setState({ "errorMessage": error.message });
-    };
+    //   } catch (error) {
+    //     console.error("错误信息：", error.message);
+    //     this.setState({ "errorMessage": error.message });
+    //   };
+    this.setState({ isAuthenticated: true })
   };
+
 
   render() {
     const { requiredMark, isLogin, errorMessage } = this.state;

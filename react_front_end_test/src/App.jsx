@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
-import { Route, Routes } from 'react-router-dom';
-import Login from "./pages/Login";
-import Manage from './pages/Manage';
+import Layouts from './pages/Layouts';
 import './App.css'
 
 
@@ -16,21 +14,17 @@ export default class App extends Component {
       { key: '5', path: '/report', label: '测试报告' },
       { key: '6', path: '/continue', label: '持续集成' },
       { key: '7', path: '/setting', label: '系统设置' },
-    ]
-
+    ],
+    isAuthenticated: false
   }
-  isAuthenticated = true;
+
 
 
   render() {
-    const { moduleNames } = this.state;
+    // const { moduleNames, isAuthenticated } = this.state;
     return (
       <div>
-        <Routes>
-          <Route path='/login'>
-            {this.isAuthenticated ? <Manage moduleNames={moduleNames} /> : <Login />}
-          </Route>
-        </Routes>
+        <Layouts />
       </div>
     )
   }

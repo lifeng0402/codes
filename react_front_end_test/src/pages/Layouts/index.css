@@ -1,0 +1,25 @@
+.layout-app {
+      height: 80vh;
+      /* 设置高度为视口高度 */
+}
+
+.content-app {
+      height: calc(100% - 64px);
+      /* 将高度减去头部的高度，例如 64px */
+}
+
+.breadcrumb-item-app {
+      margin-left: 0.5%;
+}
+
+.layout-app {
+      display: flex;
+}
+
+.content-item-app>.sider-app {
+      flex-grow: 1;
+}
+
+.sider-app {
+      width: 100%;
+}

@@ -1,0 +1,28 @@
+.ttile {
+      display: flex;
+      align-items: center;
+}
+
+.title-logo {
+      font-size: larger;
+      color: red;
+}
+
+.title {
+      color: white;
+      display: flex;
+      align-items: center;
+}
+
+.title-name {
+      margin-left: 20px;
+}
+
+.title-logout {
+      margin-left: auto;
+}
+
+.content-info {
+      display: flex;
+      justify-content: flex-end;
+}

@@ -1,0 +1,14 @@
+.space-search {
+      margin-left: 5%;
+      margin-top: 1%;
+}
+
+.space-search input,
+.space-search .case-select-time {
+      height: 35px;
+}
+
+.space-search .ant-btn {
+      height: 35px;
+      width: 100px;
+}
