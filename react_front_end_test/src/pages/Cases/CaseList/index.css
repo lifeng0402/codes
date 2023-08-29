@@ -1,5 +1,12 @@
+.list-border {
+      border: 1px solid #ccc;
+      margin: 2% 5% 2%;
+      padding: 1%;
+}
+
 .divider-list {
       overflow: visible;
+      min-width: 200px;
 }
 
 .case-tile {
@@ -16,7 +23,25 @@
       height: 20px;
 }
 
+.list-div {
+      display: flex;
+}
+
 .list-item {
-      width: 300px;
-      height: 50px;
+      flex: 1;
+      height: 22px;
+      margin-left: 5%;
+}
+
+.list-button {
+      margin-right: 25px;
+}
+
+.edit-btn .del-btn {
+      height: 30px;
+}
+.list-pagination{
+      display: flex;
+      justify-content: flex-end;
+      margin-right: 5%;
 }

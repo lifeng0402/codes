@@ -3,7 +3,8 @@ import { Breadcrumb, Layout } from 'antd';
 import Menus from './Menus';
 import Footers from './Footers';
 import Headers from './Headers'
-import Cases from '../Cases';
+import CaseList from '../Cases/CaseList';
+import SearchTerms from '../Cases/SearchTerms'
 import './index.css'
 
 
@@ -24,7 +25,8 @@ export default class Layouts extends Component {
                                                 <Menus />
                                           </Layout.Sider>
                                           <Layout.Content className='content-item-app'>
-                                                <Cases />
+                                                <SearchTerms />
+                                                <CaseList />
                                           </Layout.Content>
                                     </Layout>
                               </Layout.Content>

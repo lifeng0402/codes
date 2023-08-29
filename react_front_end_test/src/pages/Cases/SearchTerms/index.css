@@ -1,6 +1,7 @@
 .space-search {
       margin-left: 5%;
       margin-top: 1%;
+      justify-content: space-between;
 }
 
 .space-search input,
@@ -11,4 +12,12 @@
 .space-search .ant-btn {
       height: 35px;
       width: 100px;
+}
+
+.select-btn {
+      margin-left: 80%;
+}
+
+.rest-btn {
+      margin-left: 110%;
 }
