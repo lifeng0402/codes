@@ -1,5 +1,6 @@
 // import axios from 'axios';
 import React, { Component } from 'react';
+import { Navigate } from 'react-router-dom'
 import { Button, Form, Input, Radio, message } from 'antd';
 import "./index.css"
 
@@ -13,10 +14,12 @@ export default class Login extends Component {
     isLogin: true, //初始化状态为登录
     username: "",
     password: "",
+    isLoggedIn: false,
     errorMessage: "",
   };
 
   usernameChande = (e) => {
+    console.log(555, e.target)
     this.setState({ "username": e.target.value })
   };
 
@@ -37,37 +40,31 @@ export default class Login extends Component {
   };
 
   handleSubmit = async () => {
-    // const { isLogin, username, password } = this.state;
 
-    // 根据 isLogin 状态选择不同的接口路径
-    // const url = isLogin ? 'http://127.0.0.1:8000/user/login' : 'http://127.0.0.1:8000/user/register';
-    // 请求参数
-    //   const data = { username: username, password: password };
+    const { username, password } = this.state;
 
-    //   try {
-    //     const response = await axios.post(url, data);
-
-    //     if (response && response.status === 200) {
-
-    //       if (response.data.status === 1) {
-    //         // 存储Token到本地
-    //         localStorage.setItem("token", response.data.data.token);
-    //       } else {
-    //         this.setState({ "errorMessage": response.data.err_msg });
-    //       };
-    //     };
-
-    //   } catch (error) {
-    //     console.error("错误信息：", error.message);
-    //     this.setState({ "errorMessage": error.message });
-    //   };
-    this.setState({ isAuthenticated: true })
+    console.log(username, password)
+    if (username === 'debugfeng' && password === 'debugfeng') {
+      console.log('登录成功!')
+      // 更新登录成功的状态
+      this.setState({ isLoggedIn: true });
+      // 回调函数,更新登录状态
+      this.props.onAuthenticated(true);
+    } else {
+      console.log('登录失败!')
+      message.error('账号或密码错误!')
+    }
   };
 
-
   render() {
-    const { requiredMark, isLogin, errorMessage } = this.state;
-    console.log(errorMessage)
+    const { requiredMark, isLogin, isLoggedIn, errorMessage } = this.state;
+
+    // 判断登录成功进入首页
+    if (isLoggedIn) {
+      return (
+        <Navigate to='/home' />
+      )
+    }
 
     return (
       <div className='login'>
@@ -99,8 +96,7 @@ export default class Login extends Component {
               <Input.Password onChange={this.passwordChande} placeholder="密码:" />
             </Form.Item>
             <Form.Item>
-              <Button className='loginButton' type="primary" htmlType="submit"
-                onClick={() => { this.handleSubmit(); this.messageInfo(errorMessage) }}>
+              <Button className='loginButton' type="primary" htmlType="submit" onClick={this.handleSubmit}>
                 {isLogin ? "登录" : "注册并登录"}
               </Button>
             </Form.Item>

@@ -4,17 +4,18 @@
 }
 
 .title-logo {
-      font-size: larger;
+      font-size:200%;
       color: red;
+      margin-top: -1.2%;
 }
 
 .title {
-      color: white;
       display: flex;
       align-items: center;
 }
 
 .title-name {
+      color: white;
       margin-left: 20px;
 }
 

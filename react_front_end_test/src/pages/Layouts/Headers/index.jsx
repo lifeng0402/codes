@@ -5,6 +5,11 @@ import './index.css'
 
 
 export default class HeaderTitle extends Component {
+
+      handleLogout = () => {
+            this.props.onLogout();
+      }
+
       render() {
             return (
                   <div>
@@ -14,10 +19,10 @@ export default class HeaderTitle extends Component {
                                           <MediumOutlined rotate={0} />
                                     </Space>
                               </div>
-                              <div className='title-name'>Debugfeng用例测试管理平台</div>
+                              <div className='title-name'>Debugfeng用例管理测试平台</div>
                               <div className='title-logout'>
                                     <Space wrap>
-                                          <Button className='logout-btn' type='primary'>退出登录</Button>
+                                          <Button className='logout-btn' type='primary' onClick={this.handleLogout}>退出登录</Button>
                                     </Space>
                               </div>
                         </Layout.Header>

@@ -1,25 +1,21 @@
-.layout-app {
-      height: 80vh;
-      /* 设置高度为视口高度 */
+.layout-sider {
+      width: 200px;
 }
 
-.content-app {
-      height: calc(100% - 64px);
-      /* 将高度减去头部的高度，例如 64px */
+.layout {
+      padding: 0 24px 24px;
 }
 
-.breadcrumb-item-app {
-      margin-left: 0.5%;
+.layout-breadcrumb {
+      margin: 16px 0;
 }
 
-.layout-app {
-      display: flex;
+.layout-content {
+      padding: 24px;
+      margin: 0px;
+      min-height: 280px;
 }
 
-.content-item-app>.sider-app {
-      flex-grow: 1;
-}
-
-.sider-app {
-      width: 100%;
+.layout-footer {
+      text-align: center;
 }

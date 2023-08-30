@@ -1,6 +1,5 @@
 .space-search {
-      margin-left: 5%;
-      margin-top: 1%;
+      margin: 0 5%;
       justify-content: space-between;
 }
 
@@ -9,15 +8,19 @@
       height: 35px;
 }
 
-.space-search .ant-btn {
-      height: 35px;
-      width: 100px;
+.case-name {
+      width: 400px;
+}
+
+.case-create,
+.case-select-time {
+      width: 300px;
 }
 
 .select-btn {
-      margin-left: 80%;
+      margin-left: -20%;
 }
 
 .rest-btn {
-      margin-left: 110%;
+      margin-left: 10%;
 }
