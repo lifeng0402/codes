@@ -14,8 +14,7 @@ export default class Login extends Component {
     isLogin: true, //初始化状态为登录
     username: "",
     password: "",
-    isLoggedIn: false,
-    errorMessage: "",
+    isLoggedIn: false
   };
 
   usernameChande = (e) => {
@@ -35,9 +34,6 @@ export default class Login extends Component {
     this.setState(preState => ({ isLogin: !preState.isLogin }));
   };
 
-  messageInfo = (msg) => {
-    message.info(msg);
-  };
 
   handleSubmit = async () => {
 
@@ -52,12 +48,12 @@ export default class Login extends Component {
       this.props.onAuthenticated(true);
     } else {
       console.log('登录失败!')
-      message.error('账号或密码错误!')
+      message.info('账号或密码错误!')
     }
   };
 
   render() {
-    const { requiredMark, isLogin, isLoggedIn, errorMessage } = this.state;
+    const { requiredMark, isLogin, isLoggedIn } = this.state;
 
     // 判断登录成功进入首页
     if (isLoggedIn) {

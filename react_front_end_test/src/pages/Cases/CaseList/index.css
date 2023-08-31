@@ -1,5 +1,9 @@
-.list-root{
+.list-root {
       margin: 1% 5%;
+}
+
+.case-modal-root {
+      overflow: hidden;
 }
 
 .create-btn {
@@ -53,6 +57,23 @@
       justify-content: flex-end;
       margin: 1% 5%;
 }
-.list-item-title{
+
+.list-item-title {
       font-weight: bold;
+}
+
+/* antd原生className名称 */
+.ant-modal-content {
+      width: 1050px;
+      height: 800px;
+      overflow: hidden;
+}
+
+.dialog-container {
+      margin: -2% 16% 1% 0;
+      overflow: hidden;
+}
+
+.dialog-content {
+      /* 添加对话框内容样式 */
 }

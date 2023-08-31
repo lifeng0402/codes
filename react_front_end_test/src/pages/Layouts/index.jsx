@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Breadcrumb, Layout } from 'antd';
 import { Routes, Route } from 'react-router-dom'
+import { AppstoreOutlined } from '@ant-design/icons'
 import Menus from './Menus';
 import Headers from './Headers'
 import Cases from '../Cases';
@@ -10,8 +11,21 @@ import './index.css'
 
 export default class Layouts extends Component {
 
+      state = {
+            modules: [
+                  { key: '1', path: '/home', label: '首页', icon: <AppstoreOutlined /> },
+                  { key: '2', path: '/test', label: '接口测试', icon: <AppstoreOutlined /> },
+                  { key: '3', path: '/project', label: '项目管理', icon: <AppstoreOutlined /> },
+                  { key: '4', path: '/cases', label: '用例管理', icon: <AppstoreOutlined /> },
+                  { key: '5', path: '/report', label: '测试报告', icon: <AppstoreOutlined /> },
+                  { key: '6', path: '/continue', label: '持续集成', icon: <AppstoreOutlined /> },
+                  { key: '7', path: '/setting', label: '系统设置', icon: <AppstoreOutlined /> },
+            ],
+      }
+
       render() {
-            const { modules, caseList, onLogout } = this.props;
+            const { modules } = this.state;
+            const { onLogout } = this.props; //从父组件中获取回调方法
             return (
                   <div>
                         <Layout>
@@ -29,7 +43,7 @@ export default class Layouts extends Component {
                                           />
                                           <Layout.Content className='layout-content'>
                                                 <Routes>
-                                                      <Route path='/cases' element={<Cases caseList={caseList} />} />
+                                                      <Route path='/cases' element={<Cases />} />
                                                       <Route path='/home' element={<Index />} />
                                                 </Routes>
                                           </Layout.Content>

@@ -6,6 +6,7 @@ import './index.css'
 
 export default class HeaderTitle extends Component {
 
+      // 退出登录,回调方法修改登录后记录的状态
       handleLogout = () => {
             this.props.onLogout();
       }
