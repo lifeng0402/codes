@@ -1,5 +1,7 @@
 import React, { Component } from 'react'
 import { Select, Input, Tabs, Descriptions, Button } from 'antd';
+import ParamsHeaders from './ParamsHeaders';
+import BodyRequest from './BodyRequest'
 
 
 export default class CaseCreate extends Component {
@@ -27,18 +29,28 @@ export default class CaseCreate extends Component {
             tabs: [
                   {
                         key: '1',
-                        label: `Tab 1`,
-                        children: `Content of Tab Pane 1`,
+                        label: `Params`,
+                        children: <ParamsHeaders />,
                   },
                   {
                         key: '2',
-                        label: `Tab 2`,
-                        children: `Content of Tab Pane 2`,
+                        label: `Headers`,
+                        children: <ParamsHeaders />,
                   },
                   {
                         key: '3',
-                        label: `Tab 3`,
-                        children: `Content of Tab Pane 3`,
+                        label: `Body`,
+                        children: <BodyRequest />,
+                  },
+                  {
+                        key: '4',
+                        label: `Pre-request Script`,
+                        children: `Content of Tab Pane 4`,
+                  },
+                  {
+                        key: '5',
+                        label: `Test`,
+                        children: `Content of Tab Pane 5`,
                   },
             ],
             descriptions: [

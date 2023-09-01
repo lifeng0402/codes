@@ -1,0 +1,7 @@
+.description-div {
+      display: flex;
+      align-items: center
+}
+.description-input{
+      margin-right: 8px;
+}

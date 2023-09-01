@@ -1,0 +1,8 @@
+.request-key {
+      display: flex;
+      align-items: center;
+}
+
+.request-checkbox {
+      margin-right: 10px;
+}
