@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { Tabs, Select, Input } from 'antd';
 import ParamsHeaders from '../ParamsHeaders';
-import { tab } from '@testing-library/user-event/dist/tab';
 
 
 export default class BodyRequest extends Component {
