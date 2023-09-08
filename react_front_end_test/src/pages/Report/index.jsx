@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Space, Table } from 'antd';
+import { Space, Table, Button, Popconfirm, message } from 'antd';
 import { Link } from 'react-router-dom'
 
 
@@ -37,6 +37,17 @@ export default class Report extends Component {
                   },
             ]
       }
+
+      confirm = (e) => {
+            console.log(e);
+            message.success('Click on Yes');
+      };
+
+      cancel = (e) => {
+            console.log(e);
+            message.error('Click on No');
+      };
+
       render() {
             const { data } = this.state;
             return (
@@ -54,7 +65,16 @@ export default class Report extends Component {
                                     render={() => (
                                           <Space size="middle">
                                                 <Link to='/report/details'>查看详情</Link>
-                                                <a>删除报告</a>
+                                                <Popconfirm
+                                                      title="Delete the task"
+                                                      description="Are you sure to delete this task?"
+                                                      onConfirm={this.confirm}
+                                                      onCancel={this.cancel}
+                                                      okText="确定"
+                                                      cancelText="取消"
+                                                >
+                                                      <Button type="link" block>删除报告</Button>
+                                                </Popconfirm>
                                           </Space>
                                     )}
                               />
