@@ -1,47 +1,34 @@
 import React, { Component } from 'react'
 import { Collapse, Button, Table } from 'antd';
+import Plan from './Plan';
+import LabelShow from './LabelShow';
+import './index.css'
 
 
 export default class Project extends Component {
 
-      onChange = (key) => { console.log(key) };
+      state = {
+            items: [
+                  {
+                        key: '1',
+                        label: <LabelShow />,
+                        children: <Plan />
+                  },
+                  {
+                        key: '2',
+                        label: <LabelShow />,
+                        children: <Plan />
+                  }
+            ]
+      }
 
       render() {
+            const { items } = this.state;
+
             return (
                   <div>
-                        <Collapse accordion items={[{
-                              key: '1',
-                              label: <div>
-                                    <p>33333333333333333</p>
-                                    <Button>运行按钮</Button>
-                              </div>,
-                              children: <div>
-                                    <Table columns={[
-                                          {
-                                                title: 'Name',
-                                                dataIndex: 'name',
-                                                key: 'name',
-                                          },
-                                          {
-                                                title: 'Age',
-                                                dataIndex: 'age',
-                                                key: 'age',
-                                          },
-                                          {
-                                                title: 'Address',
-                                                dataIndex: 'address',
-                                                key: 'address',
-                                          },
-                                          {
-                                                title: 'Action',
-                                                dataIndex: 'action',
-                                                key: 'address',
-                                          }
-                                    ]}></Table>
-                                    <p>{555555}</p>
-                                    <Button>子任务运行按钮</Button>
-                              </div>,
-                        }]} />
+                        <Button type="primary" className='new-project'>新增测试项目</Button>
+                        <Collapse accordion items={items} />
                   </div>
             )
       }

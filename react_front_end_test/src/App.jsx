@@ -25,7 +25,7 @@ export default class App extends Component {
     const { isAuthenticated } = this.state;
 
     return (
-      <div>
+      <div className='app'>
         <Routes>
           <Route path='/login' element={<Login onAuthenticated={this.updateIsAuthenticated} />} />
         </Routes>

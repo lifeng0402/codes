@@ -1,0 +1,33 @@
+.container {
+      /* 保持一行显示 */
+      display: flex;
+      justify-content: space-between;
+}
+
+.project-text {
+      /* 保持不换行 */
+      white-space: nowrap;
+      /* 隐藏 */
+      overflow: hidden;
+      /* 显示...样式 */
+      text-overflow: ellipsis;
+      width: 60%;
+}
+
+.build-env {
+      /* 固定位置 */
+      position: absolute;
+      top: 15%;
+      left: 70%;
+      width: 30%;
+}
+
+.build-btn {
+      position: absolute;
+      top: 15%;
+      right: 8%;
+}
+
+.select-input {
+      width: 120px;
+}

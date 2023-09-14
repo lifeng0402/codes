@@ -1,3 +1,7 @@
+.container-layout {
+      height: calc(100% - 88px);
+}
+
 .layout-sider {
       width: 200px;
 }

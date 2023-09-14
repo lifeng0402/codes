@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Select, Input, Tabs, Descriptions, Button } from 'antd';
 import ParamsHeaders from './ParamsHeaders';
 import BodyRequest from './BodyRequest'
+import './index.css'
 
 
 export default class CaseCreate extends Component {
@@ -11,14 +12,6 @@ export default class CaseCreate extends Component {
                   {
                         value: 'jack',
                         label: 'Jack',
-                  },
-                  {
-                        value: 'lucy',
-                        label: 'Lucy',
-                  },
-                  {
-                        value: 'Yiminghe',
-                        label: 'yiminghe',
                   },
                   {
                         value: 'disabled',
@@ -83,17 +76,15 @@ export default class CaseCreate extends Component {
       render() {
             const { items, tabs, descriptions } = this.state;
             return (
-                  <div className="dialog-content">
-                        <Select defaultValue="" style={{ width: 120, }} onChange={this.handleChange} options={items} />
-                        <Input placeholder="Basic usage" />
+                  <div>
+                        <div className='request'>
+                              <Select className='request-method' defaultValue="" onChange={this.handleChange} options={items} />
+                              <Input className='request-url' placeholder="https:https://debugfeng.com" />
+                        </div>
                         <Tabs defaultActiveKey="1" items={tabs} onChange={this.onChange} />
                         <Descriptions title='Response' bordered items={descriptions} />
                         <Button>保存</Button>
                         <Button>清空</Button>
-                        {/* 对话框的内容 */}
-                        {/* <p>some contents...</p>
-                        <p>some contents...</p>
-                        <p>some contents...</p> */}
                   </div>
             )
       }
