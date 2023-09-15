@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Table, Input } from 'antd';
-import RequestKey from '../../../../../components/RequestKey';
-import Description from '../../../../../components/Description';
+import RequestKey from '../../RequestKey';
+import Description from '../../Description';
 
 
 export default class ParamsHeaders extends Component {

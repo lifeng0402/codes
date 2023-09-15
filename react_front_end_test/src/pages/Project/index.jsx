@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Collapse, Button, Table } from 'antd';
+import { Collapse, Button } from 'antd';
 import Plan from './Plan';
 import LabelShow from './LabelShow';
 import './index.css'

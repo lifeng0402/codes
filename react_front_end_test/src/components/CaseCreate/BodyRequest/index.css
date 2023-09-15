@@ -1,0 +1,12 @@
+.params-method {
+      width: 105px;
+      overflow: hidden;
+      white-space: nowrap;
+}
+
+
+.input-raw,
+.input-binary,
+.input-graphql {
+      height: 120px;
+}

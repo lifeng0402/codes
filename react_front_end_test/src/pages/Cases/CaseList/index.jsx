@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
-import { Button, Modal } from 'antd'
-import { List, Pagination } from 'antd';
-import CaseCreate from './CaseCreate';
+import { List, Pagination, Button, Modal } from 'antd';
+import CaseCreate from '../../../components/CaseCreate';
 import './index.css'
 
 
@@ -9,6 +8,7 @@ export default class CaseList extends Component {
 
       state = {
             isModalOpen: false,   //是否显示新增用例页面
+            isButton: true, //隐藏Send按钮
             caseList: [
                   {
                         title: 'Racing car spanese princess to wed commoner.Japanese princess to wed commoner.Australian walks 100km after outback crash.',
@@ -38,7 +38,7 @@ export default class CaseList extends Component {
       };
 
       render() {
-            const { caseList, isModalOpen } = this.state;
+            const { caseList, isModalOpen, isButton } = this.state;
 
             return (
                   <div>
@@ -47,7 +47,11 @@ export default class CaseList extends Component {
                               wrapClassName="dialog-container" // 添加类名
                         >
                               <div className="dialog-content">
-                                    <CaseCreate />
+                                    <CaseCreate isButton={isButton} />
+                              </div>
+                              <div>
+                                    <Button className='case-save' type="primary">保存</Button>
+                                    <Button className='case-clear' type="primary">清空</Button>
                               </div>
                         </Modal>
                         <div className='list-root'>

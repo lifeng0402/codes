@@ -73,3 +73,10 @@
       margin: -2% 16% 1% 0;
       overflow: hidden;
 }
+
+.case-save,
+.case-clear {
+      float: right;
+      margin-left: 10px;
+      margin-top: 25%;
+}

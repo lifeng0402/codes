@@ -8,6 +8,7 @@ import Cases from '../Cases';
 import Index from '../Index';
 import Report from '../Report';
 import Project from '../Project';
+import Interface from '../Interface';
 import ReportDetails from '../Report/Details';
 import './index.css'
 
@@ -50,6 +51,7 @@ export default class Layouts extends Component {
                                                       <Route path='/home' element={<Index />} />
                                                       <Route path='/project' element={<Project />} />
                                                       <Route path='/report' element={<Report />} />
+                                                      <Route path='/test' element={<Interface />} />
                                                       <Route path='/report/details' element={<ReportDetails />} />
                                                 </Routes>
                                           </Layout.Content>

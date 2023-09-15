@@ -1,0 +1,25 @@
+.request {
+      display: flex;
+}
+
+.request-method {
+      width: 10%;
+}
+
+.request-url {
+      left: 1%;
+      width: 80%;
+      height: auto;
+}
+
+.request-btn {
+      left: 2%;
+      width: 90px;
+}
+
+.parameters{
+      margin-top: 1%;
+}
+.input-response{
+      height: 120px;
+}
